@@ -1,0 +1,43 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "google-auth-library": "^9.15.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.4",
+    "multer": "^1.4.5-lts.1",
+    "path": "^0.12.7"
+  },
+  "name": "nodejs_site",
+  "description": "<h1 align=\"center\">This is the V2 of my base of site </h1>",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests/api_tester.js",
+    "run-test": "concurrently --kill-others \"npm run start\" \"npm run test\"",
+    "dev": "nodemon index.js",
+    "lint": "eslint .",
+    "lintfix": "eslint --fix .",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "express",
+    "nodejs",
+    "javascript",
+    "mongodb",
+    "auth",
+    "cookie"
+  ],
+  "author": "ciremia",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "concurrently": "^9.0.0",
+    "eslint": "^9.9.1",
+    "globals": "^15.9.0",
+    "nodemon": "^3.1.4"
+  }
+}
