@@ -127,7 +127,7 @@ For detailed information about the project, please visit the [Documentation](doc
 
 ## 🔗 Contributions
 
-For contribution guidelines and setup instructions, please refer to the [Contributing Guide](docs/contributing.md). 🙌
+For contribution guidelines and setup instructions, please refer to the [Contributing Guide](docs/CONTRIBUTING.md). 🙌
 
 ---
 
