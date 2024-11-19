@@ -49,6 +49,7 @@ This project uses the following technologies:
 - **MongoDB** for the database ![MongoDB Logo](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
 - **ReactJS** for the web front-end ![React Logo](https://img.shields.io/badge/ReactJS-61DAFB?logo=react&logoColor=white)
 - **Flutter** for the mobile client ![Flutter Logo](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)
+- **Azure** for the hosting ![Azure Logo](https://img.shields.io/badge/Azure-0078D4?logo=azure&logoColor=white)
 
 ---
 
@@ -132,8 +133,8 @@ For contribution guidelines and setup instructions, please refer to the [Contrib
 
 ## ✨ Authors
 
-- [Aymeric Rouyer](#https://github.com/aimericdrk)
-- [Julien Renard](#https://github.com/Neiluge)
-- [Baptiste Moreau](#https://github.com/BxptisteM)
-- [Klayni Milandou](#https://github.com/Klayni)
+- [Aymeric Rouyer](https://github.com/aimericdrk)
+- [Julien Renard](https://github.com/Neiluge)
+- [Baptiste Moreau](https://github.com/BxptisteM)
+- [Klayni Milandou](https://github.com/Klayni)
 
