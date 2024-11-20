@@ -133,7 +133,7 @@ For contribution guidelines and setup instructions, please refer to the [Contrib
 
 ## ✨ Authors
 
-- [Aymeric Rouyer](https://github.com/aimericdrk)
+- [Aimeric Rouyer](https://github.com/aimericdrk)
 - [Julien Renard](https://github.com/Neiluge)
 - [Baptiste Moreau](https://github.com/BxptisteM)
 - [Klayni Milandou](https://github.com/Klayni)
