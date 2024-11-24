@@ -86,5 +86,42 @@ By choosing Express.js for this project:
 2. **Great flexibility** allows adapting the application to the project's specific needs.
 3. **Avoidance of unnecessary complexity** ensures an efficient and lean development process.
 
+# **Database Choice Justification: MongoDB**
+
+## **Arguments for MongoDB**
+
+### **1. Ease of Use**
+- **Flexible Schema Management**: MongoDB makes it simple to handle flexible data schemas. In our case, actions and reactions can differ for each user. With MongoDB, managing flexible schemas is straightforward, allowing each user's document to contain specific structures based on their chosen configuration.
+
+---
+
+### **2. Fast Setup**
+- **Quick to Implement**: MongoDB is easy to set up and does not require a rigid schema from the start. This accelerates the initial development phase, making it easier to adjust data structures frequently at the beginning of the project.
+- **Flexibility for Evolution**: MongoDB allows adding new services, fields, or structures without the need for complex or time-consuming migrations.
+
+---
+
+### **3. Scalability**
+- **Highly Scalable**: MongoDB is designed to handle large volumes of data and high traffic spikes without significant performance loss, unlike traditional SQL databases.
+
+---
+
+### **4. Simplified Relationships**
+- **Embedded Data**: MongoDB allows data to be embedded within the same document, simplifying queries and improving performance.
+- **Example**: A `user` collection can store all configurations for a user's actions and reactions in a single document, avoiding complex joins.
+
+---
+
+### **5. Seamless Integration with Node.js**
+- **Mongoose**: MongoDB integrates well with Node.js, with tools like Mongoose facilitating data manipulation and providing a robust interface for database operations.
+
+---
+
+## **Conclusion**
+MongoDB is an ideal choice for this project because it:
+1. Handles **dynamic and evolving data** effortlessly.
+2. Enables **rapid development** with a flexible database structure.
+3. Offers **scalability** while maintaining performance for simple queries.
+
 # **Front Stack Choice Justification**
 # **Mobile Stack Choice Justification**
