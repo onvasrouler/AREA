@@ -124,4 +124,65 @@ MongoDB is an ideal choice for this project because it:
 3. Offers **scalability** while maintaining performance for simple queries.
 
 # **Front Stack Choice Justification**
+
 # **Mobile Stack Choice Justification**
+
+## **1. Performance**
+
+### **Flutter**
+
+- **Own graphical motor**: Flutter uses its own graphical engine called Skia. Composant are drawn directly so it improves performance.
+
+### **Comparison with React Native**
+
+- **React Native**: React Native is based on bridges to communicate between Javascript code and native components. It can create latency.
+
+---
+
+## **2. Exportation**
+
+### **Flutter**
+
+- **Custom components**: Flutter creates and manages ist own components. There is no difference between web widgets and Android widgets.
+- **Unique code**: With just a simple codebase, you can deploy your Flutter application on iOS, Android, Linux, Windows and web.
+
+### **Comparison with React Native**
+
+- **React Native** React Native uses native component so there could be different between two platform.
+- **React Native** There is no advanced solution for exportation exept for iOS, web and Android.
+
+---
+
+## **3. Community and Ecosystem**
+
+### **Flutter**
+
+- **Mature Ecosystem**: Flutter provides all you need to create an application. there aren't many dependencies making the project management easier.
+- **Extensive Support**: Abundant documentation and online resources make it easy to find solutions for common problems.
+
+### **Comparison with React Native**
+
+- **React Native** React Native is based on many different librairies. The maintenance and compatibility between platforms is more complicated.
+- **React Native** Sometimes, you must add new dependencies to solve common problems.
+
+---
+
+## **4. Test policy**
+
+- **Integrated tools**: Unlike React Native, Flutter provides tools to test different widgets or the application logic
+- **Continious view**: With its performant hot reload, Flutter can draw in real time the application
+
+### **Comparison with React Native**
+
+- **React Native** React Native also has a hot realod fonctiun but it is slower than Flutter's.
+- **React Native** You need external tools if you want to test your application with React Native.
+
+---
+
+## **Conclusion**
+
+By choosing Flutter for this project:
+
+1. **Drawing performance** are prioritized.
+2. **Great flexibility** allows adapting the application to the project's specific needs.
+3. **Avoidance of unnecessary dependencies** ensures an efficient and lean development process.
