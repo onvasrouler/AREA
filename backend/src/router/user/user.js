@@ -71,10 +71,12 @@ exports.register = async (req, res) => {
             .then(() => { // if the email is sent
                 return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
             }).catch((err) => {
+                console.error(err);
                 return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
             });
 
     }).catch((err) => {
+        console.error(err);
         return api_formatter(req, res, 500, "error", "Error while registering", null, err, null);
     });
     } catch (err) {
@@ -126,14 +128,17 @@ exports.verifyregister = async (req, res) => {
                 });
                 return return_signed_cookies(req, res, sessionRegistered, userRegistered); // return the signed cookies
             }).catch(async (err) => { // if an error occured while creating the session
+                console.error(err);
                 return api_formatter(req, res, 500, "error", "Error while creating session", null, err, null);
             })
         }).catch(async (err) => { // if an error occured while saving the user
+            console.error(err);
             await delete_user_account(tmpUserRegister); // delete the user account
             return api_formatter(req, res, 500, "error", "Error while activating the account", null, err, null);
         });
 
     } catch (err) { // if an error occured while verifying the email
+        console.error(err);
         await delete_user_account(tmpUserRegister);
         return api_formatter(req, res, 500, "error", "Error while verifying email", null, err, null);
     }
@@ -186,6 +191,7 @@ exports.login = async (req, res) => {
                 });
                 return return_signed_cookies(req, res, newSession, userToLogin, "login successful"); // return the signed cookies
             }).catch(async (err) => { // if an error occured while creating the session
+                console.error(err);
                 return api_formatter(req, res, 500, "error", "Error while creating session", null, err, null);
             });
         }).catch(async (err) => { // if an error occured while finding the user
@@ -319,6 +325,7 @@ exports.deleteaccount = async (req, res) => {
             }).then(() => { // if the email is sent
                 return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
             }).catch((err) => {
+                console.error(err);
                 return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
             });
     } catch (err) { // if an error occured while trying to delete the account
@@ -379,12 +386,14 @@ exports.profilepicture = async (req, res) => {
 
             profilePicture.mv(uploadPath, function(err) { // move the file
                 if (err) { // if an error occured while uploading the file
+                    console.error(err);
                     return api_formatter(req, res, 500, "error", "Error while uploading file", null, err, null, req.user.username); // return an error message
                 }
 
                 if (oldPath != null && oldPath != uploadPath) // if there is an old path
                     fs.unlink(oldPath , (err) => { // delete the old file
                         if (err) { // if an error occured while deleting the old file
+                            console.error(err);
                             console.error("error while deleting old file: " + err);
                         }
                     });
@@ -393,11 +402,13 @@ exports.profilepicture = async (req, res) => {
                 req.user.save().then((data) => { // save the user
                     return api_formatter(req, res, 200, "success", "File uploaded successfully", { fileName: uniqueFileName }, null, null, req.user.username); // return a success message
                 }).catch((err) => { // if an error occured while saving the user
+                    console.error(err);
                     return api_formatter(req, res, 500, "error", "Error while saving file path", null, err, null, req.user.username);
                 });
             });
         }
     } catch (err) { // if an error occured while uploading the file
+        console.error(err);
         return api_formatter(req, res, 500, "error", "Error while uploading file", null, err, null, req.user.username);
     }
 }
@@ -414,6 +425,7 @@ exports.getprofilepicture = async (req, res) => {
             return res.sendFile(req.user.profilePicturePath); // send the profile picture
         }
     } catch (err) { // if an error occured while getting the file
+        console.error(err);
         return api_formatter(req, res, 500, "error", "Error while getting file", null, err, null, req.user.username);
     }
 }
@@ -429,17 +441,20 @@ exports.deleteprofilepicture = async (req, res) => {
                 return api_formatter(req, res, 404, "notfound", "no profile picture found", null, null, null, req.user.username); // return an error message
             fs.unlink(req.user.profilePicturePath, (err) => { // delete the file
                 if (err) {
+                    console.error(err);
                     return api_formatter(req, res, 500, "error", "Error while deleting file", null, err, null, req.user.username); // return an error message
                 }
                 req.user.profilePicturePath = ""; // set the profile picture path to null
                 req.user.save().then((data) => { // save the user
                     return api_formatter(req, res, 200, "success", "File deleted successfully", null, null, null, req.user.username); // return a success message
                 }).catch((err) => { // if an error occured while saving the user
+                    console.error(err);
                     return api_formatter(req, res, 500, "error", "Error while saving file path", null, err, null, req.user.username); // return an error message
                 });
             });
         }
     } catch (err) { // if an error occured while deleting the file
+        console.error(err);
         return api_formatter(req, res, 500, "error", "Error while deleting file", null, err, null, req.user.username);
     }
 }
@@ -466,6 +481,7 @@ exports.getsessions = async (req, res) => {
 
         return api_formatter(req, res, 200, "success", "sessions found", formattedSessionList, null, null, req.user.username); // return a success message
     } catch (err) { // if an error occured while getting the sessions
+        console.error(err);
         return api_formatter(req, res, 500, "error", "Error while getting sessions", null, err, null, req.user.username); // return an error message
     }
 }
@@ -482,6 +498,7 @@ exports.deletesessions = async (req, res) => {
         await SessionModel.deleteMany({ user_signed_id: req.user.unique_id, signed_id: { $in: sessionsIds } }); // delete the sessions
         return api_formatter(req, res, 200, "success", `${sessionsIds} deleted successfully`, null, null, null, req.user.username); // return a success message
     } catch (err) { // if an error occured while deleting the sessions
+        console.error(err);
         return api_formatter(req, res, 500, "error", "Error while deleting sessions", null, err, null, req.user.username);
     }
 }
@@ -510,9 +527,11 @@ exports.forgotpassword = async (req, res) => {
             .then(() => { // if the email is sent
                 return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
             }).catch((err) => { // if an error occured while sending the email
+                console.error(err);
                 return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
             });
     } catch (err) { // if an error occured while trying to init the forgot password function
+        console.error(err);
         return api_formatter(req, res, 500, "error", "Error while trying to init the forgot password function", null, err, null); // return an error message
     }
 }
@@ -545,9 +564,11 @@ exports.resetpassword = async (req, res) => {
             await passwordResetToken.deleteOne(); // delete the token
             return api_formatter(req, res, 200, "success", "password reset successfully", null, null, null); // return a success message
         }).catch((err) => { // if an error occured while saving the user
+            console.error(err);
             return api_formatter(req, res, 500, "error", "Error while resetting password", null, err, null);  // return an error message
         });
     } catch (err) { // if an error occured while resetting the password
+        console.error(err);
         return api_formatter(req, res, 500, "error", "Error while resetting password", null, err, null);
     }
 }
