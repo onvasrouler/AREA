@@ -1,6 +1,6 @@
 
 
-module.exports = function sendApiData(
+module.exports = function sendApiData( // this function will be used to send the data to the client in a specific format
     req,
     res,
     status = 404,
