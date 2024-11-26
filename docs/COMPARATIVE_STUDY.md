@@ -269,3 +269,8 @@ By choosing Flutter for this project:
 1. **Drawing performance** are prioritized.
 2. **Great flexibility** allows adapting the application to the project's specific needs.
 3. **Avoidance of unnecessary dependencies** ensures an efficient and lean development process.
+
+
+# **Global Conclusion**
+
+By combining Express.js for the backend, MongoDB as the database, React.js for the frontend, and Flutter for mobile development, we have a stack that enables us to work efficiently while retaining great flexibility. This choice guarantees us a simple structure, optimized performance, and a real capacity to evolve with the project. It's clearly adapted to moving forward quickly, avoiding unnecessary complexity, and taking advantage of the synergies between these technologies. We've got everything we need to make this project a solid, coherent success.
