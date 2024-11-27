@@ -465,6 +465,8 @@ exports.profilepicture = async (req, res) => {
             const fileExtension = path.extname(profilePicture.name); // get the file extension
             const uniqueFileName = `${req.user.unique_id}_${crypto.randomUUID()}${fileExtension}`; // create a unique file name
         
+            if (!fs.existsSync(path.join(__dirname, '../../storage/')))
+                fs.mkdirSync(path.join(__dirname, '../../storage/'));
             const uploadPath = path.join(__dirname, '../../storage/', req.user.unique_id + '_' + uniqueFileName ); // create the upload path
 
             profilePicture.mv(uploadPath, function(err) { // move the file
