@@ -17,11 +17,6 @@ app.use(fileUpload()); // this will allow the backend to parse files
 app.use(express.urlencoded({ extended: true, limit: "50mb" })); // this will allow the backend to parse urlencoded data
 app.use(morgan('combined')); // this will log the requests
 
-app.use((req, res, next) => {
-    console.log(`Request from ${req.ip} : ${req.method} ${req.originalUrl}`); // this will log the request
-    next();
-});
-
 app.use(function (req, res, next) { // this will allow the frontend to communicate with the backend
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");

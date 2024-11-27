@@ -5,7 +5,7 @@ const test_request = require("./tests.js");
 
 let test_session = null;
 
-test("POST /register", async () => {
+test("POST /fastregister", async () => {
     console.log("registering in");
 
     const responseBody = await test_request.postRegister(process.env.TEST_EMAIL, process.env.TEST_USERNAME, process.env.TEST_PASSWORD);
@@ -123,7 +123,7 @@ test("POST /login", async () => {
         console.log(responseBody);
 });
 
-test("DELETE /profile", async () => {
+test("DELETE /fastprofile", async () => {
     console.log("deleting the account");
 
     const responseBody = await test_request.deleteAccount(test_session, process.env.TEST_PASSWORD);

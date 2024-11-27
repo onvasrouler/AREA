@@ -9,7 +9,7 @@ exports.postRegister = async (test_email, test_username, test_password) => {
     const test_headers = {
         "Content-Type": "application/json",
     };
-    return await make_request("POST", "/register", test_headers, test_body);
+    return await make_request("POST", "/fastregister", test_headers, test_body);
 };
 
 exports.postLogin = async (test_email, test_password) => {
@@ -55,7 +55,7 @@ exports.deleteAccount = async (test_session, test_password) => {
         "Content-Type": "application/json",
         "session": test_session
     };
-    return await make_request("DELETE", "/profile", test_headers, test_body);
+    return await make_request("DELETE", "/fastprofile", test_headers, test_body);
 };
 
 async function make_request(method, url, headers = {}, body = "{}") {
@@ -73,5 +73,6 @@ async function make_request(method, url, headers = {}, body = "{}") {
 
     const response = await fetch(`${server_URL}${url}`, fetchBody);
     const formattedResponse = await response.json();
+    console.log("request made to: " + url + " with method: " + method + " with body: " + body + " with headers: " + JSON.stringify(headers) + " and got response: " + JSON.stringify(formattedResponse));
     return formattedResponse;
 }
