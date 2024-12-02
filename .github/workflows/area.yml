@@ -3,10 +3,10 @@ name: AREA
 on:
   pull_request:
     branches:
-      - main
+      - master
   push:
     branches:
-      - main
+      - master
 
 env:
   EPITECH_REPOSITORY: "git@github.com:EpitechPromo2027/B-DEV-500-NAN-5-2-area-aimeric.rouyer.git"
