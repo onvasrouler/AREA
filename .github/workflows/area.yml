@@ -1,0 +1,133 @@
+name: AREA
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+env:
+  EPITECH_REPOSITORY: "git@github.com:EpitechPromo2027/B-DEV-500-NAN-5-2-area-aimeric.rouyer.git"
+  WIKI_URL: "https://${{ secrets.GH_TOKEN }}@github.com/onvasrouler/AREA/wiki.git"
+
+
+jobs:
+
+# Frontend
+  frontend:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [21.x]
+
+    steps:
+      - name: Setup actions
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: frontend
+
+      - name: Run lint
+        run: npm run lint
+        working-directory: front
+
+      - name: Run build
+        run: npm run build
+        working-directory: front
+
+# Backend
+  backend:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [21.x]
+
+    steps:
+      - name: Setup actions
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: back
+
+      - name: Run lint
+        run: npm run lint
+        working-directory: back
+
+      - name: Run build
+        run: npm run build
+        working-directory: back
+
+# Deploy documentation
+  deploy-documentation:
+    runs-on: ubuntu-latest
+    needs:
+      - frontend
+      - backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure Wiki access
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git clone "$WIKI_URL" wiki
+
+      - name: Deploy documentation to Wiki
+        run: |
+          rm -rf wiki/*
+          cp -r docs/* wiki/
+          cp README.md wiki/Home.md
+
+      - name: Check for changes
+        id: changes
+        run: |
+          cd wiki
+          git add .
+          if git diff-index --quiet HEAD; then
+            echo "No changes to commit"
+            echo "skip=true" >> $GITHUB_ENV
+          else
+            echo "Changes detected"
+            echo "skip=false" >> $GITHUB_ENV
+          fi
+
+      - name: Push changes to Wiki
+        if: env.skip == 'false'
+        run: |
+          cd wiki
+          git commit -m "Update Wiki documentation"
+          git push
+
+# Mirroring
+  mirroring:
+    runs-on: ubuntu-latest
+    needs:
+      - frontend
+      - backend
+      - deploy-documentation
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url:
+            ${{ env.EPITECH_REPOSITORY_LINK }}
+          ssh_private_key:
+            ${{ secrets.SSH_PRIVATE_KEY }}
