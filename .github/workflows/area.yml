@@ -69,9 +69,13 @@ jobs:
         run: npm run lint
         working-directory: back
 
+      # ADD A JOB FOR THE TESTS
+
       - name: Run build
         run: npm run build
         working-directory: back
+
+# ADD A MOBILE JOB
 
 # Deploy documentation
   deploy-documentation:
@@ -120,6 +124,7 @@ jobs:
     needs:
       - frontend
       - backend
+      # ADD MOBILE JOB
       - deploy-documentation
     steps:
       - uses: actions/checkout@v4
@@ -131,3 +136,5 @@ jobs:
             ${{ env.EPITECH_REPOSITORY_LINK }}
           ssh_private_key:
             ${{ secrets.SSH_PRIVATE_KEY }}
+
+# ADD ANSIBLE JOB
