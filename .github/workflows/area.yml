@@ -14,7 +14,6 @@ env:
 
 
 jobs:
-
 # Frontend
   frontend:
     runs-on: ubuntu-latest
