@@ -130,7 +130,7 @@ jobs:
       - uses: pixta-dev/repository-mirroring-action@v1
         with:
           target_repo_url:
-            ${{ env.EPITECH_REPOSITORY_LINK }}
+            ${{ env.EPITECH_REPOSITORY }}
           ssh_private_key:
             ${{ secrets.SSH_PRIVATE_KEY }}
 
