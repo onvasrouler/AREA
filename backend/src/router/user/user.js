@@ -36,58 +36,58 @@ const createToken = async (userId, type, expiresInMinutes) => {
 exports.fastregister = async (req, res) => {
     if (req.user && req.user != null) // if the user is already logged in
         return api_formatter(req, res, 401, "unauthorised", "You can't register when logged in"); // return an error message
-        var tmpUserRegister = null; // this will be used to store the user that was registered
-        try {
-            const register_data = { // put the data in a variable to avoid repeating the same code
-                "email": req.body.email,
-                "password": req.body.password,
-                "username": req.body.username,
-                "ip": req.headers["x-forwarded-for"] || req.connection.remoteAddress,
-            };
-            if (await check_json_data(register_data)) // check if one data is missing
-                return api_formatter(req, res, 400, "missing_informations", "some of the information were not provided", null, null, null); // return an error message
-            if (await UserModel.emailExists(register_data.email)) // check if the email already exist
-                return api_formatter(req, res, 400, "email_already_exist", "an account with the provided email already exist", null, null, null); // return an error message
-            if (await UserModel.usernameExists(register_data.username)) // check if the username already exist
-                return api_formatter(req, res, 400, "username_already_exist", "an account with the provided username already exist", null, null, null); // return an error message
-    
-            await new UserModel({ // create a new user
-                email: register_data.email,
-                username: register_data.username,
-                password: register_data.password,
-                creationIp: register_data.ip,
-                emailVerified: true
-            }).save().then(async function (userRegistered) {
-                tmpUserRegister = userRegistered; // set the user that was registered
-                await new SessionModel({
-                    unique_session_id: crypto.randomUUID(), // set the unique session id
-                    signed_id: crypto.randomUUID(), // set the signed id
-                    user_signed_id: userRegistered.unique_id, // link it with the user id
-                    connexionIp: register_data.ip, // set the IP
-                    session_type: "default", // set the session type
-                    user_agent: req.headers["user-agent"], // set the user agent
-                    expire: Date.now() + month, // set the expiration date
-                }).save().then(async function (sessionRegistered) { // if the session is created
-                    await userRegistered.updateOne({ // update the user
-                        $addToSet: {
-                            link_session_id: sessionRegistered.signed_id
-                        }
-                    });
-                    return return_signed_cookies(req, res, sessionRegistered, userRegistered); // return the signed cookies
-                }).catch(async (err) => { // if an error occured while creating the session
-                    console.error(err);
-                    return api_formatter(req, res, 500, "error", "Error while creating session", null, err, null);
+    var tmpUserRegister = null; // this will be used to store the user that was registered
+    try {
+        const register_data = { // put the data in a variable to avoid repeating the same code
+            "email": req.body.email,
+            "password": req.body.password,
+            "username": req.body.username,
+            "ip": req.headers["x-forwarded-for"] || req.connection.remoteAddress,
+        };
+        if (await check_json_data(register_data)) // check if one data is missing
+            return api_formatter(req, res, 400, "missing_informations", "some of the information were not provided", null, null, null); // return an error message
+        if (await UserModel.emailExists(register_data.email)) // check if the email already exist
+            return api_formatter(req, res, 400, "email_already_exist", "an account with the provided email already exist", null, null, null); // return an error message
+        if (await UserModel.usernameExists(register_data.username)) // check if the username already exist
+            return api_formatter(req, res, 400, "username_already_exist", "an account with the provided username already exist", null, null, null); // return an error message
+
+        await new UserModel({ // create a new user
+            email: register_data.email,
+            username: register_data.username,
+            password: register_data.password,
+            creationIp: register_data.ip,
+            emailVerified: true
+        }).save().then(async function (userRegistered) {
+            tmpUserRegister = userRegistered; // set the user that was registered
+            await new SessionModel({
+                unique_session_id: crypto.randomUUID(), // set the unique session id
+                signed_id: crypto.randomUUID(), // set the signed id
+                user_signed_id: userRegistered.unique_id, // link it with the user id
+                connexionIp: register_data.ip, // set the IP
+                session_type: "default", // set the session type
+                user_agent: req.headers["user-agent"], // set the user agent
+                expire: Date.now() + month, // set the expiration date
+            }).save().then(async function (sessionRegistered) { // if the session is created
+                await userRegistered.updateOne({ // update the user
+                    $addToSet: {
+                        link_session_id: sessionRegistered.signed_id
+                    }
                 });
-            }).catch(async (err) => { // if an error occured while registering
+                return return_signed_cookies(req, res, sessionRegistered, userRegistered); // return the signed cookies
+            }).catch(async (err) => { // if an error occured while creating the session
                 console.error(err);
-                await delete_user_account(tmpUserRegister); // delete the user account
-                return api_formatter(req, res, 500, "error", "Error while registering", null, err, null);
+                return api_formatter(req, res, 500, "error", "Error while creating session", null, err, null);
             });
-        } catch (err) { // if an error occured while trying to register
+        }).catch(async (err) => { // if an error occured while registering
             console.error(err);
-            await delete_user_account(tmpUserRegister);
-            return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err, null);
-        }
+            await delete_user_account(tmpUserRegister); // delete the user account
+            return api_formatter(req, res, 500, "error", "Error while registering", null, err, null);
+        });
+    } catch (err) { // if an error occured while trying to register
+        console.error(err);
+        await delete_user_account(tmpUserRegister);
+        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err, null);
+    }
 };
 
 // Register a new user
@@ -114,8 +114,8 @@ exports.register = async (req, res) => {
             creationIp: register_data.ip
         }).save().then(async () => { // if the user is created
             const confirmationToken = await createToken(user.unique_id, "emailVerification", 15); // create the email verification token
-        
-            const verifyUrl = `${process.env.SERVER_URL}/verify/${confirmationToken}`; // create the verification url
+
+            const verifyUrl = `${process.env.FRONT_URL}register/verify/${confirmationToken}`; // create the verification url
             const mailContent = `<p>Thank you for registering on our platform.</p>
             <p>Please click on the following link, or paste this into your browser to verify your email:</p>
             <a href="${verifyUrl}" target="_blank">${verifyUrl}</a>\n\n
@@ -124,18 +124,19 @@ exports.register = async (req, res) => {
             await mailSender({ // send the email
                 to: user.email,
                 subject: "Email Verification",
-                html: mailContent})
-            .then(() => { // if the email is sent
-                return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
-            }).catch((err) => {
-                console.error(err);
-                return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
-            });
+                html: mailContent
+            })
+                .then(() => { // if the email is sent
+                    return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
+                }).catch((err) => {
+                    console.error(err);
+                    return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
+                });
 
-    }).catch((err) => {
-        console.error(err);
-        return api_formatter(req, res, 500, "error", "Error while registering", null, err, null);
-    });
+        }).catch((err) => {
+            console.error(err);
+            return api_formatter(req, res, 500, "error", "Error while registering", null, err, null);
+        });
     } catch (err) {
         console.error(err);
         return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err, null);
@@ -168,7 +169,7 @@ exports.verifyregister = async (req, res) => {
         await user.save().then(async function (userRegistered) { // save the user
             await emailVerificationToken.deleteOne(); // delete the token
             tmpUserRegister = userRegistered; // set the user that was registered
-    
+
             await new SessionModel({ // create a new session
                 unique_session_id: crypto.randomUUID(), // set the unique session id
                 signed_id: crypto.randomUUID(), // set the signed id
@@ -179,7 +180,7 @@ exports.verifyregister = async (req, res) => {
                 expire: Date.now() + month,
             }).save().then(async function (sessionRegistered) {
                 await userRegistered.updateOne({ // update the user
-                    $addToSet: { 
+                    $addToSet: {
                         link_session_id: sessionRegistered.signed_id // add the session id to the link_session_id field
                     }
                 });
@@ -214,8 +215,8 @@ exports.login = async (req, res) => {
         }; // put the data in a variable to avoid repeating the same code
         if (await check_json_data(login_data)) // check if one data is missing
             return api_formatter(req, res, 400, "missing_informations", "some of the information were not provided"); // return an error message
-        
-        
+
+
         await UserModel.findOne({ // find the user in the database
             $or: [
                 {
@@ -238,7 +239,7 @@ exports.login = async (req, res) => {
                 connexionIp: login_data.ip,
                 expire: Date.now() + month,
                 user_agent: req.headers["user-agent"],
-                session_type: "default", 
+                session_type: "default",
             }).save().then(async function (newSession) { // if the session is created
                 tmpSessuion = newSession;
                 await userToLogin.updateOne({ // update the user
@@ -395,22 +396,22 @@ exports.deleteaccount = async (req, res) => {
 
         const deleteAccountToken = await createToken(user.unique_id, "emailVerification", 15); // create the email verification token
 
-            const deleteUrl = `${process.env.SERVER_URL}/delete/${deleteAccountToken}`; // create the delete url
-            const mailContent = `<p>You are receiving this because you (or someone else) have requested the deletion of your account.</p>
+        const deleteUrl = `${process.env.FRONT_URL}profile/delete/${deleteAccountToken}`; // create the delete url
+        const mailContent = `<p>You are receiving this because you (or someone else) have requested the deletion of your account.</p>
             <p>Please click on the following link, or paste this into your browser to complete the process:</p>
             <a href="${deleteUrl}" target="_blank">${deleteUrl}</a>\n\n
             <p>If you did not request this, please ignore this email and your account will remain unchanged.</p>`; // create the mail content
 
-            await mailSender({ // send the email
-                to: req.user.email,
-                subject: "Account Deletion",
-                html: mailContent
-            }).then(() => { // if the email is sent
-                return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
-            }).catch((err) => {
-                console.error(err);
-                return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
-            });
+        await mailSender({ // send the email
+            to: req.user.email,
+            subject: "Account Deletion",
+            html: mailContent
+        }).then(() => { // if the email is sent
+            return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
+        }).catch((err) => {
+            console.error(err);
+            return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
+        });
     } catch (err) { // if an error occured while trying to delete the account
         console.error(err);
         return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to delete the account", null, err, null);
@@ -464,25 +465,25 @@ exports.profilepicture = async (req, res) => {
             const oldPath = req.user.profilePicturePath; // get the old path
             const fileExtension = path.extname(profilePicture.name); // get the file extension
             const uniqueFileName = `${req.user.unique_id}_${crypto.randomUUID()}${fileExtension}`; // create a unique file name
-        
+
             if (!fs.existsSync(path.join(__dirname, '../../storage/')))
                 fs.mkdirSync(path.join(__dirname, '../../storage/'));
-            const uploadPath = path.join(__dirname, '../../storage/', req.user.unique_id + '_' + uniqueFileName ); // create the upload path
+            const uploadPath = path.join(__dirname, '../../storage/', req.user.unique_id + '_' + uniqueFileName); // create the upload path
 
-            profilePicture.mv(uploadPath, function(err) { // move the file
+            profilePicture.mv(uploadPath, function (err) { // move the file
                 if (err) { // if an error occured while uploading the file
                     console.error(err);
                     return api_formatter(req, res, 500, "error", "Error while uploading file", null, err, null, req.user.username); // return an error message
                 }
 
                 if (oldPath != null && oldPath != uploadPath) // if there is an old path
-                    fs.unlink(oldPath , (err) => { // delete the old file
+                    fs.unlink(oldPath, (err) => { // delete the old file
                         if (err) { // if an error occured while deleting the old file
                             console.error(err);
                             console.error("error while deleting old file: " + err);
                         }
                     });
-                    
+
                 req.user.profilePicturePath = uploadPath; // set the profile picture path
                 req.user.save().then((data) => { // save the user
                     return api_formatter(req, res, 200, "success", "File uploaded successfully", { fileName: uniqueFileName }, null, null, req.user.username); // return a success message
@@ -599,16 +600,17 @@ exports.forgotpassword = async (req, res) => {
             return api_formatter(req, res, 404, "notfound", "no user found with the provided email", null, null, null); // return an error message
 
         const resetToken = await createToken(user.unique_id, "emailVerification", 15);
-            const resetUrl = `${process.env.SERVER_URL}/reset/${resetToken}`; // create the reset url
-            const mailContent = `<p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
-            <p>Please click on the following link, or paste this into your browser to complete the process:</p>
-            <a href="${resetUrl}" target="_blank">${resetUrl}</a>\n\n
-            <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`; // create the mail content
+        const resetUrl = `${process.env.FRONT_URL}/resetpassword/${resetToken}`; // create the reset url
+        const mailContent = `<p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
+        <p>Please click on the following link, or paste this into your browser to complete the process:</p>
+        <a href="${resetUrl}" target="_blank">${resetUrl}</a>\n\n
+        <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`; // create the mail content
 
-            await mailSender({ // send the email
-                to: user.email,
-                subject: "Password Reset",
-                html: mailContent})
+        await mailSender({ // send the email
+            to: user.email,
+            subject: "Password Reset",
+            html: mailContent
+        })
             .then(() => { // if the email is sent
                 return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
             }).catch((err) => { // if an error occured while sending the email
@@ -632,7 +634,7 @@ exports.resetpassword = async (req, res) => {
             token: hashedToken,
             expiresAt: { $gt: Date.now() },
             type: "resetPassword"
-          });
+        });
 
         if (!passwordResetToken) // if the token is not found
             return api_formatter(req, res, 404, "notfound", "the provided token doesn't exist or is expired", null, null, null); // return an error message
