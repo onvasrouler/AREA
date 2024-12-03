@@ -10,7 +10,7 @@ on:
 
 env:
   EPITECH_REPOSITORY: "git@github.com:EpitechPromo2027/B-DEV-500-NAN-5-2-area-aimeric.rouyer.git"
-  WIKI_URL: "https://${{ secrets.GH_TOKEN }}@github.com/onvasrouler/AREA/wiki.git"
+  WIKI_URL: "https://${{ secrets.GH_TOKEN }}@github.com/onvasrouler/AREA.wiki.git"
 
 permissions:
   contents: write
