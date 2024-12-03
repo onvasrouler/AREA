@@ -39,6 +39,25 @@ exports.postLogout = async (test_session) => {
     return await make_request("POST", "/logout", test_headers);
 };
 
+exports.getSessions = async (test_session) => {
+    const test_headers = {
+        "Content-Type": "application/json",
+        "session": test_session
+    };
+    return await make_request("GET", "/sessions", test_headers);
+}
+
+exports.deleteSessions = async (test_session, sessions_ids) => {
+    const test_headers = {
+        "Content-Type": "application/json",
+        "session": test_session,
+    };
+    const test_body = JSON.stringify({
+        "sessionsIds": sessions_ids
+    });
+    return await make_request("DELETE", "/sessions", test_headers, test_body);
+}
+
 exports.postLogoutEverywhere = async (test_session) => {
     const test_headers = {
         "Content-Type": "application/json",
