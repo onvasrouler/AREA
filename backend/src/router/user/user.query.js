@@ -1,6 +1,6 @@
 const useractions = require("./user.js");
 const checkAuthenticated = require("../../middleware/auth.js");
-const enableTestEndpoint = process.env.ENABLE_TEST_ENDPOINT == "true"
+const enableTestEndpoint = process.env.ENABLE_TEST_ENDPOINT == "true";
 
 module.exports = function (app) {
     if (enableTestEndpoint)

@@ -98,10 +98,10 @@ async function delete_user_account(User) {
 const mailSender = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user: process.env.EMAILER_EMAIL,
-      pass: process.env.EMAILER_PASSWORD,
+        user: process.env.EMAILER_EMAIL,
+        pass: process.env.EMAILER_PASSWORD,
     },
-  });
+});
 
 module.exports = {
     return_signed_cookies,

@@ -1,7 +1,6 @@
 const { mainDB } = require("../mongo");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
     unique_id: { // this is the user id that will be used to identify the user we don't use _id to avoid security issues

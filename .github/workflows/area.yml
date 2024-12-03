@@ -64,17 +64,17 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: back
+        working-directory: backend
 
       - name: Run lint
         run: npm run lint
-        working-directory: back
+        working-directory: backend
 
       # ADD A JOB FOR THE TESTS
 
       - name: Run build
         run: npm run build
-        working-directory: back
+        working-directory: backend
 
 # ADD A MOBILE JOB
 

@@ -45,7 +45,7 @@ exports.getSessions = async (test_session) => {
         "session": test_session
     };
     return await make_request("GET", "/sessions", test_headers);
-}
+};
 
 exports.deleteSessions = async (test_session, sessions_ids) => {
     const test_headers = {
@@ -56,7 +56,7 @@ exports.deleteSessions = async (test_session, sessions_ids) => {
         "sessionsIds": sessions_ids
     });
     return await make_request("DELETE", "/sessions", test_headers, test_body);
-}
+};
 
 exports.postLogoutEverywhere = async (test_session) => {
     const test_headers = {
