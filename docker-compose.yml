@@ -1,6 +1,14 @@
 name: area
 
 services:
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
   application-server:
     build:
       context: backend/
@@ -9,6 +17,10 @@ services:
     volumes:
       - ./backend:/app
     command: npm start
+    environment:
+      MONGO_URI: mongodb://mongo:27017/area-db
+    depends_on:
+      - mongo
 
   # mobile-client:
   #   build:
@@ -31,3 +43,4 @@ services:
 
 volumes:
   shared-volume:
+  mongo-data:
