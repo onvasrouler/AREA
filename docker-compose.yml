@@ -1,21 +1,21 @@
-name: AREA
+name: area
 
 services:
   application-server:
     build:
-      context: back/
+      context: backend/
     ports:
       - "8080:8080"
     volumes:
-      - ./back:/app
+      - ./backend:/app
     command: npm start
 
-  mobile-client:
-    build:
-      context: mobile/
-    volumes:
-      - shared-volume:/shared
-    - command: ????
+  # mobile-client:
+  #   build:
+  #     context: mobile/
+  #   volumes:
+  #     - shared-volume:/shared
+  #   - command: ????
 
   web-client:
     build:
@@ -23,11 +23,11 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - client_mobile
-      - server
+      # - mobile-client
+      - application-server
     volumes:
       - shared-volume:/shared
-    command: npm start
+    command: npm run dev
 
 volumes:
   shared-volume:
