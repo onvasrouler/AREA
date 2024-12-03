@@ -72,10 +72,6 @@ jobs:
 
       # ADD A JOB FOR THE TESTS
 
-      - name: Run build
-        run: npm run build
-        working-directory: backend
-
 # ADD A MOBILE JOB
 
 # Deploy documentation
