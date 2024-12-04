@@ -22,6 +22,7 @@ import React, {
 
         if (token) {
           try {
+            // Change to use the /session endpoint, add a comparison to find if the given token is in the list of valid tokens returned by the /session endpoint
             const response = await apiClient.get("/auth/validate-token", {
               Authorization: `Bearer ${token}`,
             });
