@@ -255,6 +255,18 @@ export function LoginPage() {
               <Button type="submit" className="w-full">
                 {isLogin ? "Login" : "Sign Up"}
               </Button>
+              <Button
+                type="button"
+                className="w-full flex items-center justify-center"
+                onClick={() => handleOAuthLogin("google")}
+              >
+                <img
+                  src="src/assets/google.png"
+                  alt="Google logo"
+                  className="w-5 h-5 mr-2"
+                />
+                {isLogin ? "Login with Google" : "Sign Up with Google"}
+              </Button>
             </form>
           </Form>
         </CardContent>
