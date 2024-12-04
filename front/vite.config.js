@@ -12,7 +12,10 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"), // Suppression du "/" devant "src"
+      "@": path.resolve(__dirname, "/src"),
+      "@components": path.resolve(__dirname, "./src/components"),
+      "@features": path.resolve(__dirname, "./src/features"),
     },
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },
 });
