@@ -1,5 +1,6 @@
 'use client'
 
+import AreaLogo from "../../assets/AREA.png"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -154,14 +155,14 @@ export function LoginPage() {
       <CardHeader className="space-y-4">
         <div className="flex flex-col items-center space-y-2">
           <img
-            src="/assets/AREA.png"
+            src={AreaLogo}
             alt="AREA Logo"
-            className="w-20 h-20 rounded-full"
+            className="w-24 h-24"
           />
-          <h2 className="text-2xl font-bold text-center">AREA</h2>
+          <h2 className="text-[50px] font-bold text-center">AREA</h2>
         </div>
-        <CardTitle>{isLogin ? "Login" : "Sign Up"}</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-center">{isLogin ? "Login" : "Sign Up"}</CardTitle>
+        <CardDescription className="text-center">
           {isLogin
             ? "Enter your credentials to access your account"
             : "Create a new account"}
@@ -253,7 +254,7 @@ export function LoginPage() {
               <Button variant="link" className="w-full">
                 Forgot Password?
               </Button>
-            </DialogTrigger>
+            </DialogTrigger> 
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Forgot Password</DialogTitle>
