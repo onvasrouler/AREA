@@ -108,6 +108,7 @@ jobs:
     needs:
       - frontend
       - backend
+      - mobile
     steps:
       - uses: actions/checkout@v4
 
@@ -147,9 +148,6 @@ jobs:
   mirroring:
     runs-on: ubuntu-latest
     needs:
-      - frontend
-      - backend
-      # ADD MOBILE JOB
       - deploy-documentation
     steps:
       - uses: actions/checkout@v4
