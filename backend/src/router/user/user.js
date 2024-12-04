@@ -14,7 +14,7 @@ const { return_signed_cookies,
     delete_every_user_session,
     delete_user_account,
     delete_google_account,
-    mailSender } = require("./user.utils");
+    sendEmail} = require("./user.utils");
 
 var hour = 3600000;
 var day = hour * 24;
@@ -27,7 +27,7 @@ const createToken = async (userId, type, expiresInMinutes) => {
     await new TokenModel({
         userId,
         token: hashedToken,
-        expire: Date.now() + expiresInMinutes * 60 * 1000,
+        expiresAt: Date.now() + expiresInMinutes * 60 * 1000,
         type
     }).save();
     return token;
@@ -121,7 +121,7 @@ exports.register = async (req, res) => {
             <a href="${verifyUrl}" target="_blank">${verifyUrl}</a>\n\n
             <p>If you did not register, please ignore this email.</p>`; // create the mail content
 
-            await mailSender({ // send the email
+            await sendEmail ({ // send the email
                 to: savedUser.email,
                 subject: "Email Verification",
                 html: mailContent
@@ -402,7 +402,7 @@ exports.deleteaccount = async (req, res) => {
             <a href="${deleteUrl}" target="_blank">${deleteUrl}</a>\n\n
             <p>If you did not request this, please ignore this email and your account will remain unchanged.</p>`; // create the mail content
 
-        await mailSender({ // send the email
+        await sendEmail({ // send the email
             to: req.user.email,
             subject: "Account Deletion",
             html: mailContent
@@ -606,7 +606,7 @@ exports.forgotpassword = async (req, res) => {
         <a href="${resetUrl}" target="_blank">${resetUrl}</a>\n\n
         <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`; // create the mail content
 
-        await mailSender({ // send the email
+        await sendEmail({ // send the email
             to: user.email,
             subject: "Password Reset",
             html: mailContent
