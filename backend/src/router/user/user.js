@@ -115,7 +115,7 @@ exports.register = async (req, res) => {
         }).save().then(async (savedUser) => { // if the user is created
             const confirmationToken = await createToken(savedUser.unique_id, "emailVerification", 15); // create the email verification token
 
-            const verifyUrl = `${process.env.FRONT_URL}register/verify/${confirmationToken}`; // create the verification url
+            const verifyUrl = `${process.env.SERVER_URL}:${process.env.PORT}/register/verify/${confirmationToken}`; // create the verification url
             const mailContent = `<p>Thank you for registering on our platform.</p>
             <p>Please click on the following link, or paste this into your browser to verify your email:</p>
             <a href="${verifyUrl}" target="_blank">${verifyUrl}</a>\n\n
