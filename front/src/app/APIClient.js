@@ -14,17 +14,13 @@ const callApi = async (endpoint, method = "GET", body = null) => {
     body: body ? JSON.stringify(body) : null,
   };
 
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, options);
+  const response = await fetch(`${API_URL}${endpoint}`, options);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "An error occured");
-    }
-    return response.json();
-  } catch (error) {
-    throw error;
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "An error occured");
   }
+  return response.json();
 };
 
 export const fetchData = (endpoint) => {

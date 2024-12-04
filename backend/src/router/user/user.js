@@ -1,13 +1,13 @@
 const UserModel = require("../../database/models/users");
 const SessionModel = require("../../database/models/session");
-const GoogleUsersModel = require("../../database/models/googleUsers");
+const GoogleUsersModel = require("../../database/models/googleUsers.js");
 const TokenModel = require("../../database/models/token");
 const api_formatter = require("../../middleware/api-formatter.js");
 const { OAuth2Client } = require("google-auth-library");
 const GoogleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const path = require('path');
+const path = require("path");
 const crypto = require("crypto");
-const fs = require('fs');
+const fs = require("fs");
 const { return_signed_cookies,
     check_json_data,
     reset_user_session,
@@ -112,8 +112,8 @@ exports.register = async (req, res) => {
             username: register_data.username,
             password: register_data.password,
             creationIp: register_data.ip
-        }).save().then(async () => { // if the user is created
-            const confirmationToken = await createToken(user.unique_id, "emailVerification", 15); // create the email verification token
+        }).save().then(async (savedUser) => { // if the user is created
+            const confirmationToken = await createToken(savedUser.unique_id, "emailVerification", 15); // create the email verification token
 
             const verifyUrl = `${process.env.FRONT_URL}register/verify/${confirmationToken}`; // create the verification url
             const mailContent = `<p>Thank you for registering on our platform.</p>
@@ -122,7 +122,7 @@ exports.register = async (req, res) => {
             <p>If you did not register, please ignore this email.</p>`; // create the mail content
 
             await mailSender({ // send the email
-                to: user.email,
+                to: savedUser.email,
                 subject: "Email Verification",
                 html: mailContent
             })
@@ -174,7 +174,7 @@ exports.verifyregister = async (req, res) => {
                 unique_session_id: crypto.randomUUID(), // set the unique session id
                 signed_id: crypto.randomUUID(), // set the signed id
                 user_signed_id: userRegistered.unique_id, // link it with the user id
-                connexionIp: register_data.ip, // set the IP
+                connexionIp: req.headers["x-forwarded-for"] || req.connection.remoteAddress, // set the IP
                 session_type: "default", // set the session type
                 user_agent: req.headers["user-agent"], // set the user agent
                 expire: Date.now() + month,
@@ -188,7 +188,7 @@ exports.verifyregister = async (req, res) => {
             }).catch(async (err) => { // if an error occured while creating the session
                 console.error(err);
                 return api_formatter(req, res, 500, "error", "Error while creating session", null, err, null);
-            })
+            });
         }).catch(async (err) => { // if an error occured while saving the user
             console.error(err);
             await delete_user_account(tmpUserRegister); // delete the user account
@@ -200,7 +200,7 @@ exports.verifyregister = async (req, res) => {
         await delete_user_account(tmpUserRegister);
         return api_formatter(req, res, 500, "error", "Error while verifying email", null, err, null);
     }
-}
+};
 
 exports.login = async (req, res) => {
     if (req.user && req.user != null) // if the user is already logged in
@@ -368,7 +368,7 @@ exports.deletefastprofile = async (req, res) => {
                 return api_formatter(req, res, 401, "incorrect_password", "the provided password is incorrect for this account", null, null, null);
             await SessionModel.deleteMany({ user_signed_id: req.user.unique_id });
             if (req.user.session_type == "google")
-                await GoogleUserModel.deleteOne({ _id: req.user._id });
+                await GoogleUsersModel.deleteOne({ _id: req.user._id });
             else
                 await UserModel.deleteOne({ _id: req.user._id });
             return api_formatter(req, res, 200, "success", "account deleted successfully", null, null, null);
@@ -394,7 +394,7 @@ exports.deleteaccount = async (req, res) => {
         if (!req.user.comparePassword(req.body.password)) // if the password is incorrect
             return api_formatter(req, res, 401, "incorrect_password", "the provided password is incorrect for this account", null, null, null); // return an error message
 
-        const deleteAccountToken = await createToken(user.unique_id, "emailVerification", 15); // create the email verification token
+        const deleteAccountToken = await createToken(req.user.unique_id, "emailVerification", 15); // use req.user.unique_id
 
         const deleteUrl = `${process.env.FRONT_URL}profile/delete/${deleteAccountToken}`; // create the delete url
         const mailContent = `<p>You are receiving this because you (or someone else) have requested the deletion of your account.</p>
@@ -466,9 +466,9 @@ exports.profilepicture = async (req, res) => {
             const fileExtension = path.extname(profilePicture.name); // get the file extension
             const uniqueFileName = `${req.user.unique_id}_${crypto.randomUUID()}${fileExtension}`; // create a unique file name
 
-            if (!fs.existsSync(path.join(__dirname, '../../storage/')))
-                fs.mkdirSync(path.join(__dirname, '../../storage/'));
-            const uploadPath = path.join(__dirname, '../../storage/', req.user.unique_id + '_' + uniqueFileName); // create the upload path
+            if (!fs.existsSync(path.join(__dirname, "../../storage/")))
+                fs.mkdirSync(path.join(__dirname, "../../storage/"));
+            const uploadPath = path.join(__dirname, "../../storage/", req.user.unique_id + "_" + uniqueFileName); // create the upload path
 
             profilePicture.mv(uploadPath, function (err) { // move the file
                 if (err) { // if an error occured while uploading the file
@@ -485,7 +485,7 @@ exports.profilepicture = async (req, res) => {
                     });
 
                 req.user.profilePicturePath = uploadPath; // set the profile picture path
-                req.user.save().then((data) => { // save the user
+                req.user.save().then(() => { // save the user
                     return api_formatter(req, res, 200, "success", "File uploaded successfully", { fileName: uniqueFileName }, null, null, req.user.username); // return a success message
                 }).catch((err) => { // if an error occured while saving the user
                     console.error(err);
@@ -497,7 +497,7 @@ exports.profilepicture = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "Error while uploading file", null, err, null, req.user.username);
     }
-}
+};
 
 exports.getprofilepicture = async (req, res) => {
     try {
@@ -514,7 +514,7 @@ exports.getprofilepicture = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "Error while getting file", null, err, null, req.user.username);
     }
-}
+};
 
 exports.deleteprofilepicture = async (req, res) => {
     try {
@@ -531,7 +531,7 @@ exports.deleteprofilepicture = async (req, res) => {
                     return api_formatter(req, res, 500, "error", "Error while deleting file", null, err, null, req.user.username); // return an error message
                 }
                 req.user.profilePicturePath = ""; // set the profile picture path to null
-                req.user.save().then((data) => { // save the user
+                req.user.save().then(() => { // save the user
                     return api_formatter(req, res, 200, "success", "File deleted successfully", null, null, null, req.user.username); // return a success message
                 }).catch((err) => { // if an error occured while saving the user
                     console.error(err);
@@ -543,7 +543,7 @@ exports.deleteprofilepicture = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "Error while deleting file", null, err, null, req.user.username);
     }
-}
+};
 
 exports.getsessions = async (req, res) => {
     try {
@@ -570,7 +570,7 @@ exports.getsessions = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "Error while getting sessions", null, err, null, req.user.username); // return an error message
     }
-}
+};
 
 exports.deletesessions = async (req, res) => {
     try {
@@ -587,7 +587,7 @@ exports.deletesessions = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "Error while deleting sessions", null, err, null, req.user.username);
     }
-}
+};
 
 exports.forgotpassword = async (req, res) => {
     try {
@@ -621,7 +621,7 @@ exports.forgotpassword = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "Error while trying to init the forgot password function", null, err, null); // return an error message
     }
-}
+};
 
 exports.resetpassword = async (req, res) => {
     try {
@@ -658,4 +658,4 @@ exports.resetpassword = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "Error while resetting password", null, err, null);
     }
-}
+};
