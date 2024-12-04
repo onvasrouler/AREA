@@ -36,7 +36,7 @@ class _SignInState extends State<SignInPage> {
   Future<void> _signIn() async {
     final response = await authService.signIn(_username.text, _password.text);
     if (response) {
-      GoRouter.of(context).go('/menu');
+      GoRouter.of(context).push('/menu');
     } else {
       setState(() {
         error = true;
@@ -49,7 +49,7 @@ class _SignInState extends State<SignInPage> {
   Future<void> _signInGoogle() async {
     final response = await googleSignInService.signInWithGoogle(context);
     if (response) {
-      GoRouter.of(context).go('/menu');
+      GoRouter.of(context).push('/menu');
     }
   }
 
@@ -107,7 +107,7 @@ class _SignInState extends State<SignInPage> {
                 alignment: Alignment.center,
                 child: TextButton(
                   onPressed: () {
-                    GoRouter.of(context).go('/signUp');
+                    GoRouter.of(context).push('/signUp');
                   },
                   child: const Text(
                     'Sign Up',
