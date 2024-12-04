@@ -85,7 +85,7 @@ jobs:
         with:
           channel: stable
           flutter-version: 3.19.0
-      - run: flutter --node-version
+      - run: flutter --version
 
       - name: Install dependencies
         run: flutter pub get
