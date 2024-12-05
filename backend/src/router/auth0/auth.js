@@ -1,18 +1,7 @@
 const UserModel = require("../../database/models/users");
 const api_formatter = require("../../middleware/api-formatter.js");
 const discordBot = require('../../utils/discord');
-
-exports.googleAuth = async (req, res) => {
-    try {
-        const { googleToken } = req.body;
-        req.user.auth_token.google = googleToken;
-        await req.user.save();
-        return api_formatter(req, res, 200, "success", "Google token has been saved");
-    } catch (err) {
-        console.error(err);
-        return api_formatter(req, res, 500, "error", "An error occured while trying to save the google token", null, err);
-    }
-}
+const axios = require('axios');
 
 exports.discordCallback = async (req, res) => {
     try {
@@ -85,5 +74,41 @@ exports.discordRefresh = async (req, res) => {
     catch (err) {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, err);
+    }
+}
+
+exports.githubCallback = async (req, res) => {
+    try {
+        const { code } = req.query;
+        console.log(code);
+        if (!code)
+            return api_formatter(req, res, 400, "error", "code is required", null, null, null);
+        try {
+            const tokenResponse = await axios.post(
+                "https://github.com/login/oauth/access_token",
+                {
+                    client_id: process.env.GITHUB_CLIENT_ID,
+                    client_secret: process.env.GITHUB_SECRET,
+                    code: code,
+                },
+                {
+                    headers: { Accept: "application/json" },
+                }
+            );
+            if (!tokenResponse.data.access_token)
+                return api_formatter(req, res, 500, "error", "An error occured while trying to get the github token", null, tokenResponse.data);
+            req.user = await UserModel.findOne({ email: "aimeric.rouyer@gmail.com" });
+
+            req.user.github_token = tokenResponse.data;
+            await req.user.save();
+            return api_formatter(req, res, 200, "success", "Github token has been saved");
+        } catch (error) {
+            console.error(error.response?.data);
+            return api_formatter(req, res, 500, "error", "An error occured while trying to get the github token", null, error);
+        }
+    }
+    catch (err) {
+        console.error(err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to get the github token", null, err);
     }
 }
