@@ -15,9 +15,9 @@ const userSchema = new mongoose.Schema({
         type: Object,
         default: {}
     },
-    google_token: { // this will be used to store the google token
-        type: String,
-        default: ""
+    github_token: { // this will be used to store the github token
+        type: Object,
+        default: {}
     },
     email: { // this will be used to identify the user
         type: String,
