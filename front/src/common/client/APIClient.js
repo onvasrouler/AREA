@@ -1,5 +1,3 @@
-import process from 'process';
-
 class ApiClient {
   constructor(baseURL) {
     this.baseURL = baseURL.endsWith("/") ? baseURL : `${baseURL}/`
