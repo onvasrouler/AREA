@@ -19,8 +19,7 @@ async function return_signed_cookies(req, res, Session, User) {
             jwt.sign({ session_id: Session.unique_session_id }, process.env.SECRET),
             User.username
         );
-    }
-    catch (err) {
+    } catch (err) {
         console.error(err);
         await reset_user_session(Session, User ? User : null);
         return api_formatter(
@@ -76,6 +75,7 @@ async function delete_every_user_session(User) {
     }
 }
 
+// This function will delete a Google account
 async function delete_google_account(User) {
     delete_every_user_session(User);
     return await GoogleUsersModel.deleteOne({
@@ -95,13 +95,33 @@ async function delete_user_account(User) {
     });
 }
 
+console.log("Emailer email:", process.env.EMAILER_EMAIL);
+console.log("Emailer password:", process.env.EMAILER_PASSWORD);
+
+// This is the transporter for sending emails
 const mailSender = nodemailer.createTransport({
-    service: "Gmail",
+    service: "yahoo",
     auth: {
         user: process.env.EMAILER_EMAIL,
         pass: process.env.EMAILER_PASSWORD,
     },
 });
+
+// This function will send an email
+async function sendEmail({ to, subject, html }) {
+    try {
+        await mailSender.sendMail({
+            from: process.env.EMAILER_EMAIL, // Sender address
+            to, // List of receivers
+            subject, // Subject line
+            html, // HTML body
+        });
+        console.log("Email sent successfully.");
+    } catch (err) {
+        console.error("Error while sending email:", err);
+        throw err;
+    }
+}
 
 module.exports = {
     return_signed_cookies,
@@ -110,5 +130,5 @@ module.exports = {
     delete_every_user_session,
     delete_user_account,
     delete_google_account,
-    mailSender
+    sendEmail, // Export the email sending function
 };
