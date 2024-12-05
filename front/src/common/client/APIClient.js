@@ -1,5 +1,3 @@
-import { accessTokenKey } from "@/common/constants/auth";
-
 class ApiClient {
   constructor(baseURL) {
     this.baseURL = baseURL.endsWith("/") ? baseURL : `${baseURL}/`

@@ -104,7 +104,7 @@ export function LoginPage() {
           description: "Invalid credentials. Please try again.",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Login Error",
@@ -136,7 +136,7 @@ export function LoginPage() {
             description: "An error occurred during registration. Please try again.",
           });
         }
-      } catch (error) {
+      } catch {
         toast({
           variant: "destructive",
           title: "Registration Error",
@@ -165,7 +165,7 @@ export function LoginPage() {
           description: "Failed to send password reset email. Please try again.",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Password Reset Error",
@@ -207,7 +207,7 @@ export function LoginPage() {
           description: "Failed to verify your account. Please try again or contact support.",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Verification Error",
@@ -234,7 +234,7 @@ export function LoginPage() {
           description: "An error occurred during Google login. Please try again.",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Google Login Error",

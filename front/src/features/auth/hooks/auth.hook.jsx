@@ -1,4 +1,4 @@
-import React, {
+import {
     createContext,
     useState,
     useEffect,
@@ -48,7 +48,7 @@ import React, {
       };
 
       checkAuthStatus();
-    }, []);
+    }, [apiClient]);
 
     const login = (sessionToken) => {
       console.log("User logged in, saving session token to localStorage");
