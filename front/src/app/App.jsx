@@ -1,5 +1,6 @@
 import { AppRoutes } from "./routes.jsx";
-import { AuthProvider } from "@/features/authentification/hooks/auth.hook.jsx";
+import { AuthProvider } from "@features/auth/hooks/auth.hook";
+
 
 export const App = () => {
   return (
@@ -7,4 +8,4 @@ export const App = () => {
       <AppRoutes />
     </AuthProvider>
   );
-}
+};

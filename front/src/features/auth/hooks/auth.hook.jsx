@@ -1,11 +1,9 @@
 import React, {
     createContext,
-    useContext,
     useState,
     useEffect,
   } from "react";
-  import { getApiClient } from "@/common/api/client";
-  import { accessTokenKey } from "@/common/constants/auth";
+  import { getApiClient } from "@/common/client/APIClient";
   import { useNavigate } from "react-router-dom";
 
   const AuthContext = createContext(undefined);
@@ -18,46 +16,50 @@ import React, {
 
     useEffect(() => {
       const checkAuthStatus = async () => {
-        const token = localStorage.getItem(accessTokenKey);
+        const sessionToken = localStorage.getItem("session");
 
-        if (token) {
+        if (sessionToken) {
           try {
-            // Change to use the /session endpoint, add a comparison to find if the given token is in the list of valid tokens returned by the /session endpoint
-            const response = await apiClient.get("/auth/validate-token", {
-              Authorization: `Bearer ${token}`,
+            const response = await apiClient.get("/sessions", {
+              headers: {
+                session: sessionToken,
+              },
             });
-            console.log("Token found in localStorage:", token);
-            console.log("Validation response:", response);
 
-            if (response.ok) {
-              console.log("Token is valid");
+            if (response.status === 200 && response.data?.data?.sessions) {
+              console.log("Session token valid:", sessionToken);
               setIsAuthenticated(true);
             } else {
-              console.log("Token is invalid, clearing localStorage");
-              localStorage.removeItem(accessTokenKey);
+              console.log("Session token invalid, clearing localStorage");
+              localStorage.removeItem("session");
               setIsAuthenticated(false);
             }
-          } catch {
-            localStorage.removeItem(accessTokenKey);
+          } catch (error) {
+            console.error("Error validating session token:", error);
+            localStorage.removeItem("session");
             setIsAuthenticated(false);
           }
+        } else {
+          console.log("No session token found in localStorage");
+          setIsAuthenticated(false);
         }
 
         setLoading(false);
-        console.log("Authentication check complete, loading set to false");
       };
 
       checkAuthStatus();
     }, []);
 
-    const login = () => {
-      console.log("User logged in");
+    const login = (sessionToken) => {
+      console.log("User logged in, saving session token to localStorage");
+      localStorage.setItem("session", sessionToken);
       setIsAuthenticated(true);
+      navigate("/dashboard");
     };
 
     const logout = () => {
-      console.log("User logged out, clearing token from localStorage");
-      localStorage.removeItem(accessTokenKey);
+      console.log("User logged out, clearing session token from localStorage");
+      localStorage.removeItem("session");
       setIsAuthenticated(false);
       navigate("/login");
     };
@@ -74,8 +76,8 @@ import React, {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-      const token = localStorage.getItem("token");
-      setIsAuthenticated(!!token);
+      const session_token = localStorage.getItem("session");
+      setIsAuthenticated(!!session_token);
       setLoading(false);
     }, []);
 

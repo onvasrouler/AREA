@@ -83,66 +83,26 @@ export function LoginPage() {
 
   const submitLogin = async (values) => {
     try {
-      console.log("Attempting to log in with:", values);
-      const response = await apiClient.post("api/auth/login", {
-        email: values.email,
+      const response = await apiClient.post("login", {
+        emailOrUsername: values.email,
         password: values.password,
       });
-      if (response.status === 200 || response.status === 201) {
-        const data = await response.json();
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-          console.log(data.token);
-          console.log("Logged in successfully");
-          window.location.href = "/notes";
-        }
+
+      const data = await response.json();
+
+      if (data.session) {
+        localStorage.setItem("session", data.session);
+        console.log("Token saved:", data.session);
+        console.log("Logged in successfully");
+        window.location.href = "/dashboard";
       } else {
-        console.error("Failed to log in:", response.status, response.statusText);
+        console.log("Token not found in response:", data);
       }
     } catch (error) {
       console.error("An error occurred during login:", error.message || error);
     }
   };
 
-  const submitUserCreation = async (values) => {
-    try {
-      console.log("Creating user with values:", values);
-
-      const response = await apiClient.post("api/users/register", {
-        email: values.email,
-        password: values.password,
-        name: values.name,
-        surname: values.surname,
-        username: values.username.startsWith("@") ? values.username : "@" + values.username,
-      });
-
-      if (response.status === 201) {
-        console.log("User created successfully. Logging in...");
-
-        const responseLogin = await apiClient.post("api/auth/login", {
-          email: values.email,
-          password: values.password,
-        });
-
-        if (responseLogin.status === 200 || responseLogin.status === 201) {
-          const data = await responseLogin.json();
-          if (data.token) {
-            localStorage.setItem("token", data.token);
-            console.log("Logged in successfully after user creation");
-            window.location.href = "/notes";
-          } else {
-            console.error("No token received after user creation");
-          }
-        } else {
-          console.error("Login failed after user creation:", responseLogin.status, responseLogin.statusText);
-        }
-      } else {
-        console.error("Failed to create user:", response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error("An error occurred during user creation:", error.message || error);
-    }
-  };
 
   const onSubmit = async (data) => {
     if (!isLogin) {
@@ -157,7 +117,7 @@ export function LoginPage() {
         setShowConfirmDialog(true)
       }
     } else {
-      // Handle login logic here
+      await submitLogin(data)
     }
   }
 
@@ -167,7 +127,6 @@ export function LoginPage() {
 
   const handleConfirmRegistration = async (data) => {
     console.log('Confirm registration with token:', data.token)
-    //login request
     const response = await apiClient.post("register/verify", {
       token: data.token,
     })
@@ -175,7 +134,17 @@ export function LoginPage() {
     if (response.status === 200) {
       setShowConfirmDialog(false)
       console.log('Registration confirmed')
-      //redirect to /dashboard
+      const responseLogin = await apiClient.post("login", {
+        emailOrUsername: registeredEmail,
+        password: confirmRegistrationForm.getValues().password,
+      })
+      if (responseLogin.status === 200) {
+        const data = await responseLogin.json()
+        localStorage.setItem('session', data.session_token)
+        navigate('/dashboard')
+      } else {
+        console.log('Login failed')
+      }
     } else {
       console.log('Registration failed')
     }
