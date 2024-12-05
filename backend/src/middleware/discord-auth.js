@@ -6,7 +6,6 @@ const discordBot = require('../utils/discord.js');
 async function discordAuth(req, res, next) {
     try {
         req.guilds = null;
-        req.user = await UserModel.findOne({ email: "aimeric.rouyer@gmail.com" });
 
         if (!req.user || req.user == null) // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return a 401 error
