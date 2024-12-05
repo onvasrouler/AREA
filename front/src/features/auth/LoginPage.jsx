@@ -54,6 +54,7 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState('')
+  const [registrationData, setRegistrationData] = useState(null);
 
   const form = useForm({
     resolver: zodResolver(isLogin ? loginSchema : signUpSchema),
@@ -113,8 +114,9 @@ export function LoginPage() {
       })
 
       if (response.status === 200) {
-        setRegisteredEmail(data.email)
-        setShowConfirmDialog(true)
+        setRegisteredEmail(data.email);
+        setRegistrationData(data);
+        setShowConfirmDialog(true);
       }
     } else {
       await submitLogin(data)
@@ -135,13 +137,13 @@ export function LoginPage() {
       setShowConfirmDialog(false)
       console.log('Registration confirmed')
       const responseLogin = await apiClient.post("login", {
-        emailOrUsername: registeredEmail,
-        password: confirmRegistrationForm.getValues().password,
+        emailOrUsername: registrationData.email,
+        password:  registrationData.password,
       })
       if (responseLogin.status === 200) {
         const data = await responseLogin.json()
         localStorage.setItem('session', data.session_token)
-        navigate('/dashboard')
+        window.location.href = "/dashboard";
       } else {
         console.log('Login failed')
       }
