@@ -2,7 +2,7 @@
 
 import AreaLogo from "../../assets/AREA.png"
 import { useState } from "react"
-import { set, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Eye, EyeOff } from 'lucide-react'
@@ -34,7 +34,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { getApiClient } from "@/common/client/APIClient";
-import { useNavigate } from "react-router-dom"
+import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -55,6 +55,7 @@ export function LoginPage() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState('')
   const [registrationData, setRegistrationData] = useState(null);
+  const { toast } = useToast();
 
   const form = useForm({
     resolver: zodResolver(isLogin ? loginSchema : signUpSchema),
@@ -80,8 +81,6 @@ export function LoginPage() {
 
   const apiClient = getApiClient()
 
-  const navigate = useNavigate()
-
   const submitLogin = async (values) => {
     try {
       const response = await apiClient.post("login", {
@@ -93,75 +92,156 @@ export function LoginPage() {
 
       if (data.session) {
         localStorage.setItem("session", data.session);
-        console.log("Token saved:", data.session);
-        console.log("Logged in successfully");
+        toast({
+          title: "Login Successful",
+          description: "You have been logged in successfully.",
+        });
         window.location.href = "/dashboard";
       } else {
-        console.log("Token not found in response:", data);
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "Invalid credentials. Please try again.",
+        });
       }
     } catch (error) {
-      console.error("An error occurred during login:", error.message || error);
+      toast({
+        variant: "destructive",
+        title: "Login Error",
+        description: "An error occurred during login. Please try again later.",
+      });
     }
   };
 
-
   const onSubmit = async (data) => {
     if (!isLogin) {
-      const response = await apiClient.post("register", {
-        email: data.email,
-        password: data.password,
-        username: data.username,
-      })
-
-      if (response.status === 200) {
-        setRegisteredEmail(data.email);
-        setRegistrationData(data);
-        setShowConfirmDialog(true);
+      try {
+        const response = await apiClient.post("register", {
+          email: data.email,
+          password: data.password,
+          username: data.username,
+        });
+        if (response.status === 200) {
+          setRegisteredEmail(data.email);
+          setRegistrationData(data);
+          setShowConfirmDialog(true);
+          toast({
+            title: "Registration Successful",
+            description: "Please check your email to confirm your registration.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Registration Failed",
+            description: "An error occurred during registration. Please try again.",
+          });
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Registration Error",
+          description: "An error occurred during registration. Please try again later.",
+        });
       }
     } else {
-      await submitLogin(data)
+      await submitLogin(data);
     }
-  }
+  };
 
   const handleForgotPassword = async (values) => {
-    console.log(values)
-  }
+    try {
+      const response = await apiClient.post("forgotpassword", {
+        email: values.email,
+      });
+      if (response.status === 200) {
+        toast({
+          title: "Password Reset Email Sent",
+          description: "Please check your email for instructions to reset your password.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Password Reset Failed",
+          description: "Failed to send password reset email. Please try again.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Password Reset Error",
+        description: "An error occurred while processing your request. Please try again later.",
+      });
+    }
+  };
 
   const handleConfirmRegistration = async (data) => {
-    console.log('Confirm registration with token:', data.token)
-    const response = await apiClient.post("register/verify", {
-      token: data.token,
-    })
-    console.log(response)
-    if (response.status === 200) {
-      setShowConfirmDialog(false)
-      console.log('Registration confirmed')
-      const responseLogin = await apiClient.post("login", {
-        emailOrUsername: registrationData.email,
-        password:  registrationData.password,
-      })
-      if (responseLogin.status === 200) {
-        const data = await responseLogin.json()
-        localStorage.setItem('session', data.session_token)
-        window.location.href = "/dashboard";
+    try {
+      const response = await apiClient.post("register/verify", {
+        token: data.token,
+      });
+      if (response.status === 200) {
+        setShowConfirmDialog(false);
+        toast({
+          title: "Registration Confirmed",
+          description: "Your account has been successfully verified.",
+        });
+        const responseLogin = await apiClient.post("login", {
+          emailOrUsername: registrationData.email,
+          password: registrationData.password,
+        });
+        if (responseLogin.status === 200) {
+          const data = await responseLogin.json();
+          localStorage.setItem('session', data.session_token);
+          window.location.href = "/dashboard";
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Login Failed",
+            description: "An error occurred during login. Please try logging in manually.",
+          });
+        }
       } else {
-        console.log('Login failed')
+        toast({
+          variant: "destructive",
+          title: "Verification Failed",
+          description: "Failed to verify your account. Please try again or contact support.",
+        });
       }
-    } else {
-      console.log('Registration failed')
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Verification Error",
+        description: "An error occurred during account verification. Please try again later.",
+      });
     }
-  }
+  };
 
   const handleOAuthLogin = async () => {
-    const response = await apiClient.post("auth/google", {})
-    if (response.status === 200) {
-      const data = await response.json()
-      localStorage.setItem('session', data.session_token)
-      window.location.href = "/dashboard";
-    } else {
-      console.log('OAuth login failed')
+    try {
+      const response = await apiClient.post("auth/google", {});
+      if (response.status === 200) {
+        const data = await response.json();
+        localStorage.setItem('session', data.session_token);
+        toast({
+          title: "Google Login Successful",
+          description: "You have been logged in successfully with Google.",
+        });
+        window.location.href = "/dashboard";
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Google Login Failed",
+          description: "An error occurred during Google login. Please try again.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Google Login Error",
+        description: "An error occurred during Google login. Please try again later.",
+      });
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
