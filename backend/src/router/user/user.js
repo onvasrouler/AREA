@@ -14,7 +14,8 @@ const { return_signed_cookies,
     delete_every_user_session,
     delete_user_account,
     delete_google_account,
-    mailSender } = require("./user.utils");
+    sendEmail } = require("./user.utils");
+
 
 var hour = 3600000;
 var day = hour * 24;
@@ -27,7 +28,7 @@ const createToken = async (userId, type, expiresInMinutes) => {
     await new TokenModel({
         userId,
         token: hashedToken,
-        expire: Date.now() + expiresInMinutes * 60 * 1000,
+        expiresAt: Date.now() + expiresInMinutes * 60 * 1000,
         type
     }).save();
     return token;
@@ -59,6 +60,7 @@ exports.fastregister = async (req, res) => {
             emailVerified: true
         }).save().then(async function (userRegistered) {
             tmpUserRegister = userRegistered; // set the user that was registered
+
             await new SessionModel({
                 unique_session_id: crypto.randomUUID(), // set the unique session id
                 signed_id: crypto.randomUUID(), // set the signed id
@@ -115,13 +117,12 @@ exports.register = async (req, res) => {
         }).save().then(async (savedUser) => { // if the user is created
             const confirmationToken = await createToken(savedUser.unique_id, "emailVerification", 15); // create the email verification token
 
-            const verifyUrl = `${process.env.FRONT_URL}register/verify/${confirmationToken}`; // create the verification url
             const mailContent = `<p>Thank you for registering on our platform.</p>
-            <p>Please click on the following link, or paste this into your browser to verify your email:</p>
-            <a href="${verifyUrl}" target="_blank">${verifyUrl}</a>\n\n
+            <p>Please enter the following token in the dialog to confirm your registration:</p>
+            <a href="${confirmationToken}" target="_blank">${confirmationToken}</a>\n\n
             <p>If you did not register, please ignore this email.</p>`; // create the mail content
 
-            await mailSender({ // send the email
+            await sendEmail({ // send the email
                 to: savedUser.email,
                 subject: "Email Verification",
                 html: mailContent
@@ -402,7 +403,7 @@ exports.deleteaccount = async (req, res) => {
             <a href="${deleteUrl}" target="_blank">${deleteUrl}</a>\n\n
             <p>If you did not request this, please ignore this email and your account will remain unchanged.</p>`; // create the mail content
 
-        await mailSender({ // send the email
+        await sendEmail({ // send the email
             to: req.user.email,
             subject: "Account Deletion",
             html: mailContent
@@ -606,7 +607,7 @@ exports.forgotpassword = async (req, res) => {
         <a href="${resetUrl}" target="_blank">${resetUrl}</a>\n\n
         <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`; // create the mail content
 
-        await mailSender({ // send the email
+        await sendEmail({ // send the email
             to: user.email,
             subject: "Password Reset",
             html: mailContent
