@@ -2,7 +2,7 @@
 
 import AreaLogo from "../../assets/AREA.png"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { set, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Eye, EyeOff } from 'lucide-react'
@@ -165,12 +165,20 @@ export function LoginPage() {
     console.log(values)
   }
 
-  const handleConfirmRegistration = (data) => {
-    // Handle confirm registration logic here
+  const handleConfirmRegistration = async (data) => {
     console.log('Confirm registration with token:', data.token)
-    //close dialog
     //login request
-    //redirect to /dashboard
+    const response = await apiClient.post("register/verify", {
+      token: data.token,
+    })
+    console.log(response)
+    if (response.status === 200) {
+      setShowConfirmDialog(false)
+      console.log('Registration confirmed')
+      //redirect to /dashboard
+    } else {
+      console.log('Registration failed')
+    }
   }
 
   return (
