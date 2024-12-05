@@ -1,3 +1,5 @@
+import process from 'process';
+
 class ApiClient {
   constructor(baseURL) {
     this.baseURL = baseURL.endsWith("/") ? baseURL : `${baseURL}/`
@@ -78,7 +80,7 @@ class ApiClient {
 
 export function getApiClient() {
   const token = localStorage.getItem('token');
-  const apiClient = new ApiClient("http://localhost:8080");
+  const apiClient = new ApiClient(import.meta.env.VITE_BACKEND_URL);
   if (token) {
     apiClient.setAccessToken(token);
   }
