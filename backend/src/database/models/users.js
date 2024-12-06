@@ -93,7 +93,7 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", function (next) {
     try {
         const user = this;
         user.LastModificationIp = user.creationIp;
