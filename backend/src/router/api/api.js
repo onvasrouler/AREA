@@ -1,7 +1,6 @@
 const api_formatter = require("../../middleware/api-formatter.js");
-const axios = require('axios');
-const discordBot = require('../../utils/discord');
-const UserModel = require("../../database/models/users");
+const axios = require("axios");
+const discordBot = require("../../utils/discord");
 
 // This function will return the user profile
 exports.profile = async (req, res) => {
@@ -31,7 +30,7 @@ exports.inviteDiscordBot = async (req, res) => {
     } catch (err) { // if an error occured
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord invitation link", null, err, null);
     }
-}
+};
 
 
 // This function will return the discord server where the user is admin
@@ -46,7 +45,7 @@ exports.getDiscordServer = async (req, res) => {
     } catch (err) { // if an error occured
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the list of matching discord servers", null, err, null);
     }
-}
+};
 
 exports.getListOfChannels = async (req, res) => {
     try {
@@ -68,7 +67,7 @@ exports.getListOfChannels = async (req, res) => {
     } catch (err) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord server", null, err, null);
     }
-}
+};
 
 exports.getPullRequests = async (req, res) => {
     try {
@@ -85,7 +84,7 @@ exports.getPullRequests = async (req, res) => {
     } catch (error) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the github pull requests", null, error, null);
     }
-}
+};
 
 exports.getMyRepos = async (req, res) => {
     try {
@@ -102,4 +101,4 @@ exports.getMyRepos = async (req, res) => {
     } catch (error) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the github repositories", null, error, null);
     }
-}
+};

@@ -1,7 +1,6 @@
-const UserModel = require("../../database/models/users");
 const api_formatter = require("../../middleware/api-formatter.js");
-const discordBot = require('../../utils/discord');
-const axios = require('axios');
+const discordBot = require("../../utils/discord");
+const axios = require("axios");
 
 exports.discordCallback = async (req, res) => {
     try {
@@ -10,15 +9,15 @@ exports.discordCallback = async (req, res) => {
             return api_formatter(req, res, 400, "no code", "code is required", null, null, null);
         try {
             const params = new URLSearchParams();
-            params.append('client_id', discordBot.user.id);
-            params.append('client_secret', process.env.DISCORD_SECRET);
-            params.append('grant_type', 'authorization_code');
-            params.append('code', code);
-            params.append('redirect_uri', process.env.DISCORD_REDIRECT_URI);
-            params.append('scope', 'identify guilds');
+            params.append("client_id", discordBot.user.id);
+            params.append("client_secret", process.env.DISCORD_SECRET);
+            params.append("grant_type", "authorization_code");
+            params.append("code", code);
+            params.append("redirect_uri", process.env.DISCORD_REDIRECT_URI);
+            params.append("scope", "identify guilds");
 
             const response = await fetch("https://discord.com/api/v10/oauth2/token", {
-                method: 'POST',
+                method: "POST",
                 body: params,
                 headers: {
                     "Content-type": "application/x-www-form-urlencoded"
@@ -42,7 +41,7 @@ exports.discordCallback = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, err);
     }
-}
+};
 
 exports.discordRefresh = async (req, res) => {
     try {
@@ -54,22 +53,22 @@ exports.discordRefresh = async (req, res) => {
             return api_formatter(req, res, 400, "error", "you first have to login to discord to be able to refresh your token", null, null, null);
         try {
             const params = new URLSearchParams();
-            params.append('client_id', discordBot.user.id);
-            params.append('client_secret', process.env.DISCORD_SECRET);
-            params.append('grant_type', 'refresh_token');
-            params.append('refresh_token', refresh_token);
-            params.append('redirect_uri', process.env.DISCORD_REDIRECT_URI);
-            params.append('scope', 'identify guilds');
+            params.append("client_id", discordBot.user.id);
+            params.append("client_secret", process.env.DISCORD_SECRET);
+            params.append("grant_type", "refresh_token");
+            params.append("refresh_token", refresh_token);
+            params.append("redirect_uri", process.env.DISCORD_REDIRECT_URI);
+            params.append("scope", "identify guilds");
 
             const response = await fetch("https://discord.com/api/v10/oauth2/token", {
-                method: 'POST',
+                method: "POST",
                 body: params,
                 headers: {
                     "Content-type": "application/x-www-form-urlencoded"
                 },
             });
             const parsedData = await response.json();
-            req.user.discord_token = parsedData
+            req.user.discord_token = parsedData;
             await req.user.save();
             return api_formatter(req, res, 200, "success", "Discord token has been saved");
         } catch (error) {
@@ -83,7 +82,7 @@ exports.discordRefresh = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, err);
     }
-}
+};
 
 exports.githubCallback = async (req, res) => {
     try {
@@ -117,4 +116,4 @@ exports.githubCallback = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the github token", null, err);
     }
-}
+};

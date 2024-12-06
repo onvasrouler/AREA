@@ -7,4 +7,4 @@ module.exports = function (app) {
     app.post("/auth/refresh/discord", checkAuthenticated, authInteractions.discordRefresh);
 
     app.get("/auth/callback/github", checkAuthenticated, authInteractions.githubCallback);
-}
+};

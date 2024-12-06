@@ -1,7 +1,6 @@
-const UserModel = require("../database/models/users.js");
 const api_formatter = require("./api-formatter.js");
-const axios = require('axios');
-const discordBot = require('../utils/discord.js');
+const axios = require("axios");
+const discordBot = require("../utils/discord.js");
 
 async function discordAuth(req, res, next) {
     try {
@@ -10,11 +9,11 @@ async function discordAuth(req, res, next) {
         if (!req.user || req.user == null) // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return a 401 error
         if (!req.user.discord_token.access_token) // if the user doesn't have a discord token
-            return api_formatter(req, res, 401, "notloggedin", "you are not logged in using discord", null, null, null); // return a 401 error
+            return api_formatter(req, res, 401, "discordNotLoggedin", "you are not logged in using discord", null, null, null); // return a 401 error
         if (req.user.discord_token.expires_at < Date.now())
-            return api_formatter(req, res, 401, "notloggedin", "your discord token is expired", null, null, null); // return a 401 error
+            return api_formatter(req, res, 401, "tokenExpired", "your discord token is expired", null, null, null); // return a 401 error
 
-        const userServers = await axios.get('https://discord.com/api/users/@me/guilds', {
+        const userServers = await axios.get("https://discord.com/api/users/@me/guilds", {
             headers: {
                 Authorization: `Bearer ${req.user.discord_token.access_token}`,
             },
