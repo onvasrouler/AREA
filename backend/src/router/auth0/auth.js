@@ -45,7 +45,12 @@ exports.discordCallback = async (req, res) => {
 
 exports.discordRefresh = async (req, res) => {
     try {
-        const { refresh_token } = req.body;
+        const discord_token = req.user.discord_token;
+        if (!discord_token)
+            return api_formatter(req, res, 400, "error", "you first have to login to discord to be able to refresh your token", null, null, null);
+        const refresh_token = discord_token.refresh_token;
+        if (!refresh_token)
+            return api_formatter(req, res, 400, "error", "you first have to login to discord to be able to refresh your token", null, null, null);
         try {
             const params = new URLSearchParams();
             params.append('client_id', discordBot.user.id);
