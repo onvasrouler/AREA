@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button"
 
 export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated }) {
   const handleDiscordLogin = () => {
-    // Implement Discord login logic here
+    const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
+    const REDIRECT_URI = import.meta.env.VITE_DISCORD_REDIRECT_URI;
+    const AUTH_URL = `${import.meta.env.VITE_DISCORD_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
+        REDIRECT_URI
+    )}&response_type=code&scope=identify%20guilds`;
+
+    window.location.href = AUTH_URL;
     console.log("Logging in with Discord");
   }
 
