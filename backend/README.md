@@ -569,26 +569,6 @@ npm run lintfix
       "username": null
     }
     ```
-- **GET /get_my_discord_server**
-  - **Description**: Return a list of the discord server where the user is admin and the bot is.
-  - **header**:
-    ```json
-    {
-      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
-    }
-    ```
-  - **Response**:
-    ```json
-    {
-      "status": 200,
-      "messageStatus": "success",
-      "message": "discord invitation link getted with success",
-      "data": "InvitationLink",
-      "error": null,
-      "session": null,
-      "username": null
-    }
-    ```
 
 - **GET /get_my_discord_server**
   - **Description**: Return a list of the discord server where the user is admin and the bot is.
