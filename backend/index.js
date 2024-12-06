@@ -7,7 +7,7 @@ require("dotenv").config();
 require("./src/database/mongo");
 const api_formatter = require("./src/middleware/api-formatter.js");
 const fileUpload = require("express-fileupload");
-
+require("./src/utils/discord");
 const PORT = process.env.PORT || 3333;
 
 app.use(cors()); // this will allow the frontend to communicate with the backend
@@ -27,6 +27,7 @@ app.use(function (req, res, next) { // this will allow the frontend to communica
 
 require("./src/router/user/user.query")(app); // this will require the user queries
 require("./src/router/api/api.query")(app); // this will require the api queries
+require("./src/router/auth0/auth.query")(app); // this will require the auth0 queries
 
 app.use((req, res) => {
     return api_formatter(req, res, 404, "notFound", "This endpoint isn't found");

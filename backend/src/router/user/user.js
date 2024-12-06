@@ -14,7 +14,7 @@ const { return_signed_cookies,
     delete_every_user_session,
     delete_user_account,
     delete_google_account,
-    sendEmail} = require("./user.utils");
+    sendEmail } = require("./user.utils");
 
 var hour = 3600000;
 var day = hour * 24;
@@ -59,6 +59,7 @@ exports.fastregister = async (req, res) => {
             emailVerified: true
         }).save().then(async function (userRegistered) {
             tmpUserRegister = userRegistered; // set the user that was registered
+
             await new SessionModel({
                 unique_session_id: crypto.randomUUID(), // set the unique session id
                 signed_id: crypto.randomUUID(), // set the signed id
@@ -120,7 +121,7 @@ exports.register = async (req, res) => {
             <a href="${confirmationToken}" target="_blank">${confirmationToken}</a>\n\n
             <p>If you did not register, please ignore this email.</p>`; // create the mail content
 
-            await sendEmail ({ // send the email
+            await sendEmail({ // send the email
                 to: savedUser.email,
                 subject: "Email Verification",
                 html: mailContent

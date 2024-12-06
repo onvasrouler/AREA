@@ -5,11 +5,19 @@ const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema({
     unique_id: { // this is the user id that will be used to identify the user we don't use _id to avoid security issues
         type: String,
-        unique: true,
+        unique: [true, "The Unique ID is already taken for this userSchema"],
         trim: true
     },
     link_session_id: { // this will be used list every session that the user created
         type: Array,
+    },
+    discord_token: { // this will be used to store the discord token
+        type: Object,
+        default: {}
+    },
+    github_token: { // this will be used to store the github token
+        type: Object,
+        default: {}
     },
     email: { // this will be used to identify the user
         type: String,
@@ -59,7 +67,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         max: 100,
         default: ""
-
     },
     passwordChangedAt: {
         type: Date,
@@ -87,22 +94,27 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", function (next) {
-    const user = this;
-    user.LastModificationIp = user.creationIp;
-    user.LastModificationDate = Date.now();
+    try {
+        const user = this;
+        user.LastModificationIp = user.creationIp;
+        user.LastModificationDate = Date.now();
 
-    if (!user.isModified("password")) return next(); // if the password is not modified, we don't need to hash it
+        if (!user.isModified("password")) return next(); // if the password is not modified, we don't need to hash it
 
-    bcrypt.genSalt(10, function (err, salt) { // this will generate a salt to hash the password
-        if (err) return next(err);
-
-        bcrypt.hash(user.password, salt, function (err, hash) { // this will hash the password
+        bcrypt.genSalt(10, function (err, salt) { // this will generate a salt to hash the password
             if (err) return next(err);
 
-            user.password = hash;
-            next();
+            bcrypt.hash(user.password, salt, function (err, hash) { // this will hash the password
+                if (err) return next(err);
+
+                user.password = hash;
+                user.passwordChangedAt = Date.now();
+                next();
+            });
         });
-    });
+    } catch (err) {
+        next(err);
+    }
 });
 
 userSchema.methods.comparePassword = function (password) {

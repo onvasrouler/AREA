@@ -209,6 +209,33 @@ npm run lintfix
 
 ### User Profile Management
 
+- **GET /profile_info**
+  - **Description**: Return some infos about the user.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "you are authenticated",
+      "data": {
+            "username": "req.user.username",
+            "email": "req.user.email",
+            "account_type": "req.user.accountType",
+            "logged_in_discord": "true : false",
+            "logged_in_github": "true : false",
+        },
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
 - **DELETE /fastprofile**
   - **Description**: Delete the user profile quickly (for testing purposes).
   - **body**:
@@ -450,6 +477,202 @@ npm run lintfix
     }
     ```
 
+### OAuth Endpoints
+
+- **POST /auth/callback/discord**
+  - **Description**: Handle Discord OAuth callback.
+  - **body**:
+    ```json
+    {
+      "code": "authorization_code"
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Discord token has been saved",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /auth/refresh/discord**
+  - **Description**: Refresh Discord OAuth token.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Discord token has been saved",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **GET /auth/callback/github**
+  - **Description**: Handle GitHub OAuth callback.
+  - **query**:
+    ```json
+    {
+      "code": "authorization_code"
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Github token has been saved",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+### Discord Endpoints
+- **GET /invite_discord_bot**
+  - **Description**: Return an invitation link for the discord Bot.
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "discord invitation link getted with success",
+      "data": "InvitationLink",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **GET /get_my_discord_server**
+  - **Description**: Return a list of the discord server where the user is admin and the bot is.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "list of matching guilds get with success",
+      "data": [
+        {
+            "id": "guild.id",
+            "name": "guild.name",
+            "icon": "guild.icon"
+        }
+      ],
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **GET /get_list_of_channels**
+  - **Description**: Return a list of the text channels of a discord server ( if the bot is present in this server).
+    - **query**:
+    ```json
+    {
+      "guildId": "guild.id"
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "list of text channel of this server got with success",
+      "data": [
+        {
+            "id": "channel.id",
+            "name": "channel.name",
+        }
+      ],
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+### Github endpoint
+
+- **GET /get_pull_requests**
+  - **Description**: Return a list of the current pull request that the user opened.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "your github pull requests have been fetched with success",
+      "data": "pull requests list",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **GET /get_my_repos**
+  - **Description**: Return a list of the repository the user is in.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "your github repository have been fetched with succes",
+      "data": "user's repo list",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
 ## Data Format
 
 All API responses will be returned in the following format:
@@ -580,6 +803,11 @@ All API responses will be returned in the following format:
 
 ### User Profile Management
 
+- **GET /profile_info**
+  - **Status**: 401
+  - **Message**: "Invalid session"
+  - **Reason**: The session token is invalid or expired.
+
 - **DELETE /fastprofile**
   - **Status**: 401
   - **Message**: "Invalid session"
@@ -633,3 +861,70 @@ All API responses will be returned in the following format:
   - **Status**: 400
   - **Message**: "Invalid token"
   - **Reason**: The reset token is invalid or expired.
+
+### 0Auth endpoint
+
+- **POST /auth/callback/discord**
+  - **Status**: 400
+  - **Message**: "code is required"
+  - **Reason**: no code provided in the request body.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the discord token"
+  - **Reason**: probably because the given code is invalid so the back couldn't turn it in a token.
+
+- **POST /auth/refresh/discord**
+  - **Status**: 400
+  - **Message**: "you first have to login to discord to be able to refresh your token"
+  - **Reason**: you first have to login to discord.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the discord token"
+  - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to discord.
+
+- **GET /auth/callback/github**
+  - **Status**: 400
+  - **Message**: "code is required"
+  - **Reason**: no code provided in the request query.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the github token"
+  - **Reason**: the provided code wasn't correct so the back couldn't turn it in a token.
+
+### API endpoint
+
+- **GET /get_my_discord_server**
+  - **Status**: 401
+  - **Message**: "you are not logged in using discord"
+  - **Reason**: the user didn't logged in using the discord 0Auth.
+
+  - **Status**: 401
+  - **Message**: "your discord token is expired"
+  - **Reason**: your discord token is expired you'll have to refresh it.
+
+- **GET /get_list_of_channels**
+  - **Status**: 401
+  - **Message**: "you are not logged in using discord"
+  - **Reason**: the user didn't logged in using the discord 0Auth.
+
+  - **Status**: 401
+  - **Message**: "your discord token is expired"
+  - **Reason**: your discord token is expired you'll have to refresh it.
+
+  - **Status**: 400
+  - **Message**: "guildId is required"
+  - **Reason**: no guild Id provided in the request query.
+
+  - **Status**: 400
+  - **Message**: "you are not admin of this guild or the bot is not present there"
+  - **Reason**: the given guild id correspond to a guild where the user isn't admin or the bot isn't present or the guild simply doesn't exist.
+
+- **GET /get_pull_requests**
+  - **Status**: 401
+  - **Message**: "you are not logged in using github"
+  - **Reason**: ther user didn't logged in using github 0auth.
+
+- **GET /get_my_repos**
+  - **Status**: 401
+  - **Message**: "you are not logged in using github"
+  - **Reason**: ther user didn't logged in using github 0auth.
