@@ -10,11 +10,12 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Navbar } from "@features/dashboard/components/NavBar"
 import { ServiceDialog } from "@features/dashboard/components/ServiceDialog"
-import { getApiClient } from "@/common/client/APIClient";
+import { getApiClient } from "@/common/client/APIClient"
 
 export function DashboardPage() {
   const [username, setUsername] = useState("User")
   const [selectedService, setSelectedService] = useState(null)
+  const [isDiscordAuthenticated, setIsDiscordAuthenticated] = useState(false)
   const apiClient = getApiClient()
 
   const services = [
@@ -49,16 +50,41 @@ export function DashboardPage() {
       }
     };
 
+    const checkDiscordAuth = async () => {
+      const discordToken = localStorage.getItem("discordToken");
+
+      if (discordToken) {
+        try {
+          const response = await fetch("https://discord.com/api/users/@me", {
+            headers: { Authorization: `Bearer ${discordToken}` },
+          });
+
+          if (response.ok) {
+            setIsDiscordAuthenticated(true);
+          } else {
+            console.error("Discord token is invalid or expired");
+            setIsDiscordAuthenticated(false);
+            localStorage.removeItem("discordToken");
+          }
+        } catch (error) {
+          console.error("Error validating Discord token:", error);
+          setIsDiscordAuthenticated(false);
+        }
+      }
+    };
+
+    checkDiscordAuth();
     fetchUserData();
   }, [apiClient]);
 
   const handleCardClick = (service) => {
-    setSelectedService(service)
+      setSelectedService(service)
   }
 
   const handleCloseDialog = () => {
     setSelectedService(null)
   }
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -95,8 +121,10 @@ export function DashboardPage() {
           isOpen={!!selectedService}
           onClose={handleCloseDialog}
           service={selectedService}
+          isDiscordAuthenticated={isDiscordAuthenticated}
         />
       )}
     </div>
   )
 }
+
