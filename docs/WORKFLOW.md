@@ -20,12 +20,12 @@ The workflow consists of multiple jobs that handle distinct responsibilities, in
                               +--------------------------+
                                             |
                                             v
-            +-------------------------+             +-------------------------+
-            |         Frontend        |             |         Backend         |
-            |      (Lint, Build)      |             |  (Lint, Build, Tests)   |
-            +-------------------------+             +-------------------------+
-                        |                                         |
-                        +-------------------+---------------------+
+    +-------------------------+---------------------------+-------------------------+
+    |         Frontend        |          Mobile           |         Backend         |
+    |      (Lint, Build)      |         (Build)           |  (Lint, Build, Tests)   |
+    +-------------------------+---------------------------+-------------------------+
+                |                           |                           |
+                +---------------------------+---------------------------+
                                             |
                                             v
                               +---------------------------+
@@ -70,7 +70,17 @@ The workflow consists of multiple jobs that handle distinct responsibilities, in
   4. **Run Tests**: Execute backend tests to ensure reliability.
   5. **Run Build**: Builds the backend application.
 
-#### 3. **Deploy Documentation**
+#### 3. **Mobile**
+- **Triggered by**: `pull_request` or `push` on `main`
+- **Runs on**: `ubuntu-latest`
+- **Purpose**: Build, check the dependencies.
+- **Steps**:
+  1. **Setup Java 17**: Install Java temurin.
+  2. **Check flutter version**: Check the installed flutter version.
+  3. **Install the dependencies**: Installs all required packages for the mobile versiob.
+  4. **Run Build**: Builds the mobile application.
+
+#### 4. **Deploy Documentation**
 - **Triggered by**: Completion of `frontend` and `backend` jobs
 - **Runs on**: `ubuntu-latest`
 - **Purpose**: Update project documentation on the GitHub Wiki.
@@ -79,7 +89,7 @@ The workflow consists of multiple jobs that handle distinct responsibilities, in
   2. **Deploy Documentation**: Copy documentation files to the Wiki directory.
   3. **Commit and Push Changes**: If changes are detected, they are committed and pushed to the Wiki.
 
-#### 4. **Mirroring**
+#### 5. **Mirroring**
 - **Triggered by**: Completion of all previous jobs (Frontend, Backend, and Deploy Documentation)
 - **Runs on**: `ubuntu-latest`
 - **Purpose**: Mirror the repository to an external location.
@@ -88,11 +98,7 @@ The workflow consists of multiple jobs that handle distinct responsibilities, in
   2. **Mirror to Target**: Push all changes to the external target repository using `pixta-dev/repository-mirroring-action`.
 
 ### Future Jobs
-1. **Mobile**
-   - **Purpose**: Handle mobile app-related workflows (e.g., builds, tests).
-   - **Status**: To be added.
-
-2. **Ansible**
+1. **Ansible**
    - **Purpose**: Automate deployment or server configuration using Ansible.
    - **Status**: To be added.
 

@@ -95,9 +95,6 @@ async function delete_user_account(User) {
     });
 }
 
-console.log("Emailer email:", process.env.EMAILER_EMAIL);
-console.log("Emailer password:", process.env.EMAILER_PASSWORD);
-
 // This is the transporter for sending emails
 const mailSender = nodemailer.createTransport({
     service: "yahoo",

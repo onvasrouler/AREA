@@ -16,7 +16,6 @@ const { return_signed_cookies,
     delete_google_account,
     sendEmail } = require("./user.utils");
 
-
 var hour = 3600000;
 var day = hour * 24;
 var month = day * 30;
