@@ -6,6 +6,8 @@ const axios = require('axios');
 exports.discordCallback = async (req, res) => {
     try {
         const { code } = req.body;
+        if (!code)
+            return api_formatter(req, res, 400, "no code", "code is required", null, null, null);
         try {
             const params = new URLSearchParams();
             params.append('client_id', discordBot.user.id);
@@ -67,12 +69,14 @@ exports.discordRefresh = async (req, res) => {
                 },
             });
             const parsedData = await response.json();
-            req.user.auth_token.discord = parsedData
+            req.user.discord_token = parsedData
             await req.user.save();
             return api_formatter(req, res, 200, "success", "Discord token has been saved");
         } catch (error) {
             console.error(error.response?.data);
-            return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, error);
+            req.user.discord_token = {};
+            return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token re log-in discord", null, error);
+
         }
     }
     catch (err) {
