@@ -913,7 +913,24 @@ All API responses will be returned in the following format:
 
 ### API endpoint
 
+- **GET /get_my_discord_server**
+  - **Status**: 401
+  - **Message**: "you are not logged in using discord"
+  - **Reason**: the user didn't logged in using the discord 0Auth.
+
+  - **Status**: 401
+  - **Message**: "your discord token is expired"
+  - **Reason**: your discord token is expired you'll have to refresh it.
+
 - **GET /get_list_of_channels**
+  - **Status**: 401
+  - **Message**: "you are not logged in using discord"
+  - **Reason**: the user didn't logged in using the discord 0Auth.
+
+  - **Status**: 401
+  - **Message**: "your discord token is expired"
+  - **Reason**: your discord token is expired you'll have to refresh it.
+
   - **Status**: 400
   - **Message**: "guildId is required"
   - **Reason**: no guild Id provided in the request query.
