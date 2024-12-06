@@ -22,7 +22,6 @@ exports.discordCallback = async (req, res) => {
                     "Content-type": "application/x-www-form-urlencoded"
                 },
             });
-            req.user = await UserModel.findOne({ email: "aimeric.rouyer@gmail.com" });
             let parsedData = await response.json();
             if (parsedData.access_token) {
                 parsedData.expires_at = Date.now() + (parsedData.expires_in * 1000);
@@ -85,7 +84,6 @@ exports.discordRefresh = async (req, res) => {
 exports.githubCallback = async (req, res) => {
     try {
         const { code } = req.query;
-        console.log(code);
         if (!code)
             return api_formatter(req, res, 400, "error", "code is required", null, null, null);
         try {
@@ -102,7 +100,6 @@ exports.githubCallback = async (req, res) => {
             );
             if (!tokenResponse.data.access_token)
                 return api_formatter(req, res, 500, "error", "An error occured while trying to get the github token", null, tokenResponse.data);
-            req.user = await UserModel.findOne({ email: "aimeric.rouyer@gmail.com" });
 
             req.user.github_token = tokenResponse.data;
             await req.user.save();
