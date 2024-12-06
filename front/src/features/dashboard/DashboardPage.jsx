@@ -6,14 +6,16 @@ import spotifyImage from "../../assets/services/Spotify.png"
 import onedriveImage from "../../assets/services/Onedrive.png"
 import gmailImage from "../../assets/services/Gmail.png"
 import instagramImage from "../../assets/services/Instagram.png"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Navbar } from "@features/dashboard/components/NavBar"
 import { ServiceDialog } from "@features/dashboard/components/ServiceDialog"
+import { getApiClient } from "@/common/client/APIClient";
 
 export function DashboardPage() {
   const [username, setUsername] = useState("User")
   const [selectedService, setSelectedService] = useState(null)
+  const apiClient = getApiClient()
 
   const services = [
     { id: 1, name: "Discord", image: discordImage, bgColor: "#526af1", titleStyle: "text-2xl font-bold text-center text-white" },
@@ -23,6 +25,32 @@ export function DashboardPage() {
     { id: 5, name: "Gmail", image: gmailImage, bgColor: "#ffdc5c", titleStyle: "text-2xl font-bold text-center text-white" },
     { id: 6, name: "Instagram", image: instagramImage, bgColor: "#E4405F", titleStyle: "text-2xl font-bold text-center text-white" },
   ]
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const session = localStorage.getItem("session");
+      if (session) {
+        try {
+          const response = await apiClient.get("sessions", {
+            session: session
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setUsername(data.username);
+          } else {
+            console.error('Failed to fetch user data');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      } else {
+        console.error('No session found');
+      }
+    };
+
+    fetchUserData();
+  }, [apiClient]);
 
   const handleCardClick = (service) => {
     setSelectedService(service)

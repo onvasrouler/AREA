@@ -19,4 +19,3 @@ export function ServiceDialog({ isOpen, onClose, service }) {
     </Dialog>
   )
 }
-
