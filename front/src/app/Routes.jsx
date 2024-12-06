@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useAuth } from "@features/auth/hooks/auth.hook";
 import { LoginPage } from "@features/auth/LoginPage";
 import { DashboardPage } from "../features/dashboard/DashboardPage";
+import { Callback } from "../features/auth/Callback";
 
 const AppRoutes = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -19,6 +20,7 @@ const AppRoutes = () => {
         {isAuthenticated ? (
           <>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/callback/" element={<Callback />} />
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </>
         ) : (

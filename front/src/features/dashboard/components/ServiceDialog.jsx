@@ -1,3 +1,4 @@
+import React from "react"
 import {
   Dialog,
   DialogContent,
@@ -16,7 +17,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
 
     window.location.href = AUTH_URL;
     console.log("Logging in with Discord");
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

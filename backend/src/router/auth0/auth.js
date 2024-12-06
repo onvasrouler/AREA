@@ -16,6 +16,15 @@ exports.discordCallback = async (req, res) => {
             params.append("redirect_uri", process.env.DISCORD_REDIRECT_URI);
             params.append("scope", "identify guilds");
 
+            console.log("OAuth parameters sent to Discord:", {
+                client_id: discordBot.user.id,
+                client_secret: process.env.DISCORD_SECRET,
+                grant_type: "authorization_code",
+                code,
+                redirect_uri: process.env.DISCORD_REDIRECT_URI,
+                scope: "identify guilds",
+            });
+
             const response = await fetch("https://discord.com/api/v10/oauth2/token", {
                 method: "POST",
                 body: params,
