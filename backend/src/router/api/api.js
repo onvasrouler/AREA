@@ -24,9 +24,13 @@ exports.profile = async (req, res) => {
 };
 
 exports.inviteDiscordBot = async (req, res) => {
-    const discordClientId = discordBot.user.id;
-    const inviteLink = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&permissions=8&scope=bot%20applications.commands`;
-    return api_formatter(req, res, 200, "success", "discord invitation link getted with success", inviteLink, null, null); // return the user informations
+    try {
+        const discordClientId = discordBot.user.id;
+        const inviteLink = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&permissions=8&scope=bot%20applications.commands`;
+        return api_formatter(req, res, 200, "success", "discord invitation link getted with success", inviteLink, null, null); // return the user informations
+    } catch (err) { // if an error occured
+        return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord invitation link", null, err, null);
+    }
 }
 
 
@@ -38,9 +42,9 @@ exports.getDiscordServer = async (req, res) => {
             name: guild.name,
             icon: guild.icon
         }));
-        return api_formatter(req, res, 200, "success", "you are authenticated", matchingGuilds, null, null); // return the user informations
+        return api_formatter(req, res, 200, "success", "list of matching guilds get with success", matchingGuilds, null, null); // return the user informations
     } catch (err) { // if an error occured
-        return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord server", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to get the list of matching discord servers", null, err, null);
     }
 }
 
@@ -48,11 +52,11 @@ exports.getListOfChannels = async (req, res) => {
     try {
         const { guildId } = req.query;
         if (!guildId)
-            return api_formatter(req, res, 400, "error", "guildId is required", null, null, null);
+            return api_formatter(req, res, 400, "missing guildId", "guildId is required", null, null, null);
         //check if the guildId is in req.quilds
         const guild = req.guilds.find(guild => guild.id === guildId);
         if (!guild)
-            return api_formatter(req, res, 400, "error", "you are not admin of this guild or the bot is not present there", null, null, null);
+            return api_formatter(req, res, 400, "unauthorised Server", "you are not admin of this guild or the bot is not present there", null, null, null);
         // use discordBot to get the text channels of the guild
         const allChannels = discordBot.guilds.cache.get(guildId).channels.cache;
         const textChannels = allChannels.filter(channel => channel.type === 0);
@@ -60,7 +64,7 @@ exports.getListOfChannels = async (req, res) => {
             id: channel.id,
             name: channel.name,
         }));
-        return api_formatter(req, res, 200, "success", "you are authenticated", channelsList, null, null); // return the user informations
+        return api_formatter(req, res, 200, "success", "list of text channel of this server got with success", channelsList, null, null); // return the user informations
     } catch (err) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord server", null, err, null);
     }
@@ -68,7 +72,6 @@ exports.getListOfChannels = async (req, res) => {
 
 exports.getPullRequests = async (req, res) => {
     try {
-        req.user = await UserModel.findOne({ email: "aimeric.rouyer@gmail.com" });
         const token = req.user.github_token.access_token;
         if (!token)
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
