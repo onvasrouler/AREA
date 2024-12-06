@@ -9,7 +9,7 @@ var month = day * 30;
 const sessionSchema = new mongoose.Schema({
     unique_session_id: { // this is the session id that will be used to identify the session we don't use _id to avoid security issues
         type: String,
-        unique: true,
+        unique: [true, "The Unique ID for session Schema is already taken"],
         trim: true
     },
     session_type: { // this will be used to know if the session is a default session or a google session
