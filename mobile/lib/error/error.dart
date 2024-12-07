@@ -16,8 +16,8 @@ class _SignUpState extends State<ErrorPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+    return const Scaffold(
+      backgroundColor: Color.fromARGB(255, 241, 237, 233),
       body: Center(
         child: Text(
           "Error 404 : Page not found",

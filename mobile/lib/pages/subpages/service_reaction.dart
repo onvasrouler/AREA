@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
 
-class MenuPage extends StatefulWidget {
-  const MenuPage({super.key});
+class ServiceReactionPage extends StatefulWidget {
+  const ServiceReactionPage({super.key});
 
   @override
-  State<MenuPage> createState() => _MenuPageState();
+  State<ServiceReactionPage> createState() => _ServiceReactionPageState();
 }
 
-class _MenuPageState extends State<MenuPage> {
+class _ServiceReactionPageState extends State<ServiceReactionPage> {
 
   @override
   void initState() {
@@ -32,7 +32,17 @@ class _MenuPageState extends State<MenuPage> {
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 300.0),
+                          padding: const EdgeInsets.only(left: 25),
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: () {
+                              currentAction = 0;
+                              GoRouter.of(context).pop();
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 200.0),
                           child: PopupMenuButton<String>(
                             icon: const CircleAvatar(
                               backgroundColor: Color.fromARGB(255, 225, 220, 216),
@@ -72,8 +82,8 @@ class _MenuPageState extends State<MenuPage> {
                       onTap: () 
                       {
                         if (services[index - 1].connected) {
-                          currentActionService = index - 1;
-                          GoRouter.of(context).push('/action');
+                          currentReactionService = index - 1;
+                          GoRouter.of(context).push('/reaction');
                         } else {
                           //methode pour se connecter (fonction orientation)
                           //si reussi ->
@@ -85,8 +95,6 @@ class _MenuPageState extends State<MenuPage> {
                         width: 300,
                         height: 300,
                         decoration: BoxDecoration(
-                          //couleur index
-                          //image index
                           color: services[index - 1].color,
                           image: DecorationImage(
                             image: AssetImage(services[index - 1].image),

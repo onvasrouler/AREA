@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/auth/signin.dart';
 import 'package:area/pages/menu.dart';
+import 'package:area/pages/subpages/action.dart';
+import 'package:area/pages/subpages/reaction.dart';
+import 'package:area/pages/subpages/service_reaction.dart';
 import 'package:area/error/error.dart';
-//import 'package:area/constant/constant.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -31,6 +33,18 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
           path: '/signIn',
           builder: (context, state) => const SignInPage(),
+        ),
+        GoRoute(
+          path: '/action',
+          builder: (context, state) => const ActionPage(),
+        ),
+        GoRoute(
+          path: '/reaction',
+          builder: (context, state) => const ReactionPage(),
+        ),
+        GoRoute(
+          path: '/reactionService',
+          builder: (context, state) => const ServiceReactionPage(),
         ),
         GoRoute(
           path: '/signUp',

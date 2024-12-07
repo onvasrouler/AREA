@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/provider/auth.service.dart';
+import 'package:area/constant/constant.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -12,12 +13,14 @@ class SignUpPage extends StatefulWidget {
 class _SignUpState extends State<SignUpPage> {
   late TextEditingController _email;
   late TextEditingController _password;
+  late TextEditingController _username;
   bool loader = false;
 
   @override
   void initState() {
     _email = TextEditingController();
     _password = TextEditingController();
+    _username = TextEditingController();
     super.initState();
   }
 
@@ -25,13 +28,14 @@ class _SignUpState extends State<SignUpPage> {
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _username.dispose();
     super.dispose();
   }
 
   final authService = AuthService();
 
   Future<void> _signUp() async {
-    final response = await authService.signUp(_email.text, _password.text);
+    final response = await authService.signUp(_email.text, _username.text, _password.text);
 
     if (response) {
       GoRouter.of(context).push('/menu');
@@ -41,16 +45,16 @@ class _SignUpState extends State<SignUpPage> {
   final GoogleSignInService googleSignInService = GoogleSignInService();
 
   Future<void> _signInGoogle() async {
-    final response = await googleSignInService.signInWithGoogle(context);
-    if (response) {
-      GoRouter.of(context).push('/menu');
-    }
+    //final response = await googleSignInService.signInWithGoogle(context);
+    //if (response) {
+    //  GoRouter.of(context).push('/menu');
+    //}
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+      backgroundColor: backgroundColor,
       body: Stack(
         children: [
           Center(
@@ -58,7 +62,7 @@ class _SignUpState extends State<SignUpPage> {
               width: 300,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 241, 237, 233),
+                color: containerColor,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: const [
                   BoxShadow(
@@ -83,6 +87,14 @@ class _SignUpState extends State<SignUpPage> {
                       border: OutlineInputBorder(),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _username,
+                    decoration: const InputDecoration(
+                      labelText: 'Username',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                   const SizedBox(height: 15),
                   TextField(
                     controller: _password,
@@ -97,9 +109,9 @@ class _SignUpState extends State<SignUpPage> {
                     onPressed: _signUp,
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
-                      backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+                      backgroundColor: buttonColor,
                       foregroundColor: Colors.black,
-                      side: const BorderSide(color: Colors.grey),
+                      side: const BorderSide(color: Colors.black),
                     ),
                     child : const Text('Sign up'),
                   ),
@@ -109,10 +121,10 @@ class _SignUpState extends State<SignUpPage> {
                     icon: const Icon(Icons.g_mobiledata),
                     label: const Text('Continue with Google'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+                      backgroundColor: buttonColor,
                       foregroundColor: Colors.black,
                       minimumSize: const Size(double.infinity, 50),
-                      side: const BorderSide(color: Colors.grey),
+                      side: const BorderSide(color: Colors.black),
                     ),
                   ),
                 ],

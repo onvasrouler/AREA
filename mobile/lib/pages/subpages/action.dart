@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
 
-class MenuPage extends StatefulWidget {
-  const MenuPage({super.key});
+class ActionPage extends StatefulWidget {
+  const ActionPage({super.key});
 
   @override
-  State<MenuPage> createState() => _MenuPageState();
+  State<ActionPage> createState() => _ActionPageState();
 }
 
-class _MenuPageState extends State<MenuPage> {
+class _ActionPageState extends State<ActionPage> {
 
   @override
   void initState() {
@@ -24,7 +24,7 @@ class _MenuPageState extends State<MenuPage> {
         children: [
           Center(
             child: ListView.builder(
-              itemCount: services.length + 1,
+              itemCount: services[currentActionService].action.length + 1,
               itemBuilder:(context, index) {
                 if (index == 0) {
                   return SizedBox(
@@ -32,7 +32,17 @@ class _MenuPageState extends State<MenuPage> {
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 300.0),
+                          padding: const EdgeInsets.only(left: 25),
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: () {
+                              currentActionService = 0;
+                              GoRouter.of(context).pop();
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 200.0),
                           child: PopupMenuButton<String>(
                             icon: const CircleAvatar(
                               backgroundColor: Color.fromARGB(255, 225, 220, 216),
@@ -59,7 +69,7 @@ class _MenuPageState extends State<MenuPage> {
                                 ),
                               ];
                             },
-                            color: containerColor,
+                            color: const Color.fromARGB(255, 241, 237, 233),
                           ),
                         ),
                       ],
@@ -71,35 +81,24 @@ class _MenuPageState extends State<MenuPage> {
                     GestureDetector(
                       onTap: () 
                       {
-                        if (services[index - 1].connected) {
-                          currentActionService = index - 1;
-                          GoRouter.of(context).push('/action');
-                        } else {
-                          //methode pour se connecter (fonction orientation)
-                          //si reussi ->
-                          // currentActionService = index - 1;
-                          //aller page de action
-                        }
+                        currentAction = index - 1;
+                        GoRouter.of(context).push('/reactionService');
                       },
                       child:Container(
                         width: 300,
-                        height: 300,
+                        height: 100,
                         decoration: BoxDecoration(
-                          //couleur index
-                          //image index
-                          color: services[index - 1].color,
-                          image: DecorationImage(
-                            image: AssetImage(services[index - 1].image),
-                            fit: BoxFit.fitWidth,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 10,
-                              spreadRadius: 5,
+                          color : buttonColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Center(
+                          child: Text(
+                            services[currentActionService].action[index - 1],
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontStyle: FontStyle.italic,
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),

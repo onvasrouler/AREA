@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/provider/auth.service.dart';
+import 'package:area/constant/constant.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -56,13 +57,13 @@ class _SignInState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+      backgroundColor: backgroundColor,
       body: Center(
         child: Container(
           width: 300,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 241, 237, 233),
+            color: containerColor,
             borderRadius: BorderRadius.circular(10),
             boxShadow: const [
               BoxShadow(
@@ -119,10 +120,10 @@ class _SignInState extends State<SignInPage> {
               ElevatedButton(
                 onPressed: _signIn,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+                  backgroundColor: buttonColor,
                   foregroundColor: Colors.black,
                   minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: Colors.grey),
+                  side: const BorderSide(color: Colors.black),
                 ),
                 child : const Text('Sign in'),
               ),
@@ -132,10 +133,10 @@ class _SignInState extends State<SignInPage> {
                 icon: const Icon(Icons.g_mobiledata),
                 label: const Text('Continue with Google'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+                  backgroundColor: buttonColor,
                   foregroundColor: Colors.black,
                   minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: Colors.grey),
+                  side: const BorderSide(color: Colors.black),
                 ),
               ),
             ],
