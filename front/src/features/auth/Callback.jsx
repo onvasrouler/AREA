@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -35,10 +35,16 @@ export const Callback = () => {
                 }
             )
             .then((response) => {
-                const { token } = response.data;
-                localStorage.setItem('discordToken', token);
-                alert('Logged in successfully!');
-                navigate('/dashboard');
+                console.log('Response:', response.data);
+                const token = response.data?.data?.token;
+                if (token) {
+                    localStorage.setItem('discordToken', token);
+                    console.log('Token:', token);
+                    alert('Logged in successfully!');
+                    navigate('/dashboard');
+                } else {
+                    setError('Token not found in the response.');
+                }
             })
             .catch((err) => {
                 setError('Failed to authenticate.');

@@ -52,6 +52,7 @@ export function DashboardPage() {
 
     const checkDiscordAuth = async () => {
       const discordToken = localStorage.getItem("discordToken");
+      console.log("Discord token:", discordToken);
 
       if (discordToken) {
         try {
