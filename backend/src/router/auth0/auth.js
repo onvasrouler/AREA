@@ -35,9 +35,11 @@ exports.discordCallback = async (req, res) => {
             let parsedData = await response.json();
             if (parsedData.access_token) {
                 parsedData.expires_at = Date.now() + (parsedData.expires_in * 1000);
-                req.user.discord_token = parsedData;
+                req.user.discord_token = parsedData.access_token;
                 await req.user.save();
-                return api_formatter(req, res, 200, "success", "Discord token has been saved");
+                return api_formatter(req, res, 200, "success", "Discord token has been saved", {
+                    token: parsedData.access_token,
+                });
             } else {
                 return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, parsedData);
             }

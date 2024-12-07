@@ -31,6 +31,7 @@ export function DashboardPage() {
     const fetchUserData = async () => {
       const session = localStorage.getItem("session");
       if (session) {
+        console.log("Session:", session);
         try {
           const response = await apiClient.get("sessions", {
             session: session
