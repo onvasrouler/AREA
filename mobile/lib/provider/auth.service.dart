@@ -2,8 +2,11 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:area/constant/constant.dart';
 import 'dart:convert';
+import 'package:area/provider/user.service.dart';
 
 class AuthService {
+  final userService = UserService();
+
   Future<bool> login(String email, String password) async {
     final url = Uri.parse('$baseurl/login');
 
@@ -25,6 +28,8 @@ class AuthService {
 
         final data = jsonDecode(response.body);
         session = data['session'];
+
+        await userService.getUserInfo();
 
         return true;
       } else {
@@ -54,8 +59,12 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+
         final data = jsonDecode(response.body);
         session = data['session'];
+
+        await userService.getUserInfo();
+
         return true;
       } else {
         return false;
@@ -93,22 +102,16 @@ class GoogleLoginService {
     return true;
       
   }
-
-  Future<bool> sendAuthCodeToBackend(String? accessToken) async {
-    return true;
-  }
 }
 
 class DiscordAuthService {
   Future<bool> authDiscord(BuildContext context) async {
-    return true;
-      
+    return true;  
   }
 }
 
 class GitHubAuthService {
   Future<bool> authGitHub(BuildContext context) async {
-    return true;
-      
+    return true;  
   }
 }

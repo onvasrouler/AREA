@@ -5,11 +5,8 @@ String baseurl = "http://10.84.107.117:8081";
 String session = "";
 
 int currentActionService = 0;
-
 int currentReactionService = 0;
-
 int currentAction = 0;
-
 int currentReaction = 0;
 
 Color containerColor = const Color.fromARGB(255, 255, 255, 255);
@@ -27,6 +24,9 @@ class Service {
   Service({required this.color, required this.image, required this.name, required this.action, required this.reaction, required this.connected});
 }
 
+const int indexDiscord = 1;
+const int indexGithub = 0;
+
 final List<Service> services = [
   Service(
     color: const Color.fromARGB(255, 0, 0, 0), 
@@ -37,7 +37,7 @@ final List<Service> services = [
       "Detecting new repository",
     ],
     reaction: [],
-    connected: true,
+    connected: false,
   ),
 
   Service(
@@ -48,7 +48,7 @@ final List<Service> services = [
     reaction: [
       "Message in a channel",
     ],
-    connected: true,
+    connected: false,
   ),
 
   Service(
