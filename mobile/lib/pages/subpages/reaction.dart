@@ -105,7 +105,7 @@ class _ReactionPageState extends State<ReactionPage> {
                       {
                         currentReaction = index - 1;
 
-                        if (services[currentReactionService].reaction[currentReaction] == "Message in a channel" && services[currentAction].name == "Discord") {
+                        if (services[currentReactionService].reaction[currentReaction] == "Message in a channel") {
                           _server();
                         } else {
                           //si l'envois au back sest bien dérouler
