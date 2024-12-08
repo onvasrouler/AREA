@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
 import 'package:area/provider/auth.service.dart';
-import 'package:area/provider/user.service.dart';
 
-class ReactionPage extends StatefulWidget {
-  const ReactionPage({super.key});
+class ChannelPage extends StatefulWidget {
+  const ChannelPage({super.key});
 
   @override
-  State<ReactionPage> createState() => _ReactionPageState();
+  State<ChannelPage> createState() => _ChannelPageState();
 }
 
-class _ReactionPageState extends State<ReactionPage> {
+class _ChannelPageState extends State<ChannelPage> {
 
   @override
   void initState() {
@@ -28,16 +27,6 @@ class _ReactionPageState extends State<ReactionPage> {
     }
   }
 
-  final userService = UserService();
-
-  Future<void> _server() async {
-    final response = await userService.getServer();
-
-    if (response) {
-      GoRouter.of(context).push('/server');
-    }
-  }
-
   @override
     Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +35,7 @@ class _ReactionPageState extends State<ReactionPage> {
         children: [
           Center(
             child: ListView.builder(
-              itemCount: services[currentReactionService].reaction.length + 1,
+              itemCount: discordChannel.length,
               itemBuilder:(context, index) {
                 if (index == 0) {
                   return SizedBox(
@@ -58,7 +47,7 @@ class _ReactionPageState extends State<ReactionPage> {
                           child: IconButton(
                             icon: const Icon(Icons.arrow_back),
                             onPressed: () {
-                              currentReactionService = 0;
+                              currentReaction = 0;
                               GoRouter.of(context).pop();
                             },
                           ),
@@ -103,14 +92,9 @@ class _ReactionPageState extends State<ReactionPage> {
                     GestureDetector(
                       onTap: () 
                       {
-                        currentReaction = index - 1;
-
-                        if (services[currentReactionService].reaction[currentReaction] == "Message in a channel" && services[currentAction].name == "Discord") {
-                          _server();
-                        } else {
-                          //si l'envois au back sest bien dérouler
-                          GoRouter.of(context).push('/success');
-                        }
+                        currentChannel = index;
+                        GoRouter.of(context).push('/success');
+                        //result
                       },
                       child:Container(
                         width: 300,
@@ -121,7 +105,7 @@ class _ReactionPageState extends State<ReactionPage> {
                         ),
                         child: Center(
                           child: Text(
-                            services[currentReactionService].reaction[index - 1],
+                            discordChannel[index]["name"],
                             style: const TextStyle(
                               fontSize: 20,
                               fontStyle: FontStyle.italic,

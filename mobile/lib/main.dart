@@ -7,6 +7,8 @@ import 'package:area/pages/subpages/action.dart';
 import 'package:area/pages/subpages/reaction.dart';
 import 'package:area/pages/subpages/service_reaction.dart';
 import 'package:area/pages/subpages/success.dart';
+import 'package:area/pages/subpages/discord/channel.dart';
+import 'package:area/pages/subpages/discord/server.dart';
 import 'package:area/pages/subpages/fail.dart';
 import 'package:area/error/error.dart';
 
@@ -59,6 +61,14 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
           path: '/register',
           builder: (context, state) => const RegisterPage(),
+        ),
+        GoRoute(
+          path: '/server',
+          builder: (context, state) => const ServerPage(),
+        ),
+        GoRoute(
+          path: '/channel',
+          builder: (context, state) => const ChannelPage(),
         ),
         GoRoute(
           path: '/menu',

@@ -8,6 +8,8 @@ int currentActionService = 0;
 int currentReactionService = 0;
 int currentAction = 0;
 int currentReaction = 0;
+int currentChannel = 0;
+int currentServer = 0;
 
 Color containerColor = const Color.fromARGB(255, 255, 255, 255);
 Color backgroundColor = const Color.fromARGB(255, 245, 245, 245);
@@ -23,6 +25,9 @@ class Service {
 
   Service({required this.color, required this.image, required this.name, required this.action, required this.reaction, required this.connected});
 }
+
+var discordChannel = [];
+var discordServer = [];
 
 const int indexDiscord = 1;
 const int indexGithub = 0;
