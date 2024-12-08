@@ -28,16 +28,14 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
 
   useEffect(() => {
     const fetchDiscordData = async () => {
-      const discordToken = localStorage.getItem("discordToken");
       const session = localStorage.getItem("session");
 
-      if (discordToken && isDiscordAuthenticated) {
+      if (session) {
         try {
-          // Get available Discord servers for the user
           const serversResponse = await apiClient.get("get_my_discord_server", {
             session: session,
           });
-          console.log(serversResponse.data);
+          console.log("serversResponse", serversResponse);
           if (serversResponse.data && serversResponse.data.data) {
             setDiscordServers(serversResponse.data.data);
           }

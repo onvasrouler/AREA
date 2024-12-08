@@ -52,26 +52,25 @@ export function DashboardPage() {
     };
 
     const checkDiscordAuth = async () => {
-      const discordToken = localStorage.getItem("discordToken");
-      console.log("Discord token:", discordToken);
-
-      if (discordToken) {
+      const session = localStorage.getItem("session");
+      if (session) {
         try {
-          const response = await fetch("https://discord.com/api/users/@me", {
-            headers: { Authorization: `Bearer ${discordToken}` },
+          const response = await apiClient.get("profile_info", {
+            session: session
           });
+          const responseData = await response.json();
+          console.log(responseData);
 
-          if (response.ok) {
+          if (responseData.data && responseData.data.logged_in_discord === true) {
             setIsDiscordAuthenticated(true);
           } else {
-            console.error("Discord token is invalid or expired");
             setIsDiscordAuthenticated(false);
-            localStorage.removeItem("discordToken");
           }
         } catch (error) {
-          console.error("Error validating Discord token:", error);
-          setIsDiscordAuthenticated(false);
+          console.error("Error:", error);
         }
+      } else {
+        console.error("No session found");
       }
     };
 
