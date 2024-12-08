@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,14 +7,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { getApiClient } from "@/common/client/APIClient"
 
 export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated }) {
   const apiClient = getApiClient();
   const [discordServers, setDiscordServers] = useState([]);
-  const [selectedServer, setSelectedServer] = useState(null);
-  const [discordChannels, setDiscordChannels] = useState([]);
+  const [discordChannels, setDiscordChannels] = useState({});
 
   const handleDiscordLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
@@ -51,44 +56,40 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     fetchDiscordData();
   }, [isDiscordAuthenticated]);
 
-  useEffect(() => {
-    const fetchChannels = async () => {
-      if (!selectedServer)
-        return;
-
-      const session = localStorage.getItem("session");
-      if (!session) {
-        console.error("No session found. Please log in.");
-        return;
-      }
-      try {
-        const response = await fetch(
-          `http://localhost:8080/get_list_of_channels?guildId=${selectedServer}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "session": session,
-            },
-          }
-        );
-        const responseData = await response.json();
-
-        if (responseData && responseData.data) {
-          setDiscordChannels(responseData.data);
-        } else {
-          setDiscordChannels([]);
+  const fetchChannels = async (serverId) => {
+    const session = localStorage.getItem("session");
+    if (!session) {
+      console.error("No session found. Please log in.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `http://localhost:8080/get_list_of_channels?guildId=${serverId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "session": session,
+          },
         }
-      } catch (error) {
-        console.error("Error fetching Discord channels:", error);
-      }
-    };
+      );
+      const responseData = await response.json();
 
-    fetchChannels();
-  }, [selectedServer]);
+      if (responseData && responseData.data) {
+        setDiscordChannels(prevChannels => ({
+          ...prevChannels,
+          [serverId]: responseData.data
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching Discord channels:", error);
+    }
+  };
 
   const handleServerSelect = (serverId) => {
-    setSelectedServer(serverId);
+    if (!discordChannels[serverId]) {
+      fetchChannels(serverId);
+    }
   };
 
   return (
@@ -115,42 +116,39 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
             <div>
               <h3 className="text-lg font-semibold mb-2">Your Discord Servers</h3>
               {discordServers.length > 0 ? (
-                <ul className="space-y-2">
+                <Accordion type="single" collapsible className="w-full">
                   {discordServers.map((server) => (
-                    <li key={server.id} className="flex items-center space-x-2">
-                      {server.icon && (
-                        <img
-                          src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
-                          alt={`${server.name} icon`}
-                          className="w-6 h-6 rounded-full"
-                        />
-                      )}
-                      <Button
-                        onClick={() => handleServerSelect(server.id)}
-                        variant={selectedServer === server.id ? "default" : "outline"}
-                      >
+                    <AccordionItem key={server.id} value={server.id}>
+                      <AccordionTrigger onClick={() => handleServerSelect(server.id)} className="flex items-center space-x-2">
+                        {server.icon && (
+                          <img
+                            src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
+                            alt={`${server.name} icon`}
+                            className="w-6 h-6 rounded-full mr-2"
+                          />
+                        )}
                         {server.name}
-                      </Button>
-                    </li>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        {discordChannels[server.id] ? (
+                          discordChannels[server.id].length > 0 ? (
+                            <ul className="space-y-1 pl-8">
+                              {discordChannels[server.id].map((channel) => (
+                                <li key={channel.id}>{channel.name}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="pl-8">No channels found for this server.</p>
+                          )
+                        ) : (
+                          <p className="pl-8">Loading channels...</p>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
                   ))}
-                </ul>
+                </Accordion>
               ) : (
                 <p>No Discord servers found.</p>
-              )}
-
-              {selectedServer && (
-                <div className="mt-4">
-                  <h4 className="text-md font-semibold mb-2">Channels</h4>
-                  {discordChannels.length > 0 ? (
-                    <ul className="space-y-1">
-                      {discordChannels.map((channel) => (
-                        <li key={channel.id}>{channel.name}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No channels found for this server.</p>
-                  )}
-                </div>
               )}
             </div>
           )}
@@ -159,3 +157,4 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     </Dialog>
   )
 }
+
