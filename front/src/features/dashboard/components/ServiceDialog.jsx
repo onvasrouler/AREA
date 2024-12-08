@@ -52,7 +52,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     };
 
     fetchDiscordData();
-  }, [isDiscordAuthenticated]);
+  }, [isDiscordAuthenticated, apiClient]);
 
   const fetchChannels = async (serverId) => {
     const session = localStorage.getItem("session");

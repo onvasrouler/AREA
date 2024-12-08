@@ -23,7 +23,7 @@ async function discordAuth(req, res, next) {
         const matchingGuilds = userGuilds.filter((guild) => {
             const hasAdminPermission = (BigInt(guild.permissions) & BigInt(0x8)) === BigInt(0x8);
             return botGuilds.includes(guild.id) && hasAdminPermission;
-          });
+        });
 
         req.guilds = matchingGuilds;
         return next();
