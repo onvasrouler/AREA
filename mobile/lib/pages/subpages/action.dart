@@ -50,7 +50,7 @@ class _ActionPageState extends State<ActionPage> {
                             ),
                             onSelected: (String value) {
                               if (value == 'logout') {
-                                GoRouter.of(context).push('/signIn');
+                                GoRouter.of(context).push('/login');
                               }
                             },
                             itemBuilder: (BuildContext context) {

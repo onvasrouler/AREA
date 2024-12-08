@@ -5,10 +5,10 @@ class ErrorPage extends StatefulWidget {
   const ErrorPage({super.key});
 
   @override
-  _SignUpState createState() => _SignUpState();
+  _ErrorState createState() => _ErrorState();
 }
 
-class _SignUpState extends State<ErrorPage> {
+class _ErrorState extends State<ErrorPage> {
 
   @override
   void initState() {

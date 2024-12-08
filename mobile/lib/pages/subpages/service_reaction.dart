@@ -50,7 +50,7 @@ class _ServiceReactionPageState extends State<ServiceReactionPage> {
                             ),
                             onSelected: (String value) {
                               if (value == 'logout') {
-                                GoRouter.of(context).push('/signIn');
+                                GoRouter.of(context).push('/login');
                               }
                             },
                             itemBuilder: (BuildContext context) {

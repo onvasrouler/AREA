@@ -1,7 +1,7 @@
-import 'package:area/auth/signup.dart';
+import 'package:area/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:area/auth/signin.dart';
+import 'package:area/auth/register.dart';
 import 'package:area/pages/menu.dart';
 import 'package:area/pages/subpages/action.dart';
 import 'package:area/pages/subpages/reaction.dart';
@@ -30,11 +30,11 @@ class _MyAppState extends State<MyApp> {
       routes: [
         GoRoute(
           path: '/',
-          redirect: (context, state) => ('/signIn'),
+          redirect: (context, state) => ('/login'),
         ),
         GoRoute(
-          path: '/signIn',
-          builder: (context, state) => const SignInPage(),
+          path: '/login',
+          builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
           path: '/action',
@@ -57,8 +57,8 @@ class _MyAppState extends State<MyApp> {
           builder: (context, state) => const FailPage(),
         ),
         GoRoute(
-          path: '/signUp',
-          builder: (context, state) => const SignUpPage(),
+          path: '/register',
+          builder: (context, state) => const RegisterPage(),
         ),
         GoRoute(
           path: '/menu',

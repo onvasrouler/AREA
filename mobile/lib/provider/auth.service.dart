@@ -4,7 +4,7 @@ import 'package:area/constant/constant.dart';
 import 'dart:convert';
 
 class AuthService {
-  Future<bool> signIn(String email, String password) async {
+  Future<bool> login(String email, String password) async {
     final url = Uri.parse('$baseurl/login');
 
     final Map<String, dynamic> requestBody = {
@@ -22,6 +22,10 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+
+        final data = jsonDecode(response.body);
+        session = data['session'];
+
         return true;
       } else {
         return false;
@@ -31,7 +35,7 @@ class AuthService {
     }
   }
 
-  Future<bool> signUp(String email, String username, String password) async {
+  Future<bool> register(String email, String username, String password) async {
     final url = Uri.parse('$baseurl/fastregister');
 
     final Map<String, dynamic> requestBody = {
@@ -50,6 +54,30 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        session = data['session'];
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+  Future<bool> logout() async {
+    final url = Uri.parse('$baseurl/logout');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        session = "";
         return true;
       } else {
         return false;
@@ -60,8 +88,8 @@ class AuthService {
   }
 }
 
-class GoogleSignInService {
-  Future<bool> signInWithGoogle(BuildContext context) async {
+class GoogleLoginService {
+  Future<bool> loginWithGoogle(BuildContext context) async {
     return true;
       
   }

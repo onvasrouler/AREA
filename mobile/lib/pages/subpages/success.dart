@@ -6,10 +6,10 @@ class SuccessPage extends StatefulWidget {
   const SuccessPage({super.key});
 
   @override
-  _SignUpState createState() => _SignUpState();
+  _SuccessState createState() => _SuccessState();
 }
 
-class _SignUpState extends State<SuccessPage> {
+class _SuccessState extends State<SuccessPage> {
 
   @override
   void initState() {
