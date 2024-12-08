@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
+import 'package:area/provider/auth.service.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -14,6 +15,16 @@ class _MenuPageState extends State<MenuPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  final authService = AuthService();
+
+  Future<void> _logout() async {
+    final response = await authService.logout();
+
+    if (response) {
+      GoRouter.of(context).push('/login');
+    }
   }
 
   @override
@@ -40,7 +51,7 @@ class _MenuPageState extends State<MenuPage> {
                             ),
                             onSelected: (String value) {
                               if (value == 'logout') {
-                                GoRouter.of(context).push('/login');
+                                _logout();
                               }
                             },
                             itemBuilder: (BuildContext context) {
