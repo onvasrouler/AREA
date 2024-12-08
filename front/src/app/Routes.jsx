@@ -12,7 +12,7 @@ const AppRoutes = () => {
   }
 
   return (
-    <Router>
+    <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -20,7 +20,7 @@ const AppRoutes = () => {
         {isAuthenticated ? (
           <>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/callback/" element={<Callback />} />
+            <Route path="/callback" element={<Callback />} />
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </>
         ) : (

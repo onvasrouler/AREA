@@ -19,12 +19,12 @@ export function DashboardPage() {
   const apiClient = getApiClient()
 
   const services = [
-    { id: 1, name: "Discord", image: discordImage, bgColor: "#526af1", titleStyle: "text-2xl font-bold text-center text-white" },
-    { id: 2, name: "GitHub", image: githubImage, bgColor: "#000000", titleStyle: "text-2xl font-bold text-center text-white" },
-    { id: 3, name: "Spotify", image: spotifyImage, bgColor: "#1DB954", titleStyle: "text-2xl font-bold text-center text-white" },
-    { id: 4, name: "OneDrive", image: onedriveImage, bgColor: "#0849b0", titleStyle: "text-2xl font-bold text-center text-white" },
-    { id: 5, name: "Gmail", image: gmailImage, bgColor: "#ffdc5c", titleStyle: "text-2xl font-bold text-center text-white" },
-    { id: 6, name: "Instagram", image: instagramImage, bgColor: "#E4405F", titleStyle: "text-2xl font-bold text-center text-white" },
+    { id: 1, name: "Discord", description: "Manage Discord service", image: discordImage, bgColor: "#526af1", titleStyle: "text-2xl font-bold text-center text-white" },
+    { id: 2, name: "GitHub", description: "Manage GitHub service", image: githubImage, bgColor: "#000000", titleStyle: "text-2xl font-bold text-center text-white" },
+    { id: 3, name: "Spotify", description: "Manage Spotfiy service", image: spotifyImage, bgColor: "#1DB954", titleStyle: "text-2xl font-bold text-center text-white" },
+    { id: 4, name: "OneDrive", description: "Manage OneDrive service", image: onedriveImage, bgColor: "#0849b0", titleStyle: "text-2xl font-bold text-center text-white" },
+    { id: 5, name: "Gmail", description: "Manage Gmail service", image: gmailImage, bgColor: "#ffdc5c", titleStyle: "text-2xl font-bold text-center text-white" },
+    { id: 6, name: "Instagram", description: "Manage Instagram service", image: instagramImage, bgColor: "#E4405F", titleStyle: "text-2xl font-bold text-center text-white" },
   ]
 
   useEffect(() => {
