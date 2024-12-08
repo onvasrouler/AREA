@@ -83,7 +83,7 @@ class _ReactionPageState extends State<ReactionPage> {
                       {
                         currentReaction = index - 1;
                         //si l'envois au back sest bien dérouler
-                        //GoRouter.of(context).push('/success');
+                        GoRouter.of(context).push('/success');
                       },
                       child:Container(
                         width: 300,

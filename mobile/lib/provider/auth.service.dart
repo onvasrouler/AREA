@@ -1,6 +1,5 @@
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-//import 'package:google_sign_in/google_sign_in.dart';
 import 'package:area/constant/constant.dart';
 import 'dart:convert';
 
@@ -9,7 +8,7 @@ class AuthService {
     final url = Uri.parse('$baseurl/login');
 
     final Map<String, dynamic> requestBody = {
-      "email": email,
+      "emailOrUsername": email,
       "password": password,
     };
 
@@ -33,7 +32,7 @@ class AuthService {
   }
 
   Future<bool> signUp(String email, String username, String password) async {
-    final url = Uri.parse('$baseurl/register');
+    final url = Uri.parse('$baseurl/fastregister');
 
     final Map<String, dynamic> requestBody = {
       "email": email,

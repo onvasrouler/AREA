@@ -6,6 +6,8 @@ import 'package:area/pages/menu.dart';
 import 'package:area/pages/subpages/action.dart';
 import 'package:area/pages/subpages/reaction.dart';
 import 'package:area/pages/subpages/service_reaction.dart';
+import 'package:area/pages/subpages/success.dart';
+import 'package:area/pages/subpages/fail.dart';
 import 'package:area/error/error.dart';
 
 void main() async {
@@ -45,6 +47,14 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
           path: '/reactionService',
           builder: (context, state) => const ServiceReactionPage(),
+        ),
+        GoRoute(
+          path: '/success',
+          builder: (context, state) => const SuccessPage(),
+        ),
+        GoRoute(
+          path: '/fail',
+          builder: (context, state) => const FailPage(),
         ),
         GoRoute(
           path: '/signUp',

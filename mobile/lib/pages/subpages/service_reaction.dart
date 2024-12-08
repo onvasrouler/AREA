@@ -24,7 +24,7 @@ class _ServiceReactionPageState extends State<ServiceReactionPage> {
         children: [
           Center(
             child: ListView.builder(
-              itemCount: services.length + 1,
+              itemCount: services.length + 2,
               itemBuilder:(context, index) {
                 if (index == 0) {
                   return SizedBox(
@@ -74,6 +74,47 @@ class _ServiceReactionPageState extends State<ServiceReactionPage> {
                         ),
                       ],
                     ),
+                  );
+                }
+                if (index == services.length + 1) {
+                  return Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () 
+                        {
+                          GoRouter.of(context).push('/success');
+                          //verify the result
+                          currentReactionService = -1;
+                        },
+                        child:Container(
+                          width: 300,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            color: buttonColor,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                spreadRadius: 5,
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "No Reaction",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      )
+                    ],
                   );
                 }
                 return Column(

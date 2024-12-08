@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:area/constant/constant.dart';
 
 class ErrorPage extends StatefulWidget {
   const ErrorPage({super.key});
@@ -16,9 +17,9 @@ class _SignUpState extends State<ErrorPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color.fromARGB(255, 241, 237, 233),
-      body: Center(
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: const Center(
         child: Text(
           "Error 404 : Page not found",
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
