@@ -1,24 +1,27 @@
 const api_formatter = require("../../middleware/api-formatter.js");
 const axios = require("axios");
 const discordBot = require("../../utils/discord");
+const User = require("../../database/models/users");
 
 // This function will return the user profile
 exports.profile = async (req, res) => {
     try {
-        if (!req.user || req.user == null) // if the user is not logged in
-            return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return a 401 error
+        if (!req.user) {
+            return api_formatter(req, res, 401, "notloggedin", "You are not logged in", null, null, null);
+        }
+        const userInDb = await User.findById(req.user._id).select("discord_token github_token");    // get the user from the database to check if he is logged in using discord or github
 
-        const user_infos = { // this will store the user informations
+        const user_infos = {    // create the user informations object to return
             "username": req.user.username,
             "email": req.user.email,
             "account_type": req.user.accountType,
-            "logged_in_discord": req.user.discord_token ? true : false,
-            "logged_in_github": req.user.github_token ? true : false,
+            "logged_in_discord": !!(userInDb.discord_token && userInDb.discord_token.access_token),
+            "logged_in_github": !!(userInDb.github_token && userInDb.github_token.access_token),
         };
-        return api_formatter(req, res, 200, "success", "you are authenticated", user_infos, null, null); // return the user informations
-    } catch (err) { // if an error occured
+        return api_formatter(req, res, 200, "success", "You are authenticated", user_infos, null, null); // return the user informations
+    } catch (err) {
         console.error(err);
-        return api_formatter(req, res, 500, "error", "An error occured while trying to get the user profile", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occurred while trying to get the user profile", null, err, null);
     }
 };
 
