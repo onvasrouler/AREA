@@ -59,7 +59,6 @@ export function DashboardPage() {
             session: session
           });
           const responseData = await response.json();
-          console.log(responseData);
 
           if (responseData.data && responseData.data.logged_in_discord === true) {
             setIsDiscordAuthenticated(true);

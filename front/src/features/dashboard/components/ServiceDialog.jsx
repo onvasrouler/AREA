@@ -23,7 +23,6 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     )}&response_type=code&scope=identify%20guilds`;
 
     window.location.href = AUTH_URL;
-    console.log("Logging in with Discord");
   };
 
   useEffect(() => {
@@ -35,9 +34,11 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
           const serversResponse = await apiClient.get("get_my_discord_server", {
             session: session,
           });
-          console.log("serversResponse", serversResponse);
-          if (serversResponse.data && serversResponse.data.data) {
-            setDiscordServers(serversResponse.data.data);
+
+          const responseData = await serversResponse.json();
+
+          if (responseData && responseData.data) {
+            setDiscordServers(responseData.data);
           }
         } catch (error) {
           console.error("Error fetching Discord servers:", error);
@@ -52,20 +53,34 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
 
   useEffect(() => {
     const fetchChannels = async () => {
-      if (selectedServer) {
-        const session = localStorage.getItem("session");
-        try {
-          const channelsResponse = await apiClient.get("get_list_of_channels", {
-            session: session,
-            guildId: selectedServer,
-          });
+      if (!selectedServer)
+        return;
 
-          if (channelsResponse.data && channelsResponse.data.data) {
-            setDiscordChannels(channelsResponse.data.data);
+      const session = localStorage.getItem("session");
+      if (!session) {
+        console.error("No session found. Please log in.");
+        return;
+      }
+      try {
+        const response = await fetch(
+          `http://localhost:8080/get_list_of_channels?guildId=${selectedServer}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "session": session,
+            },
           }
-        } catch (error) {
-          console.error("Error fetching Discord channels:", error);
+        );
+        const responseData = await response.json();
+
+        if (responseData && responseData.data) {
+          setDiscordChannels(responseData.data);
+        } else {
+          setDiscordChannels([]);
         }
+      } catch (error) {
+        console.error("Error fetching Discord channels:", error);
       }
     };
 

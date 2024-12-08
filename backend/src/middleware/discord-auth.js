@@ -19,12 +19,13 @@ async function discordAuth(req, res, next) {
             },
         });
         const userGuilds = userServers.data;
-        const botGuilds = discordBot.guilds.cache.map((guild) => guild.id);
-        //the user is admin of the guild and the bot is in the guild
-        const mathingGuilds = userGuilds.filter((guild) => {
-            return botGuilds.includes(guild.id) && guild.owner === true && guild.permissions === 2147483647;
-        });
-        req.guilds = mathingGuilds;
+        const botGuilds = Array.from(discordBot.guilds.cache.values()).map((guild) => guild.id);
+        const matchingGuilds = userGuilds.filter((guild) => {
+            const hasAdminPermission = (BigInt(guild.permissions) & BigInt(0x8)) === BigInt(0x8);
+            return botGuilds.includes(guild.id) && hasAdminPermission;
+          });
+
+        req.guilds = matchingGuilds;
         return next();
     } catch (err) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord server", null, err, null);
