@@ -34,7 +34,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     const fetchDiscordData = async () => {
       const session = localStorage.getItem("session");
 
-      if (session) {
+      if (session && isDiscordAuthenticated) {
         try {
           const serversResponse = await apiClient.get("get_my_discord_server", {
             session: session,
@@ -48,8 +48,6 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
         } catch (error) {
           console.error("Error fetching Discord servers:", error);
         }
-      } else {
-        console.error("No Discord token found or not authenticated. Please log in.");
       }
     };
 

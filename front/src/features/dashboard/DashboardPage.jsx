@@ -64,6 +64,7 @@ export function DashboardPage() {
             console.log("Discord authenticated");
             setIsDiscordAuthenticated(true);
           } else {
+            console.log("Discord not authenticated");
             setIsDiscordAuthenticated(false);
           }
         } catch (error) {
