@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/dialog"
 import { getApiClient } from "@/common/client/APIClient";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from 'react-router-dom';
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -57,7 +56,6 @@ export function LoginPage() {
   const [registeredEmail, setRegisteredEmail] = useState('')
   const [registrationData, setRegistrationData] = useState(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const form = useForm({
     resolver: zodResolver(isLogin ? loginSchema : signUpSchema),
