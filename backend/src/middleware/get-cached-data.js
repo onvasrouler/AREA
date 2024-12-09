@@ -26,7 +26,6 @@ async function CachedData(req, res, next) {
             } else {
                 req.cachedData = CorrespondingData;
                 return next();
-
             }
         }).catch(function (err) {
             return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to get the user cache", null, err, null, null);
