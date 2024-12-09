@@ -51,7 +51,6 @@ exports.getDiscordServer = async (req, res) => {
 };
 
 exports.getListOfChannels = async (req, res) => {
-    console.log("hello");
     try {
         const { guildId } = req.query;
         if (!guildId)
@@ -75,33 +74,62 @@ exports.getListOfChannels = async (req, res) => {
 
 exports.getPullRequests = async (req, res) => {
     try {
-        const token = req.user.github_token.access_token;
-        if (!token)
-            return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
-        const prsResponse = await axios.get(
-            "https://api.github.com/search/issues?q=type:pr+author:@me",
-            {
-                headers: { Authorization: `Bearer ${token}` },
+        let githubCachedData = req.cachedData.data.githubPrCachedData;
+        if (!githubCachedData || githubCachedData.updatedAt + 60 > Date.now()) {
+            const token = req.user.github_token.access_token;
+            if (!token)
+                return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
+            const prsResponse = await axios.get(
+                "https://api.github.com/search/issues?q=type:pr+author:@me",
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const GithubData = {
+                data: prsResponse.data,
+                updatedAt: Date.now(),
+            };
+            req.cachedData.data = {
+                ...req.cachedData.data,
+                githubPrCachedData: GithubData
             }
-        );
-        return api_formatter(req, res, 200, "success", "your github pull requests have been fetched with success", prsResponse.data, null, null); // return the user informations
+            await req.cachedData.save();
+            githubCachedData = GithubData.data;
+
+        }
+        return api_formatter(req, res, 200, "success", "your github pull requests have been fetched with success", githubCachedData, null, null); // return the user informations
     } catch (error) {
+        console.error(error)
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the github pull requests", null, error, null);
     }
 };
 
 exports.getMyRepos = async (req, res) => {
     try {
-        const token = req.user.github_token.access_token;
-        if (!token)
-            return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
-        const reposResponse = await axios.get(
-            "https://api.github.com/user/repos",
-            {
-                headers: { Authorization: `Bearer ${token}` },
+        let githubCachedData = req.cachedData.data.githubRepoCachedData;
+        if (!githubCachedData || githubCachedData.updatedAt + 60 > Date.now()) {
+            const token = req.user.github_token.access_token;
+            if (!token)
+                return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
+            const reposResponse = await axios.get(
+                "https://api.github.com/user/repos",
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const GithubData = {
+                data: reposResponse.data,
+                updatedAt: Date.now(),
+            };
+
+            req.cachedData.data = {
+                ...req.cachedData.data,
+                githubRepoCachedData: GithubData
             }
-        );
-        return api_formatter(req, res, 200, "success", "your github repository have been fetched with success", reposResponse.data, null, null); // return the user informations
+            await req.cachedData.save();
+            githubCachedData = GithubData.data;
+        }
+        return api_formatter(req, res, 200, "success", "your github repository have been fetched with success", githubCachedData, null, null); // return the user informations
     } catch (error) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the github repositories", null, error, null);
     }
