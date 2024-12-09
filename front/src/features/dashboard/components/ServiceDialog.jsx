@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,14 +7,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { getApiClient } from "@/common/client/APIClient"
 
 export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated }) {
   const apiClient = getApiClient();
   const [discordServers, setDiscordServers] = useState([]);
-  const [selectedServer, setSelectedServer] = useState(null);
-  const [discordChannels, setDiscordChannels] = useState([]);
+  const [discordChannels, setDiscordChannels] = useState({});
 
   const [githubRepos, setGithubRepos] = useState([]);
   const [isGithubAuthenticated, setIsGithubAuthenticated] = useState(false);
@@ -21,7 +26,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   const handleDiscordLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
     const REDIRECT_URI = import.meta.env.VITE_DISCORD_REDIRECT_URI;
-    const AUTH_URL = `${import.meta.env.VITE_DISCORD_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    const AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
         REDIRECT_URI
     )}&response_type=code&scope=identify%20guilds`;
 
@@ -39,102 +44,65 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   };
 
   useEffect(() => {
-    const fetchDiscordData = async () => {
-      const session = localStorage.getItem("session");
+    if (isOpen && service.name === "Discord") {
+      fetchServers();
+    }
+  }, [isOpen, service.name]);
 
-      if (session) {
-        try {
-          const serversResponse = await apiClient.get("get_my_discord_server", {
-            session: session,
-          });
+  const fetchServers = async () => {
+    const session = localStorage.getItem("session");
 
-          const responseData = await serversResponse.json();
-
-          if (responseData && responseData.data) {
-            setDiscordServers(responseData.data);
-          }
-        } catch (error) {
-          console.error("Error fetching Discord servers:", error);
-        }
-      } else {
-        console.error("No Discord token found or not authenticated. Please log in.");
-      }
-    };
-
-    fetchDiscordData();
-  }, [isDiscordAuthenticated]);
-
-  useEffect(() => {
-    const fetchChannels = async () => {
-      if (!selectedServer)
-        return;
-
-      const session = localStorage.getItem("session");
-      if (!session) {
-        console.error("No session found. Please log in.");
-        return;
-      }
+    if (session && isDiscordAuthenticated) {
       try {
-        const response = await fetch(
-          `http://localhost:8080/get_list_of_channels?guildId=${selectedServer}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "session": session,
-            },
-          }
-        );
-        const responseData = await response.json();
-
-        if (responseData && responseData.data) {
-          setDiscordChannels(responseData.data);
-        } else {
-          setDiscordChannels([]);
-        }
-      } catch (error) {
-        console.error("Error fetching Discord channels:", error);
-      }
-    };
-
-    fetchChannels();
-  }, [selectedServer]);
-
-  useEffect(() => {
-    const fetchGithubData = async () => {
-      const session = localStorage.getItem("session");
-
-      if (!session) {
-        console.error("No github session found. Please log in.");
-        return;
-      }
-
-      try {
-        const response = await apiClient.get("get_my_repos", {
+        const serversResponse = await apiClient.get("get_my_discord_server", {
           session: session,
         });
 
-        const responseData = await response.json();
+        const responseData = await serversResponse.json();
 
         if (responseData && responseData.data) {
-          setGithubRepos(responseData.data);
-          setIsGithubAuthenticated(true);
-        } else {
-          setGithubRepos([]);
-          setIsGithubAuthenticated(false);
+          setDiscordServers(responseData.data);
         }
       } catch (error) {
-        console.error("Error fetching Github repositories:", error);
+        console.error("Error fetching Discord servers:", error);
       }
-    };
-
-    if (service.name === "Github") {
-      fetchGithubData();
     }
-  }, [service.name]);
+  };
+
+  const fetchChannels = async (serverId) => {
+    const session = localStorage.getItem("session");
+    if (!session) {
+      console.error("No session found. Please log in.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_DISCORD_CHANNELS_FETCH_URL}${serverId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "session": session,
+          },
+        }
+      );
+      const responseData = await response.json();
+
+      if (responseData && responseData.data) {
+        setDiscordChannels(prevChannels => ({
+          ...prevChannels,
+          [serverId]: responseData.data
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching Discord channels:", error);
+    }
+  };
 
   const handleServerSelect = (serverId) => {
-    setSelectedServer(serverId);
+    if (!discordChannels[serverId]) {
+      fetchChannels(serverId);
+    }
   };
 
   return (
@@ -145,94 +113,55 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
           <DialogDescription>{service.description}</DialogDescription>
         </DialogHeader>
         <div className="p-4">
-          {service.name === "Discord" && (
-            <>
-              {!isDiscordAuthenticated ? (
-                <div className="flex flex-col items-center">
-                  <p className="mb-4">You need to log in with Discord to access this service.</p>
-                  <Button
-                    onClick={handleDiscordLogin}
-                    className="font-bold py-2 px-4 rounded"
-                  >
-                    Login with Discord
-                  </Button>
-                </div>
+          {service.name === "Discord" && !isDiscordAuthenticated ? (
+            <div className="flex flex-col items-center">
+              <p className="mb-4">You need to log in with Discord to access this service.</p>
+              <Button
+                onClick={handleDiscordLogin}
+                className="font-bold py-2 px-4 rounded"
+              >
+                Login with Discord
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Your Discord Servers</h3>
+              {discordServers.length > 0 ? (
+                <Accordion type="single" collapsible className="w-full">
+                  {discordServers.map((server) => (
+                    <AccordionItem key={server.id} value={server.id}>
+                      <AccordionTrigger onClick={() => handleServerSelect(server.id)} className="flex items-center space-x-2">
+                        {server.icon && (
+                          <img
+                            src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
+                            alt={`${server.name} icon`}
+                            className="w-6 h-6 rounded-full mr-2"
+                          />
+                        )}
+                        {server.name}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        {discordChannels[server.id] ? (
+                          discordChannels[server.id].length > 0 ? (
+                            <ul className="space-y-1 pl-8">
+                              {discordChannels[server.id].map((channel) => (
+                                <li key={channel.id}>{channel.name}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="pl-8">No channels found for this server.</p>
+                          )
+                        ) : (
+                          <p className="pl-8">Loading channels...</p>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               ) : (
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Your Discord Servers</h3>
-                  {discordServers.length > 0 ? (
-                    <ul className="space-y-2">
-                      {discordServers.map((server) => (
-                        <li key={server.id} className="flex items-center space-x-2">
-                          {server.icon && (
-                            <img
-                              src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
-                              alt={`${server.name} icon`}
-                              className="w-6 h-6 rounded-full"
-                            />
-                          )}
-                          <Button
-                            onClick={() => handleServerSelect(server.id)}
-                            variant={selectedServer === server.id ? "default" : "outline"}
-                          >
-                            {server.name}
-                          </Button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No Discord servers found.</p>
-                  )}
-
-                  {selectedServer && (
-                    <div className="mt-4">
-                      <h4 className="text-md font-semibold mb-2">Channels</h4>
-                      {discordChannels.length > 0 ? (
-                        <ul className="space-y-1">
-                          {discordChannels.map((channel) => (
-                            <li key={channel.id}>{channel.name}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>No channels found for this server.</p>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <p>No Discord servers found.</p>
               )}
-            </>
-          )}
-
-          {service.name === "GitHub" && (
-            <>
-              {!isGithubAuthenticated ? (
-                <div className="flex flex-col items-center">
-                  <p className="mb-4">You need to log in with GitHub to access this service.</p>
-                  <Button
-                    onClick={handleGithubLogin}
-                    className="font-bold py-2 px-4 rounded"
-                  >
-                    Login with GitHub
-                  </Button>
-                </div>
-              ) : (
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Your GitHub Repositories</h3>
-                  {githubRepos.length > 0 ? (
-                    <ul className="space-y-2">
-                      {githubRepos.map((repo) => (
-                        <li key={repo.id} className="flex items-center space-x-2">
-                          <span className="font-medium">{repo.name}</span>
-                          <span className="text-gray-500">{repo.language}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No repositories found.</p>
-                  )}
-                </div>
-              )}
-            </>
+            </div>
           )}
         </div>
       </DialogContent>

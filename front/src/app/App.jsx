@@ -1,4 +1,3 @@
-import React from 'react';
 import { AppRoutes } from "./routes.jsx";
 import { AuthProvider } from "@features/auth/hooks/auth.hook";
 import { Toaster } from "@/components/ui/Toaster";
