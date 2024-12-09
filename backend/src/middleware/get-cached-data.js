@@ -1,5 +1,6 @@
-const CachedDataModel = require("../database/models/cachedData.js")
+const CachedDataModel = require("../database/models/cachedData.js");
 const crypto = require("crypto");
+const api_formatter = require("./api-formatter.js");
 
 async function CachedData(req, res, next) {
     try {
@@ -17,19 +18,19 @@ async function CachedData(req, res, next) {
                     user_signed_id: req.user.unique_id,
                     createdAt: Date.now()
                 }).save().then(async function (newCache) {
-                    req.cachedData = newCache
-                    return next()
+                    req.cachedData = newCache;
+                    return next();
                 }).catch(function (err) {
                     return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to create a new cache for the user", null, err, null, null);
-                })
+                });
             } else {
-                req.cachedData = CorrespondingData
+                req.cachedData = CorrespondingData;
                 return next();
 
             }
         }).catch(function (err) {
             return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to get the user cache", null, err, null, null);
-        })
+        });
     } catch (err) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the user's cached data", null, err, null);
     }

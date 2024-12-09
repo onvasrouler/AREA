@@ -15,7 +15,7 @@ exports.postArea = async (req, res) => {
         const tokens = `
             ${action.service}: ${action.service == "github" ? req.user.github_token : ""}
             ${reaction.service}: ${reaction.service == "discord" ? req.user.discord_token : ""}
-        `
+        `;
         const newActionReaction = new ActionReactionModel({
             unique_id: crypto.randomBytes(16).toString("hex"),
             action,
@@ -47,7 +47,7 @@ exports.getArea = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, err);
     }
-}
+};
 
 exports.deleteArea = async (req, res) => {
     try {
@@ -61,4 +61,4 @@ exports.deleteArea = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, err);
     }
-}
+};

@@ -31,7 +31,7 @@ cachedDataSchema.pre("save", function (next) {
         cachedData.LastModificationDate = Date.now();
         next();
     } catch (err) {
-        console.error(err)
+        console.error(err);
         next(err);
     }
 });

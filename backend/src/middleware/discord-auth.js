@@ -23,12 +23,12 @@ async function discordAuth(req, res, next) {
                 data: userServers.data,
                 updatedAt: Date.now(),
 
-            }
+            };
             req.cachedData.data["discordCachedData"] = DiscordData;
-            await req.cachedData.save()
-            discordCachedData = DiscordData
+            await req.cachedData.save();
+            discordCachedData = DiscordData;
         }
-        const userGuilds = discordCachedData.data
+        const userGuilds = discordCachedData.data;
         const botGuilds = Array.from(discordBot.guilds.cache.values()).map((guild) => guild.id);
         const matchingGuilds = userGuilds.filter((guild) => {
             const hasAdminPermission = (BigInt(guild.permissions) & BigInt(0x8)) === BigInt(0x8);
@@ -37,7 +37,7 @@ async function discordAuth(req, res, next) {
         req.guilds = matchingGuilds;
         return next();
     } catch (err) {
-        console.error(err)
+        console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord server", null, err, null);
     }
 }

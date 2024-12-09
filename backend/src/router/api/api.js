@@ -10,7 +10,7 @@ exports.profile = async (req, res) => {
         let logged_in_discord = req.user.discord_token != {} &&
             req.user.discord_token.access_token != null ? true : false;
         if (logged_in_discord && req.user.discord_token.expires_at < Date.now())
-            logged_in_discord = "session_expired"
+            logged_in_discord = "session_expired";
         const user_infos = { // this will store the user informations
             "username": req.user.username,
             "email": req.user.email,
@@ -51,6 +51,7 @@ exports.getDiscordServer = async (req, res) => {
 };
 
 exports.getListOfChannels = async (req, res) => {
+    console.log("hello");
     try {
         const { guildId } = req.query;
         if (!guildId)
