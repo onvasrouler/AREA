@@ -25,7 +25,7 @@ app.use(function (req, res, next) { // this will allow the frontend to communica
 
 require("./src/router/user/user.query")(app); // this will require the user queries
 require("./src/router/api/api.query")(app); // this will require the api queries
-require("./src/router/0Auth/auth.query")(app); // this will require the auth0 queries
+require("./src/router/auth0/auth.query.js")(app); // this will require the auth0 queries
 require("./src/router/actionReaction/actionReaction.query")(app); // this will require the actionReaction queries
 
 app.use((req, res) => {
