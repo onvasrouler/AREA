@@ -23,7 +23,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   const handleDiscordLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
     const REDIRECT_URI = import.meta.env.VITE_DISCORD_REDIRECT_URI;
-    const AUTH_URL = `${import.meta.env.VITE_DISCORD_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    const AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
         REDIRECT_URI
     )}&response_type=code&scope=identify%20guilds`;
 
@@ -64,7 +64,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     }
     try {
       const response = await fetch(
-        `http://localhost:8080/get_list_of_channels?guildId=${serverId}`,
+        `${import.meta.env.VITE_DISCORD_CHANNELS_FETCH_URL}${serverId}`,
         {
           method: "GET",
           headers: {
