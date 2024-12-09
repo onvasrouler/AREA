@@ -36,14 +36,13 @@ export const Callback = () => {
             )
             .then((response) => {
                 console.log('Response:', response.data);
-                const token = response.data?.data?.token;
-                if (token) {
-                    localStorage.setItem('discordToken', token);
-                    console.log('Token:', token);
+                if (response.status == 200) {
+                    setStatus('success');
                     navigate('/dashboard');
                 } else {
-                    setError('Token not found in the response.');
+                    setError('Failed to authenticate.');
                     setStatus('error');
+                    console.error('Error:', response.data);
                 }
             })
             .catch((err) => {
