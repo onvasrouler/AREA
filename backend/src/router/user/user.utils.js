@@ -97,7 +97,7 @@ async function delete_user_account(User) {
 
 // This is the transporter for sending emails
 const mailSender = nodemailer.createTransport({
-    service: "yahoo",
+    service: "gmail",
     auth: {
         user: process.env.EMAILER_EMAIL,
         pass: process.env.EMAILER_PASSWORD,
