@@ -7,9 +7,10 @@ exports.profile = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return a 401 error
-        const logged_in_discord = req.user.discord_token != {} &&
-            req.user.discord_token.access_token != null &&
-            req.user.discord_token.expires_at > Date.now() ? true : false;
+        let logged_in_discord = req.user.discord_token != {} &&
+            req.user.discord_token.access_token != null ? true : false;
+        if (logged_in_discord && req.user.discord_token.expires_at > Date.now())
+            logged_in_discord = "session_expired"
         const user_infos = { // this will store the user informations
             "username": req.user.username,
             "email": req.user.email,
