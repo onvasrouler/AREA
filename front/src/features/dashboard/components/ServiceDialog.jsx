@@ -31,28 +31,30 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   };
 
   useEffect(() => {
-    const fetchDiscordData = async () => {
-      const session = localStorage.getItem("session");
+    if (isOpen && service.name === "Discord") {
+      fetchServers();
+    }
+  }, [isOpen, service.name]);
 
-      if (session && isDiscordAuthenticated) {
-        try {
-          const serversResponse = await apiClient.get("get_my_discord_server", {
-            session: session,
-          });
+  const fetchServers = async () => {
+    const session = localStorage.getItem("session");
 
-          const responseData = await serversResponse.json();
+    if (session && isDiscordAuthenticated) {
+      try {
+        const serversResponse = await apiClient.get("get_my_discord_server", {
+          session: session,
+        });
 
-          if (responseData && responseData.data) {
-            setDiscordServers(responseData.data);
-          }
-        } catch (error) {
-          console.error("Error fetching Discord servers:", error);
+        const responseData = await serversResponse.json();
+
+        if (responseData && responseData.data) {
+          setDiscordServers(responseData.data);
         }
+      } catch (error) {
+        console.error("Error fetching Discord servers:", error);
       }
-    };
-
-    fetchDiscordData();
-  }, [isDiscordAuthenticated, apiClient]);
+    }
+  };
 
   const fetchChannels = async (serverId) => {
     const session = localStorage.getItem("session");
@@ -155,4 +157,3 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     </Dialog>
   )
 }
-
