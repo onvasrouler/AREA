@@ -24,9 +24,28 @@ export const Callback = () => {
             setStatus('error');
             return;
         }
+
+        const service = location.pathname.includes("github")
+            ? "github"
+            : location.pathname.includes("discord")
+            ? "discord"
+            : null;
+
+        if (!service) {
+            setError("Unsupported service.");
+            setStatus("error");
+            return;
+        }
+
+        // Use the appropriate backend URL for the service
+        const callbackUrl =
+            service === "github"
+                ? import.meta.env.VITE_BACKEND_CALLBACK_URL_GITHUB
+                : import.meta.env.VITE_BACKEND_CALLBACK_URL_DISCORD;
+
         axios
             .post(
-                `${import.meta.env.VITE_BACKEND_CALLBACK_URL}`,
+                callbackUrl,
                 { code },
                 {
                     headers: {
