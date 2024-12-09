@@ -527,9 +527,9 @@ npm run lintfix
     }
     ```
 
-- **GET /auth/callback/github**
+- **POST /auth/callback/github**
   - **Description**: Handle GitHub OAuth callback.
-  - **query**:
+  - **body**:
     ```json
     {
       "code": "authorization_code"
@@ -547,6 +547,27 @@ npm run lintfix
       "status": 200,
       "messageStatus": "success",
       "message": "Github token has been saved",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /auth/refresh/github**
+  - **Description**: Github refresh token.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Github token has been refreshed",
       "data": null,
       "error": null,
       "session": null,
@@ -882,7 +903,7 @@ All API responses will be returned in the following format:
   - **Message**: "An error occured while trying to get the discord token"
   - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to discord.
 
-- **GET /auth/callback/github**
+- **POST /auth/callback/github**
   - **Status**: 400
   - **Message**: "code is required"
   - **Reason**: no code provided in the request query.
@@ -890,6 +911,11 @@ All API responses will be returned in the following format:
   - **Status**: 500
   - **Message**: "An error occured while trying to get the github token"
   - **Reason**: the provided code wasn't correct so the back couldn't turn it in a token.
+
+- **POST /auth/callback/github**
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the github token"
+  - **Reason**: the back couldn't refresh the token in this case delete the github token.
 
 ### API endpoint
 
