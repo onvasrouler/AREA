@@ -92,14 +92,14 @@ exports.getPullRequests = async (req, res) => {
             req.cachedData.data = {
                 ...req.cachedData.data,
                 githubPrCachedData: GithubData
-            }
+            };
             await req.cachedData.save();
             githubCachedData = GithubData.data;
 
         }
         return api_formatter(req, res, 200, "success", "your github pull requests have been fetched with success", githubCachedData, null, null); // return the user informations
     } catch (error) {
-        console.error(error)
+        console.error(error);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the github pull requests", null, error, null);
     }
 };
@@ -125,7 +125,7 @@ exports.getMyRepos = async (req, res) => {
             req.cachedData.data = {
                 ...req.cachedData.data,
                 githubRepoCachedData: GithubData
-            }
+            };
             await req.cachedData.save();
             githubCachedData = GithubData.data;
         }

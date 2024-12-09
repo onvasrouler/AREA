@@ -27,7 +27,7 @@ async function discordAuth(req, res, next) {
             req.cachedData.data = {
                 ...req.cachedData.data,
                 discordCachedData: DiscordData
-            }
+            };
             await req.cachedData.save();
             discordCachedData = DiscordData;
         }
