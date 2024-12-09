@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const morgan = require("morgan");
 const helmet = require("helmet");
 require("dotenv").config();
 require("./src/database/mongo");
@@ -15,7 +14,6 @@ app.use(helmet()); // this will add security headers
 app.use(express.json()); // this will allow the backend to parse json data
 app.use(fileUpload()); // this will allow the backend to parse files
 app.use(express.urlencoded({ extended: true, limit: "50mb" })); // this will allow the backend to parse urlencoded data
-app.use(morgan("combined")); // this will log the requests
 
 app.use(function (req, res, next) { // this will allow the frontend to communicate with the backend
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -27,7 +25,8 @@ app.use(function (req, res, next) { // this will allow the frontend to communica
 
 require("./src/router/user/user.query")(app); // this will require the user queries
 require("./src/router/api/api.query")(app); // this will require the api queries
-require("./src/router/auth0/auth.query")(app); // this will require the auth0 queries
+require("./src/router/auth0/auth.query.js")(app); // this will require the auth0 queries
+require("./src/router/actionReaction/actionReaction.query")(app); // this will require the actionReaction queries
 
 app.use((req, res) => {
     return api_formatter(req, res, 404, "notFound", "This endpoint isn't found");
