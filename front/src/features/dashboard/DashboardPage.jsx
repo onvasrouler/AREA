@@ -16,6 +16,7 @@ export function DashboardPage() {
   const [username, setUsername] = useState("User")
   const [selectedService, setSelectedService] = useState(null)
   const [isDiscordAuthenticated, setIsDiscordAuthenticated] = useState(false)
+  const [isGithubAuthenticated, setIsGithubAuthenticated] = useState(false)
   const apiClient = getApiClient()
 
   const services = [
@@ -75,7 +76,32 @@ export function DashboardPage() {
       }
     };
 
+    const checkGithubAuth = async () => {
+      const session = localStorage.getItem("session");
+      if (session) {
+        try {
+          const response = await apiClient.get("profile_info", {
+            session: session
+          });
+          const responseData = await response.json();
+
+          if (responseData.data && responseData.data.logged_in_github === true) {
+            console.log("GitHub authenticated");
+            setIsGithubAuthenticated(true);
+          } else {
+            console.log("GitHub not authenticated");
+            setIsGithubAuthenticated(false);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      } else {
+        console.error("No session found");
+      }
+    };
+
     checkDiscordAuth();
+    checkGithubAuth();
     fetchUserData();
   }, [apiClient]);
 
