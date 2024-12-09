@@ -9,7 +9,7 @@ exports.profile = async (req, res) => {
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return a 401 error
         let logged_in_discord = req.user.discord_token != {} &&
             req.user.discord_token.access_token != null ? true : false;
-        if (logged_in_discord && req.user.discord_token.expires_at > Date.now())
+        if (logged_in_discord && req.user.discord_token.expires_at < Date.now())
             logged_in_discord = "session_expired"
         const user_infos = { // this will store the user informations
             "username": req.user.username,
