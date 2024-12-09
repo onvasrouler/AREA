@@ -36,7 +36,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   const handleGithubLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
     const REDIRECT_URI = import.meta.env.VITE_GITHUB_REDIRECT_URI;
-    const AUTH_URL = `${import.meta.env.VITE_GITHUB_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    const AUTH_URL = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
       REDIRECT_URI
     )}&scope=repo`;
 
@@ -113,55 +113,107 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
           <DialogDescription>{service.description}</DialogDescription>
         </DialogHeader>
         <div className="p-4">
-          {service.name === "Discord" && !isDiscordAuthenticated ? (
-            <div className="flex flex-col items-center">
-              <p className="mb-4">You need to log in with Discord to access this service.</p>
-              <Button
-                onClick={handleDiscordLogin}
-                className="font-bold py-2 px-4 rounded"
-              >
-                Login with Discord
-              </Button>
-            </div>
-          ) : (
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Your Discord Servers</h3>
-              {discordServers.length > 0 ? (
-                <Accordion type="single" collapsible className="w-full">
-                  {discordServers.map((server) => (
-                    <AccordionItem key={server.id} value={server.id}>
-                      <AccordionTrigger onClick={() => handleServerSelect(server.id)} className="flex items-center space-x-2">
-                        {server.icon && (
-                          <img
-                            src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
-                            alt={`${server.name} icon`}
-                            className="w-6 h-6 rounded-full mr-2"
-                          />
-                        )}
-                        {server.name}
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        {discordChannels[server.id] ? (
-                          discordChannels[server.id].length > 0 ? (
-                            <ul className="space-y-1 pl-8">
-                              {discordChannels[server.id].map((channel) => (
-                                <li key={channel.id}>{channel.name}</li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="pl-8">No channels found for this server.</p>
-                          )
-                        ) : (
-                          <p className="pl-8">Loading channels...</p>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+          {service.name === "Discord" ? (
+            <>
+              {!isDiscordAuthenticated ? (
+                <div className="flex flex-col items-center">
+                  <p className="mb-4">
+                    You need to log in with Discord to access this service.
+                  </p>
+                  <Button
+                    onClick={handleDiscordLogin}
+                    className="font-bold py-2 px-4 rounded"
+                  >
+                    Login with Discord
+                  </Button>
+                </div>
               ) : (
-                <p>No Discord servers found.</p>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Your Discord Servers
+                  </h3>
+                  {discordServers.length > 0 ? (
+                    <Accordion type="single" collapsible className="w-full">
+                      {discordServers.map((server) => (
+                        <AccordionItem key={server.id} value={server.id}>
+                          <AccordionTrigger
+                            onClick={() => handleServerSelect(server.id)}
+                            className="flex items-center space-x-2"
+                          >
+                            {server.icon && (
+                              <img
+                                src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
+                                alt={`${server.name} icon`}
+                                className="w-6 h-6 rounded-full mr-2"
+                              />
+                            )}
+                            {server.name}
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            {discordChannels[server.id] ? (
+                              discordChannels[server.id].length > 0 ? (
+                                <ul className="space-y-1 pl-8">
+                                  {discordChannels[server.id].map((channel) => (
+                                    <li key={channel.id}>{channel.name}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="pl-8">
+                                  No channels found for this server.
+                                </p>
+                              )
+                            ) : (
+                              <p className="pl-8">Loading channels...</p>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  ) : (
+                    <p>No Discord servers found.</p>
+                  )}
+                </div>
               )}
-            </div>
+            </>
+          ) : service.name === "GitHub" ? (
+            <>
+              {!isGithubAuthenticated ? (
+                <div className="flex flex-col items-center">
+                  <p className="mb-4">
+                    You need to log in with GitHub to access this service.
+                  </p>
+                  <Button
+                    onClick={handleGithubLogin}
+                    className="font-bold py-2 px-4 rounded"
+                  >
+                    Login with GitHub
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Your GitHub Repositories
+                  </h3>
+                  {githubRepos.length > 0 ? (
+                    <ul className="space-y-2">
+                      {githubRepos.map((repo) => (
+                        <li
+                          key={repo.id}
+                          className="flex items-center space-x-2"
+                        >
+                          <span className="font-medium">{repo.name}</span>
+                          <span className="text-gray-500">{repo.language}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No repositories found.</p>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <p>Service not supported.</p>
           )}
         </div>
       </DialogContent>
