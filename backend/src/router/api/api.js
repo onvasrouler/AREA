@@ -7,13 +7,15 @@ exports.profile = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return a 401 error
-
+        const logged_in_discord = req.user.discord_token != {} &&
+            req.user.discord_token.access_token != null &&
+            req.user.discord_token.expires_at > Date.now() ? true : false;
         const user_infos = { // this will store the user informations
             "username": req.user.username,
             "email": req.user.email,
             "account_type": req.user.accountType,
-            "logged_in_discord": req.user.discord_token ? true : false,
-            "logged_in_github": req.user.github_token ? true : false,
+            "logged_in_discord": logged_in_discord,
+            "logged_in_github": req.user.github_token.access_token ? true : false,
         };
         return api_formatter(req, res, 200, "success", "you are authenticated", user_infos, null, null); // return the user informations
     } catch (err) { // if an error occured
