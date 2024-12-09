@@ -22,11 +22,22 @@ AREA is a web application built with ReactJS. It leverages modern libraries and 
    ```bash
    npm install
    ```
-4. Start the development server:
+4. Setup your environment variables:
+   - Create a `.env` file in the root of the project.
+   - Add the following environment variables:
+     ```env
+        VITE_BACKEND_URL=
+
+        VITE_DISCORD_CLIENT_ID=
+        VITE_DISCORD_REDIRECT_URI=
+        VITE_BACKEND_CALLBACK_URL=
+        VITE_DISCORD_CHANNELS_FETCH_URL=
+     ```
+5. Start the development server:
    ```bash
    npm run dev
    ```
-5. Open your browser and navigate to [http://localhost:8081](http://localhost:8081).
+6. Open your browser and navigate to [http://localhost:8081](http://localhost:8081).
 
 ## NPM Scripts
 ```json
