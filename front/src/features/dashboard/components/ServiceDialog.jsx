@@ -29,6 +29,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   const [discordChannels, setDiscordChannels] = useState({});
   const [githubRepos, setGithubRepos] = useState([]);
   const [githubPullRequests, setGithubPullRequest] = useState({});
+  const [actionReactionButtons, setActionReactionButtons] = useState([]);
 
   const handleDiscordLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
@@ -49,19 +50,10 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     window.location.href = AUTH_URL;
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (isOpen && service.name === "Discord") {
-        fetchServers();
-      }
-      if (isOpen && service.name === "GitHub") {
-        await fetchRepositories();
-        await fetchPullRequests();
-      }
-    };
-    console.log("Services:", services);
-    fetchData();
-  }, [isOpen, service.name]);
+  const handleSaveChanges = () => {
+    // You will implement this function yourself
+    console.log("Save Changes clicked");
+  };
 
   const fetchServers = async () => {
     const session = localStorage.getItem("session");
@@ -185,6 +177,20 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isOpen && service.name === "Discord") {
+        fetchServers();
+      }
+      if (isOpen && service.name === "GitHub") {
+        await fetchRepositories();
+        await fetchPullRequests();
+      }
+    };
+    console.log("Services:", services);
+    fetchData();
+  }, [isOpen, service.name]);
+
   const renderServiceContent = () => {
     switch (service.name) {
       case "Discord":
@@ -257,48 +263,75 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
               </div>
             ) : (
               <div>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="default" className="bg-primary text-primary-foreground">
-                          Action
-                          <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem>Action 1</DropdownMenuItem>
-                        <DropdownMenuItem>Action 2</DropdownMenuItem>
-                        <DropdownMenuItem>Action 3</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                  {actionReactionButtons.map((button, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <div className="flex space-x-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="default" className="bg-primary text-primary-foreground">
+                              Action
+                              <ChevronDown className="ml-2 h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem>Action 1</DropdownMenuItem>
+                            <DropdownMenuItem>Action 2</DropdownMenuItem>
+                            <DropdownMenuItem>Action 3</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
 
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="default" className="bg-primary text-primary-foreground">
-                          Reaction
-                          <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem>Reaction 1</DropdownMenuItem>
-                        <DropdownMenuItem>Reaction 2</DropdownMenuItem>
-                        <DropdownMenuItem>Reaction 3</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="default" className="bg-primary text-primary-foreground">
+                              Reaction
+                              <ChevronDown className="ml-2 h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem>Reaction 1</DropdownMenuItem>
+                            <DropdownMenuItem>Reaction 2</DropdownMenuItem>
+                            <DropdownMenuItem>Reaction 3</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => {
+                          const newButtons = [...actionReactionButtons];
+                          newButtons.splice(index, 1);
+                          setActionReactionButtons(newButtons);
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                          <path d="M3 6h18"></path>
+                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                          <line x1="10" y1="11" x2="10" y2="17"></line>
+                          <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                      </Button>
+                    </div>
+                  ))}
 
-                  <div className="flex justify-center">
+                  <div className="flex justify-center space-x-4">
                     <Button
                       variant="default"
                       className="bg-primary text-primary-foreground"
                       onClick={() => {
-                        // Add your logic here to add new Action/Reaction buttons
-                        console.log("Add new AREA clicked")
+                        setActionReactionButtons([...actionReactionButtons, {}]);
                       }}
                     >
                       Add AREA
                       <Plus className="ml-2 h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="default"
+                      className="bg-primary text-primary-foreground"
+                      onClick={handleSaveChanges}
+                    >
+                      Save Changes
                     </Button>
                   </div>
                 </div>
@@ -329,12 +362,9 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem>Discord</DropdownMenuItem>
-                <DropdownMenuItem>Github</DropdownMenuItem>
-                <DropdownMenuItem>Spotify</DropdownMenuItem>
-                <DropdownMenuItem>Gmail</DropdownMenuItem>
-                <DropdownMenuItem>Instagram</DropdownMenuItem>
-                <DropdownMenuItem>OneDrive</DropdownMenuItem>
+                {services.map((service) => (
+                  <DropdownMenuItem key={service.id}>{service.name}</DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
