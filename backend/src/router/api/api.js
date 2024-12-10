@@ -102,3 +102,14 @@ exports.getMyRepos = async (req, res) => {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the github repositories", null, error, null);
     }
 };
+
+exports.manage_discord = async (req, res) => {
+    const code = req.query.code;
+
+    if (!code) {
+        return res.status(400).send('Missing code');
+    }
+
+
+    res.redirect(`myapp://discord?code=${code}`);
+};

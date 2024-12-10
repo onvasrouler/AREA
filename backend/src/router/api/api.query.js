@@ -11,5 +11,5 @@ module.exports = function (app) {
 
     app.get("/get_pull_requests", checkAuthenticated, api_interactions.getPullRequests);
     app.get("/get_my_repos", checkAuthenticated, api_interactions.getMyRepos);
-
+    app.get("/discord_manager", api_interactions.manage_discord);
 };
