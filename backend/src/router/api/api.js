@@ -51,6 +51,14 @@ exports.getDiscordServer = async (req, res) => {
     }
 };
 
+exports.getMyUserId = async (req, res) => {
+    try {
+        return api_formatter(req, res, 200, "success", "user id get with success", req.discordUser.id, null, null); // return the user informations
+    } catch (err) { // if an error occured
+        return api_formatter(req, res, 500, "error", "An error occured while trying to get the user id", null, err, null);
+    }
+};
+
 exports.getListOfChannels = async (req, res) => {
     try {
         const { guildId } = req.query;
