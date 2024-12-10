@@ -80,10 +80,12 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
       if (button.reaction === "Send private message") {
         reactionArguments.react = "private_message";
         reactionArguments.userId = userId;
+        reactionArguments.message = "Hello, World!";
       } else if (button.reaction === "Send message in channel") {
         reactionArguments.react = "channel_message";
         reactionArguments.serverId = selectedServer;
         reactionArguments.channelId = selectedChannel;
+        reactionArguments.message = "Hello, World!";
       }
   
       const area = {
@@ -95,6 +97,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
           service: "discord",
           arguments: reactionArguments,
         },
+        message: "AREA"
       };
   
       console.log("Request body:", JSON.stringify(area, null, 2));
