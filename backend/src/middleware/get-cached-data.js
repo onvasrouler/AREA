@@ -28,9 +28,11 @@ async function CachedData(req, res, next) {
                 return next();
             }
         }).catch(function (err) {
+            console.error(err);
             return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to get the user cache", null, err, null, null);
         });
     } catch (err) {
+        console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the user's cached data", null, err, null);
     }
 }
