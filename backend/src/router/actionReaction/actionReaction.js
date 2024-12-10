@@ -12,14 +12,15 @@ exports.postArea = async (req, res) => {
         if (reaction.service == "discord" && req.user.discord_token == null)
             return api_formatter(req, res, 400, "error", "You need to connect your discord account to use discord's reaction", null);
 
-        const tokens = `
-            ${action.service}: ${action.service == "github" ? req.user.github_token : ""}
-            ${reaction.service}: ${reaction.service == "discord" ? req.user.discord_token : ""}
-        `;
+        const tokens = `{
+            "${action.service}": "${action.service == "github" ? req.user.github_token.access_token : ""}",
+            "${reaction.service}": "${reaction.service == "discord" ? req.user.discord_token.access_token : ""}"
+        }`;
         const newActionReaction = new ActionReactionModel({
             unique_id: crypto.randomBytes(16).toString("hex"),
-            action,
-            reaction,
+            creator_id: req.user.unique_id,
+            Action: action,
+            Reaction: reaction,
             tokens: JSON.parse(tokens),
             user: req.user.unique_id
         });
@@ -35,11 +36,12 @@ exports.postArea = async (req, res) => {
 
 exports.getArea = async (req, res) => {
     try {
-        const actionReactions = await ActionReactionModel.find({ user: req.user.unique_id });
+        const actionReactions = await ActionReactionModel.find({ creator_id: req.user.unique_id });
+        console.log(actionReactions);
         const parsedData = actionReactions.map(actionReaction => ({
             id: actionReaction.unique_id,
-            action: actionReaction.action,
-            reaction: actionReaction.reaction
+            action: actionReaction.Action,
+            reaction: actionReaction.Reaction
         }));
         return api_formatter(req, res, 200, "success", "Action Reaction found", parsedData);
     }
