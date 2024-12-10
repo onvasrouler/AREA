@@ -1,7 +1,7 @@
 'use client'
 
 import AreaLogo from "../../assets/AREA.png"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -56,6 +56,15 @@ export function LoginPage() {
   const [registeredEmail, setRegisteredEmail] = useState('')
   const [registrationData, setRegistrationData] = useState(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const session = localStorage.getItem('session');
+    if (session) {
+      window.location.href = '/dashboard';
+    } else {
+      console.log('No session found');
+    }
+  }, []);
 
   const form = useForm({
     resolver: zodResolver(isLogin ? loginSchema : signUpSchema),
@@ -191,7 +200,8 @@ export function LoginPage() {
         });
         if (responseLogin.status === 200) {
           const data = await responseLogin.json();
-          localStorage.setItem('session', data.session_token);
+          localStorage.setItem('session', data.session);
+          console.log('Session:', data.session);
           window.location.href = "/dashboard";
         } else {
           toast({
