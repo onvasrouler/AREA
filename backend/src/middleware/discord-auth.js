@@ -13,7 +13,7 @@ async function discordAuth(req, res, next) {
             return api_formatter(req, res, 401, "discordNotLoggedin", "you are not logged in using discord", null, null, null); // return a 401 error
         if (req.user.discord_token.expires_at < Date.now())
             return api_formatter(req, res, 401, "tokenExpired", "your discord token is expired", null, null, null); // return a 401 error
-        if (!discordCachedData || discordCachedData.updatedAt + 60 < Date.now()) {
+        if (!discordCachedData || (discordCachedData.updatedAt + 1000) < Date.now()) {
             const userServers = await axios.get("https://discord.com/api/users/@me/guilds", {
                 headers: {
                     Authorization: `Bearer ${req.user.discord_token.access_token}`,

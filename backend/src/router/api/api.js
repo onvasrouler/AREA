@@ -77,7 +77,7 @@ exports.getListOfChannels = async (req, res) => {
 exports.getPullRequests = async (req, res) => {
     try {
         let githubCachedData = req.cachedData.data.githubPrCachedData;
-        if (!githubCachedData || githubCachedData.updatedAt + 60 < Date.now()) {
+        if (!githubCachedData || (githubCachedData.updatedAt + 10000) < Date.now()) {
             const token = req.user.github_token.access_token;
             if (!token)
                 return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
@@ -109,7 +109,7 @@ exports.getPullRequests = async (req, res) => {
 exports.getMyRepos = async (req, res) => {
     try {
         let githubCachedData = req.cachedData.data.githubRepoCachedData;
-        if (!githubCachedData || githubCachedData.updatedAt + 60 < Date.now()) {
+        if (!githubCachedData || (githubCachedData.updatedAt + 10000) < Date.now()) {
             const token = req.user.github_token.access_token;
             if (!token)
                 return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
