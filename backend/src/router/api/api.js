@@ -7,18 +7,21 @@ exports.profile = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return a 401 error
-
+        let logged_in_discord = req.user.discord_token != {} &&
+            req.user.discord_token.access_token != null ? true : false;
+        if (logged_in_discord && req.user.discord_token.expires_at < Date.now())
+            logged_in_discord = "session_expired";
         const user_infos = { // this will store the user informations
             "username": req.user.username,
             "email": req.user.email,
             "account_type": req.user.accountType,
-            "logged_in_discord": req.user.discord_token ? true : false,
-            "logged_in_github": req.user.github_token ? true : false,
+            "logged_in_discord": logged_in_discord,
+            "logged_in_github": req.user.github_token.access_token ? true : false,
         };
-        return api_formatter(req, res, 200, "success", "you are authenticated", user_infos, null, null); // return the user informations
-    } catch (err) { // if an error occured
+        return api_formatter(req, res, 200, "success", "You are authenticated", user_infos, null, null); // return the user informations
+    } catch (err) {
         console.error(err);
-        return api_formatter(req, res, 500, "error", "An error occured while trying to get the user profile", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occurred while trying to get the user profile", null, err, null);
     }
 };
 
@@ -71,33 +74,62 @@ exports.getListOfChannels = async (req, res) => {
 
 exports.getPullRequests = async (req, res) => {
     try {
-        const token = req.user.github_token.access_token;
-        if (!token)
-            return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
-        const prsResponse = await axios.get(
-            "https://api.github.com/search/issues?q=type:pr+author:@me",
-            {
-                headers: { Authorization: `Bearer ${token}` },
-            }
-        );
-        return api_formatter(req, res, 200, "success", "your github pull requests have been fetched with success", prsResponse.data, null, null); // return the user informations
+        let githubCachedData = req.cachedData.data.githubPrCachedData;
+        if (!githubCachedData || githubCachedData.updatedAt + 60 > Date.now()) {
+            const token = req.user.github_token.access_token;
+            if (!token)
+                return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
+            const prsResponse = await axios.get(
+                "https://api.github.com/search/issues?q=type:pr+author:@me",
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const GithubData = {
+                data: prsResponse.data,
+                updatedAt: Date.now(),
+            };
+            req.cachedData.data = {
+                ...req.cachedData.data,
+                githubPrCachedData: GithubData
+            };
+            await req.cachedData.save();
+            githubCachedData = GithubData.data;
+
+        }
+        return api_formatter(req, res, 200, "success", "your github pull requests have been fetched with success", githubCachedData, null, null); // return the user informations
     } catch (error) {
+        console.error(error);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the github pull requests", null, error, null);
     }
 };
 
 exports.getMyRepos = async (req, res) => {
     try {
-        const token = req.user.github_token.access_token;
-        if (!token)
-            return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
-        const reposResponse = await axios.get(
-            "https://api.github.com/user/repos",
-            {
-                headers: { Authorization: `Bearer ${token}` },
-            }
-        );
-        return api_formatter(req, res, 200, "success", "your github repository have been fetched with success", reposResponse.data, null, null); // return the user informations
+        let githubCachedData = req.cachedData.data.githubRepoCachedData;
+        if (!githubCachedData || githubCachedData.updatedAt + 60 > Date.now()) {
+            const token = req.user.github_token.access_token;
+            if (!token)
+                return api_formatter(req, res, 401, "notloggedin", "you are not logged in using github", null, null, null);
+            const reposResponse = await axios.get(
+                "https://api.github.com/user/repos",
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const GithubData = {
+                data: reposResponse.data,
+                updatedAt: Date.now(),
+            };
+
+            req.cachedData.data = {
+                ...req.cachedData.data,
+                githubRepoCachedData: GithubData
+            };
+            await req.cachedData.save();
+            githubCachedData = GithubData.data;
+        }
+        return api_formatter(req, res, 200, "success", "your github repository have been fetched with success", githubCachedData, null, null); // return the user informations
     } catch (error) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the github repositories", null, error, null);
     }

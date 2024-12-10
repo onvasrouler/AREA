@@ -18,7 +18,7 @@ module.exports = function sendApiData( // this function will be used to send the
         "messageStatus": messageStatus,
         "message": message,
         "data": data,
-        "error": String(error),
+        "error": typeof error == "object" ? error : String(error),
         "session": session,
         "username": username,
     };

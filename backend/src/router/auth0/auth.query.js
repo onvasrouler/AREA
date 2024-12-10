@@ -6,5 +6,6 @@ module.exports = function (app) {
     app.post("/auth/callback/discord", checkAuthenticated, authInteractions.discordCallback);
     app.post("/auth/refresh/discord", checkAuthenticated, authInteractions.discordRefresh);
 
-    app.get("/auth/callback/github", checkAuthenticated, authInteractions.githubCallback);
+    app.post("/auth/callback/github", checkAuthenticated, authInteractions.githubCallback);
+    app.post("/auth/refresh/github", checkAuthenticated, authInteractions.githubRefresh);
 };
