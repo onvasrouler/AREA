@@ -1,7 +1,6 @@
 const api_formatter = require("../../middleware/api-formatter.js");
 const axios = require("axios");
 const discordBot = require("../../utils/discord");
-const User = require("../../database/models/users");
 
 // This function will return the user profile
 exports.profile = async (req, res) => {
