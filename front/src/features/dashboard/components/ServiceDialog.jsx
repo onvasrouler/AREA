@@ -42,13 +42,17 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   };
 
   useEffect(() => {
-    if (isOpen && service.name === "Discord") {
-      fetchServers();
-    }
-    if (isOpen && service.name === "GitHub") {
-      fetchRepositories();
-      fetchPullRequests();
-    }
+    const fetchData = async () => {
+      if (isOpen && service.name === "Discord") {
+        fetchServers();
+      }
+      if (isOpen && service.name === "GitHub") {
+        await fetchRepositories();
+        await fetchPullRequests();
+      }
+    };
+  
+    fetchData();
   }, [isOpen, service.name]);
 
   const fetchServers = async () => {
