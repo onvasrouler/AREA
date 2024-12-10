@@ -19,6 +19,8 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   const apiClient = getApiClient();
   const [discordServers, setDiscordServers] = useState([]);
   const [discordChannels, setDiscordChannels] = useState({});
+  const [githubRepos, setGithubRepos] = useState([]);
+  const [githubPullRequests, setGithubPullRequest] = useState({});
 
   const handleDiscordLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
@@ -40,12 +42,17 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   };
 
   useEffect(() => {
-    if (isOpen && service.name === "Discord") {
-      fetchServers();
-    }
-    if (isOpen && service.name === "GitHub") {
-      // Add GitHub-specific logic here
-    }
+    const fetchData = async () => {
+      if (isOpen && service.name === "Discord") {
+        fetchServers();
+      }
+      if (isOpen && service.name === "GitHub") {
+        await fetchRepositories();
+        await fetchPullRequests();
+      }
+    };
+  
+    fetchData();
   }, [isOpen, service.name]);
 
   const fetchServers = async () => {
@@ -95,6 +102,76 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
       }
     } catch (error) {
       console.error("Error fetching Discord channels:", error);
+    }
+  };
+
+  const fetchRepositories = async() => {
+    const session = localStorage.getItem("session");
+    if (session && isGithubAuthenticated) {
+      try {
+        const reposResponse = await apiClient.get("get_my_repos", {
+          session: session,
+        });
+
+        const responseData = await reposResponse.json();
+
+        if (responseData?.data?.data) {
+          const data = responseData.data.data;
+
+        setGithubRepos(data);
+    
+          console.log("Fetched Repositories:", data);
+        } else {
+          console.warn("No repositories items found in the response.");
+        }
+
+      if (responseData && responseData.data) {
+          setGithubRepos(responseData.data);
+        }
+      } catch (error) {
+        console.error("Error fetching Github repositories:", error);
+      }
+    }
+  };
+
+  const fetchPullRequests = async() => {
+    const session = localStorage.getItem("session");
+
+    if (!session) {
+      console.error("No session found. Please log in.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_GITHUB_PR_FETCH_URL}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "session": session,
+          },
+        }
+      );
+      console.log(response)
+      const responseData = await response.json();
+
+      if (responseData?.data?.data?.items) {
+        const items = responseData.data.data.items;
+
+      setGithubPullRequest(items);
+  
+        console.log("Fetched Pull Requests:", items);
+      } else {
+        console.warn("No pull request items found in the response.");
+      }
+
+      if (responseData && responseData.data) {
+        setGithubPullRequest(prevPullRequest => ({
+          ...prevPullRequest,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching Github pull requests:", error);
     }
   };
 
@@ -175,7 +252,48 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
                 </Button>
               </div>
             ) : (
-              <p>GitHub content here</p>
+              <div>
+                <div className="mb-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="repositories">
+                      <AccordionTrigger className="no-underline font-semibold text-lg">Your repositories</AccordionTrigger>
+                      <AccordionContent>
+                        {Object.keys(githubRepos).length > 0 ? (
+                          <ul className="space-y-1 pl-4">
+                            {Object.values(githubRepos).flat().map((repo) => (
+                              <li key={repo.id} className="list-disc">
+                                {repo.name}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="pl-4">No repositories found.</p>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+                <div>
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="pull-requests">
+                      <AccordionTrigger className="no-underline font-semibold text-lg">Your pull requests</AccordionTrigger>
+                      <AccordionContent>
+                        {Object.keys(githubPullRequests).length > 0 ? (
+                          <ul className="space-y-1 pl-4">
+                            {Object.values(githubPullRequests).flat().map((pr) => (
+                              <li key={pr.id} className="list-disc">
+                                {pr.title}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="pl-4">No pull requests found.</p>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              </div>
             )}
           </div>
         )
