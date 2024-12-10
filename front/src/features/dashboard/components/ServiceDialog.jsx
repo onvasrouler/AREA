@@ -13,9 +13,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { ChevronDown, Plus } from 'lucide-react'
+import { Separator } from "@/components/ui/separator"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { getApiClient } from "@/common/client/APIClient"
 
-export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGithubAuthenticated }) {
+export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGithubAuthenticated, services }) {
   const apiClient = getApiClient();
   const [discordServers, setDiscordServers] = useState([]);
   const [discordChannels, setDiscordChannels] = useState({});
@@ -117,9 +125,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
 
         if (responseData?.data?.data) {
           const data = responseData.data.data;
-
-        setGithubRepos(data);
-    
+          setGithubRepos(data);
           console.log("Fetched Repositories:", data);
         } else {
           console.warn("No repositories items found in the response.");
@@ -157,9 +163,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
 
       if (responseData?.data?.data?.items) {
         const items = responseData.data.data.items;
-
-      setGithubPullRequest(items);
-  
+        setGithubPullRequest(items);
         console.log("Fetched Pull Requests:", items);
       } else {
         console.warn("No pull request items found in the response.");
@@ -185,7 +189,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     switch (service.name) {
       case "Discord":
         return (
-          <div className="p-4">
+          <div className="p-6">
             {!isDiscordAuthenticated ? (
               <div className="flex flex-col items-center">
                 <p className="mb-4">You need to log in with Discord to access this service.</p>
@@ -240,7 +244,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
         )
       case "GitHub":
         return (
-          <div className="p-4">
+          <div className="p-6">
             {!isGithubAuthenticated ? (
               <div className="flex flex-col items-center">
                 <p className="mb-4">You need to log in with Github to access this service.</p>
@@ -253,45 +257,50 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
               </div>
             ) : (
               <div>
-                <div className="mb-6">
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="repositories">
-                      <AccordionTrigger className="no-underline font-semibold text-lg">Your repositories</AccordionTrigger>
-                      <AccordionContent>
-                        {Object.keys(githubRepos).length > 0 ? (
-                          <ul className="space-y-1 pl-4">
-                            {Object.values(githubRepos).flat().map((repo) => (
-                              <li key={repo.id} className="list-disc">
-                                {repo.name}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="pl-4">No repositories found.</p>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-                <div>
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="pull-requests">
-                      <AccordionTrigger className="no-underline font-semibold text-lg">Your pull requests</AccordionTrigger>
-                      <AccordionContent>
-                        {Object.keys(githubPullRequests).length > 0 ? (
-                          <ul className="space-y-1 pl-4">
-                            {Object.values(githubPullRequests).flat().map((pr) => (
-                              <li key={pr.id} className="list-disc">
-                                {pr.title}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="pl-4">No pull requests found.</p>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="default" className="bg-primary text-primary-foreground">
+                          Action
+                          <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem>Action 1</DropdownMenuItem>
+                        <DropdownMenuItem>Action 2</DropdownMenuItem>
+                        <DropdownMenuItem>Action 3</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="default" className="bg-primary text-primary-foreground">
+                          Reaction
+                          <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem>Reaction 1</DropdownMenuItem>
+                        <DropdownMenuItem>Reaction 2</DropdownMenuItem>
+                        <DropdownMenuItem>Reaction 3</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <Button
+                      variant="default"
+                      className="bg-primary text-primary-foreground"
+                      onClick={() => {
+                        // Add your logic here to add new Action/Reaction buttons
+                        console.log("Add new AREA clicked")
+                      }}
+                    >
+                      Add AREA
+                      <Plus className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
@@ -308,13 +317,32 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{service.name}</DialogTitle>
+      <DialogContent className="w-[80vw] h-[80vh] max-w-[1200px] max-h-[800px] p-9">
+        <DialogHeader className="flex flex-col space-y-1.5 text-center sm:text-left">
+          <div className="flex justify-between items-center">
+            <DialogTitle>{service.name}</DialogTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="default" className="bg-primary text-primary-foreground">
+                  Link With
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>Discord</DropdownMenuItem>
+                <DropdownMenuItem>Github</DropdownMenuItem>
+                <DropdownMenuItem>Spotify</DropdownMenuItem>
+                <DropdownMenuItem>Gmail</DropdownMenuItem>
+                <DropdownMenuItem>Instagram</DropdownMenuItem>
+                <DropdownMenuItem>OneDrive</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <DialogDescription>
             {service.description}
           </DialogDescription>
         </DialogHeader>
+        <Separator className="my-4" />
         {renderServiceContent()}
       </DialogContent>
     </Dialog>
