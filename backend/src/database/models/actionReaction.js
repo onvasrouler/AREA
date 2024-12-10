@@ -14,13 +14,25 @@ const actionReactionSchema = new mongoose.Schema({
         type: Object,
         default: {}
     },
-    action: { // this will be the action
+    Action: { // this will be the action
         type: Object,
         required: [true, "action is required"],
     },
     Reaction: { // this will be the Reaction
         type: Object,
         required: [true, "Reaction is required"],
+    },
+    CachedData: { // this will be the CachedData
+        type: Object,
+        default: {}
+    },
+    Treated: { // this will be used to know if the actionReaction was treated
+        type: Boolean,
+        default: true
+    },
+    Errors: { // this will be used to store the errors
+        type: String,
+        default: ""
     },
     LastModificationDate: { // this will be used to know when the actionReaction's data was last modified
         type: Date,
