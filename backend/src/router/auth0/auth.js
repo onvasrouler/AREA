@@ -88,7 +88,7 @@ exports.discordRefresh = async (req, res) => {
 exports.githubCallback = async (req, res) => {
     try {
         const { code } = req.body;
-=        if (!code)
+        if (!code)
             return api_formatter(req, res, 400, "error", "code is required", null, null, null);
         try {
             const tokenResponse = await axios.post(
