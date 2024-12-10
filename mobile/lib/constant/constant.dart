@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-String baseurl = "http://10.84.107.117:8081";
+String baseurl = "";
 
 String session = "";
 

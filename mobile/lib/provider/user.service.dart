@@ -20,10 +20,10 @@ class UserService {
         final data = jsonDecode(response.body);
         
         if (data['data']['logged_in_discord'] == true) {
-          services[indexDiscord].connected = true;
+          services[indexDiscord].connected = false;
         }
         if (data['data']['logged_in_github'] == true) {
-          services[indexGithub].connected = true;
+          services[indexGithub].connected = false;
         }
 
         return true;

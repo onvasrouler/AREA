@@ -27,6 +27,25 @@ class _MenuPageState extends State<MenuPage> {
     }
   }
 
+  final gitHubAuthService = GitHubAuthService();
+  final discordAuthService = DiscordAuthService();
+
+  Future<void> _connect(String name, int index) async {
+    var response = false;
+
+    if (name == "GitHub") {
+      response = await gitHubAuthService.authGitHub();
+    } else if (name == "Discord") {
+      response = await discordAuthService.authDiscord();
+    }
+
+    if (response) {
+      currentActionService = index - 1;
+      services[index-1].connected = true;
+      GoRouter.of(context).push('/action');
+    }
+  }
+
   @override
     Widget build(BuildContext context) {
     return Scaffold(
@@ -86,10 +105,7 @@ class _MenuPageState extends State<MenuPage> {
                           currentActionService = index - 1;
                           GoRouter.of(context).push('/action');
                         } else {
-                          //methode pour se connecter (fonction orientation)
-                          //si reussi ->
-                          // currentActionService = index - 1;
-                          //aller page de action
+                          _connect(services[index - 1].name, index);
                         }
                       },
                       child:Container(

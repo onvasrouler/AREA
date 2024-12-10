@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:area/constant/constant.dart';
 import 'dart:convert';
 import 'package:area/provider/user.service.dart';
+import 'package:flutter_web_auth/flutter_web_auth.dart';
 
 class AuthService {
   final userService = UserService();
@@ -99,19 +100,99 @@ class AuthService {
 
 class GoogleLoginService {
   Future<bool> loginWithGoogle(BuildContext context) async {
-    return true;
-      
+    return false;
   }
 }
 
 class DiscordAuthService {
-  Future<bool> authDiscord(BuildContext context) async {
-    return true;  
+
+  final String clientId = "";
+  final String redirectUri = "$baseurl/discord_manager";
+  final String authUrl = "https://discord.com/api/oauth2/authorize";
+
+  Future<bool> authDiscord() async {
+    try {
+      final authEndpoint = Uri.parse(
+        "$authUrl?client_id=$clientId&redirect_uri=$redirectUri&response_type=code&scope=identify%20guilds"
+      );
+
+      final result = await FlutterWebAuth.authenticate(
+        url: authEndpoint.toString(),
+        callbackUrlScheme: "myapp",
+      );
+      print("result = $result");
+
+      final code = Uri.parse(result).queryParameters['code'];
+      if (code == null) {
+        return false;
+      }
+
+      final url = Uri.parse('$baseurl/auth/callback/discord');
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+        body: jsonEncode({
+          "code": code,
+        })
+      );
+
+      if (response.statusCode == 500) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+  }
   }
 }
 
 class GitHubAuthService {
-  Future<bool> authGitHub(BuildContext context) async {
-    return true;  
+
+  final String clientId = "";
+  final String redirectUri = "myapp://github";
+  final String authUrl = "https://github.com/login/oauth/authorize";
+  
+  Future<bool> authGitHub() async {
+    try {
+      final authEndpoint = Uri.parse(
+        "$authUrl?client_id=$clientId&redirect_uri=$redirectUri&scope=repo%20read:user"
+      );
+
+      final result = await FlutterWebAuth.authenticate(
+        url: authEndpoint.toString(),
+        callbackUrlScheme: Uri.parse(redirectUri).scheme,
+      );
+
+      final code = Uri.parse(result).queryParameters['code'];
+      if (code == null) {
+        return false;
+      }
+        
+      final url = Uri.parse('$baseurl/auth/callback/github');
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+        body: jsonEncode({
+          "code": code,
+        })
+      );
+
+      if (response.statusCode == 200) {
+          return true;
+      } else {
+          return false;
+      }
+    } catch (e) {
+      return false;
+    }
   }
 }
