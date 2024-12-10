@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-
 const MongoDBURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/";
 
 mongoose.set("strictQuery", false);
