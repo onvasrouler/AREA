@@ -1,10 +1,16 @@
-import 'package:area/auth/signup.dart';
+import 'package:area/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:area/auth/signin.dart';
+import 'package:area/auth/register.dart';
 import 'package:area/pages/menu.dart';
+import 'package:area/pages/subpages/action.dart';
+import 'package:area/pages/subpages/reaction.dart';
+import 'package:area/pages/subpages/service_reaction.dart';
+import 'package:area/pages/subpages/success.dart';
+import 'package:area/pages/subpages/discord/channel.dart';
+import 'package:area/pages/subpages/discord/server.dart';
+import 'package:area/pages/subpages/fail.dart';
 import 'package:area/error/error.dart';
-//import 'package:area/constant/constant.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -26,15 +32,43 @@ class _MyAppState extends State<MyApp> {
       routes: [
         GoRoute(
           path: '/',
-          redirect: (context, state) => ('/signIn'),
+          redirect: (context, state) => ('/login'),
         ),
         GoRoute(
-          path: '/signIn',
-          builder: (context, state) => const SignInPage(),
+          path: '/login',
+          builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
-          path: '/signUp',
-          builder: (context, state) => const SignUpPage(),
+          path: '/action',
+          builder: (context, state) => const ActionPage(),
+        ),
+        GoRoute(
+          path: '/reaction',
+          builder: (context, state) => const ReactionPage(),
+        ),
+        GoRoute(
+          path: '/reactionService',
+          builder: (context, state) => const ServiceReactionPage(),
+        ),
+        GoRoute(
+          path: '/success',
+          builder: (context, state) => const SuccessPage(),
+        ),
+        GoRoute(
+          path: '/fail',
+          builder: (context, state) => const FailPage(),
+        ),
+        GoRoute(
+          path: '/register',
+          builder: (context, state) => const RegisterPage(),
+        ),
+        GoRoute(
+          path: '/server',
+          builder: (context, state) => const ServerPage(),
+        ),
+        GoRoute(
+          path: '/channel',
+          builder: (context, state) => const ChannelPage(),
         ),
         GoRoute(
           path: '/menu',

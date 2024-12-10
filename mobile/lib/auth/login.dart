@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/provider/auth.service.dart';
+import 'package:area/constant/constant.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  _SignInState createState() => _SignInState();
+  _LoginState createState() => _LoginState();
 }
 
-class _SignInState extends State<SignInPage> {
+class _LoginState extends State<LoginPage> {
   late TextEditingController _username;
   late TextEditingController _password;
   late bool error;
@@ -33,8 +34,8 @@ class _SignInState extends State<SignInPage> {
   final authService = AuthService();
 
 
-  Future<void> _signIn() async {
-    final response = await authService.signIn(_username.text, _password.text);
+  Future<void> _login() async {
+    final response = await authService.login(_username.text, _password.text);
     if (response) {
       GoRouter.of(context).push('/menu');
     } else {
@@ -44,10 +45,10 @@ class _SignInState extends State<SignInPage> {
     }
   }
 
-  final GoogleSignInService googleSignInService = GoogleSignInService();
+  final GoogleLoginService googleLoginService = GoogleLoginService();
 
-  Future<void> _signInGoogle() async {
-    final response = await googleSignInService.signInWithGoogle(context);
+  Future<void> _loginGoogle() async {
+    final response = await googleLoginService.loginWithGoogle(context);
     if (response) {
       GoRouter.of(context).push('/menu');
     }
@@ -56,13 +57,13 @@ class _SignInState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+      backgroundColor: backgroundColor,
       body: Center(
         child: Container(
           width: 300,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 241, 237, 233),
+            color: containerColor,
             borderRadius: BorderRadius.circular(10),
             boxShadow: const [
               BoxShadow(
@@ -76,7 +77,7 @@ class _SignInState extends State<SignInPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Sign in',
+                'Login',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
@@ -107,35 +108,35 @@ class _SignInState extends State<SignInPage> {
                 alignment: Alignment.center,
                 child: TextButton(
                   onPressed: () {
-                    GoRouter.of(context).push('/signUp');
+                    GoRouter.of(context).push('/register');
                   },
                   child: const Text(
-                    'Sign Up',
+                    'Register',
                     style: TextStyle(color: Color.fromARGB(255, 27, 27, 28)),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _signIn,
+                onPressed: _login,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+                  backgroundColor: buttonColor,
                   foregroundColor: Colors.black,
                   minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: Colors.grey),
+                  side: const BorderSide(color: Colors.black),
                 ),
-                child : const Text('Sign in'),
+                child : const Text('Login'),
               ),
               const SizedBox(height: 10),
               ElevatedButton.icon(
-                onPressed: _signInGoogle,
+                onPressed: _loginGoogle,
                 icon: const Icon(Icons.g_mobiledata),
                 label: const Text('Continue with Google'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 241, 237, 233),
+                  backgroundColor: buttonColor,
                   foregroundColor: Colors.black,
                   minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: Colors.grey),
+                  side: const BorderSide(color: Colors.black),
                 ),
               ),
             ],
