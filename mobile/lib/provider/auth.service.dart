@@ -127,7 +127,7 @@ class DiscordAuthService {
         return false;
       }
 
-      final url = Uri.parse('$baseurl/auth/callback/discord');
+      final url = Uri.parse('$baseurl/mobileauth/callback/discord');
 
       final response = await http.post(
         url,
@@ -140,7 +140,7 @@ class DiscordAuthService {
         })
       );
 
-      if (response.statusCode == 500) {
+      if (response.statusCode == 200) {
         return true;
       } else {
         return false;

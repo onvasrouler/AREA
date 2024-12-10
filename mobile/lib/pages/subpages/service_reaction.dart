@@ -66,7 +66,6 @@ class _ServiceReactionPageState extends State<ServiceReactionPage> {
                           child: IconButton(
                             icon: const Icon(Icons.arrow_back),
                             onPressed: () {
-                              currentAction = 0;
                               GoRouter.of(context).pop();
                             },
                           ),
@@ -112,8 +111,7 @@ class _ServiceReactionPageState extends State<ServiceReactionPage> {
                       GestureDetector(
                         onTap: () 
                         {
-                          GoRouter.of(context).push('/success');
-                          //verify the result
+                          GoRouter.of(context).push('/fail');
                           currentReactionService = -1;
                         },
                         child:Container(

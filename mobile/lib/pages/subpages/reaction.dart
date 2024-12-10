@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
 import 'package:area/provider/auth.service.dart';
+import 'package:area/provider/action.service.dart';
 import 'package:area/provider/user.service.dart';
 
 class ReactionPage extends StatefulWidget {
@@ -35,6 +36,16 @@ class _ReactionPageState extends State<ReactionPage> {
 
     if (response) {
       GoRouter.of(context).push('/server');
+    }
+  }
+
+  final actionService = ActionService();
+
+  Future<void> _disordmp() async {
+    final response = await actionService.sendActionWithDiscordReactionPrivate();
+
+    if (response) {
+      GoRouter.of(context).push('/success');
     }
   }
 
@@ -107,9 +118,10 @@ class _ReactionPageState extends State<ReactionPage> {
 
                         if (services[currentReactionService].reaction[currentReaction] == "Message in a channel") {
                           _server();
+                        } else if (services[currentReactionService].reaction[currentReaction] == "Private message") {
+                          _disordmp();
                         } else {
-                          //si l'envois au back sest bien dérouler
-                          GoRouter.of(context).push('/success');
+                          GoRouter.of(context).push('/fail');
                         }
                       },
                       child:Container(

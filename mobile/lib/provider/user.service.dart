@@ -20,10 +20,10 @@ class UserService {
         final data = jsonDecode(response.body);
         
         if (data['data']['logged_in_discord'] == true) {
-          services[indexDiscord].connected = false;
+          services[indexDiscord].connected = true;
         }
         if (data['data']['logged_in_github'] == true) {
-          services[indexGithub].connected = false;
+          services[indexGithub].connected = true;
         }
 
         return true;
@@ -63,7 +63,8 @@ class UserService {
   }
 
   Future<bool> getChannel(channelId) async {
-    final url = Uri.parse('$baseurl/get_list_of_channels');
+    final id  = discordServer[currentServer]['id'];
+    final url = Uri.parse('$baseurl/get_list_of_channels?guildId=$id');
 
     try {
       final response = await http.get(
@@ -72,7 +73,6 @@ class UserService {
           "Content-Type": "application/json",
           "session": session,
         },
-        
       );
 
       if (response.statusCode == 200) {
