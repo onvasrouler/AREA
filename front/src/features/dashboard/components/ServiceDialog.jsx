@@ -62,8 +62,15 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
       return;
     }
   
-    const areas = actionReactionButtons.map(button => {
+    const userId = await getUserId();
+    if (!userId) {
+      console.error("User ID not found. Aborting save.");
+      return;
+    }
+  
+    for (const button of actionReactionButtons) {
       let actionArguments = {};
+  
       if (button.action === "New repository") actionArguments.on = "new_repo";
       else if (button.action === "New issue") actionArguments.on = "new_issue";
       else if (button.action === "New commit") actionArguments.on = "new_commit";
@@ -72,51 +79,52 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
       let reactionArguments = {};
       if (button.reaction === "Send private message") {
         reactionArguments.react = "private_message";
-        // You need to implement a way to get the user ID
-        reactionArguments.userId = getUserId();
+        reactionArguments.userId = userId;
       } else if (button.reaction === "Send message in channel") {
         reactionArguments.react = "channel_message";
         reactionArguments.serverId = selectedServer;
         reactionArguments.channelId = selectedChannel;
       }
   
-      return {
+      const area = {
         action: {
           service: "github",
-          arguments: actionArguments
+          arguments: actionArguments,
         },
         reaction: {
           service: "discord",
-          arguments: reactionArguments
-        }
-      };
-    });
-  
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/area`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'session': session
+          arguments: reactionArguments,
         },
-        body: JSON.stringify(areas)
-      });
+      };
   
-      if (response.ok) {
-        console.log("Changes saved successfully");
-        // Optionally, you can update the UI to show a success message
-      } else {
-        console.error("Failed to save changes");
-        // Optionally, you can update the UI to show an error message
+      console.log("Request body:", JSON.stringify(area, null, 2));
+  
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/area`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'session': session,
+          },
+          body: JSON.stringify(area),
+        });
+  
+        if (response.ok) {
+          console.log("Changes saved successfully");
+        } else {
+          console.error("Failed to save changes");
+        }
+      } catch (error) {
+        console.error("Error saving changes:", error);
       }
-    } catch (error) {
-      console.error("Error saving changes:", error);
-      // Optionally, you can update the UI to show an error message
     }
   
-    localStorage.setItem(`${service.name}_actions_reactions`, JSON.stringify(actionReactionButtons));
+    localStorage.setItem(
+      `${service.name}_actions_reactions`,
+      JSON.stringify(actionReactionButtons)
+    );
   };
-  
+
   const getUserId = async () => {
     const session = localStorage.getItem("session");
     if (!session) {
@@ -135,7 +143,8 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   
       if (response.ok) {
         const data = await response.json();
-        return data.userId;
+        console.log("User ID:", data.data);
+        return data.data;
       } else {
         console.error("Failed to get user ID");
         return null;
