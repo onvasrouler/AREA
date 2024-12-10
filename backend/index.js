@@ -4,6 +4,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 require("dotenv").config();
 require("./src/database/mongo");
+const { ServerRunner } = require("./src/runner/runner");
 const api_formatter = require("./src/middleware/api-formatter.js");
 const fileUpload = require("express-fileupload");
 require("./src/utils/discord");
@@ -39,4 +40,5 @@ app.use(function (err, req, res) { // this will return a 500 error if an error o
 
 app.listen(PORT, () => { // this will start the server
     console.log(`Server is running on port ${PORT}.`); // this will log the port
+    ServerRunner.run(); // this will run the server
 });
