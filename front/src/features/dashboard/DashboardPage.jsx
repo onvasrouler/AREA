@@ -133,6 +133,7 @@ export function DashboardPage() {
           service={selectedService}
           isDiscordAuthenticated={isDiscordAuthenticated}
           isGithubAuthenticated={isGithubAuthenticated}
+          services={services}
         />
       )}
     </div>

@@ -59,7 +59,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
         await fetchPullRequests();
       }
     };
-  
+    console.log("Services:", services);
     fetchData();
   }, [isOpen, service.name]);
 
