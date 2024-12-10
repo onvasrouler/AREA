@@ -7,12 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { ChevronDown, Plus } from 'lucide-react'
 import { Separator } from "@/components/ui/separator"
 import {
@@ -21,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getApiClient } from "@/common/client/APIClient"
 
 export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGithubAuthenticated, services }) {
@@ -29,7 +24,17 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   const [discordChannels, setDiscordChannels] = useState({});
   const [githubRepos, setGithubRepos] = useState([]);
   const [githubPullRequests, setGithubPullRequest] = useState({});
+  const [linkedService, setLinkedService] = useState(() => {
+    const saved = localStorage.getItem(`${service.name}_linked_service`);
+    return saved || "Link With";
+  });
   const [actionReactionButtons, setActionReactionButtons] = useState([]);
+  const [selectedServer, setSelectedServer] = useState(null);
+  const [selectedChannel, setSelectedChannel] = useState(null);
+
+  useEffect(() => {
+    localStorage.setItem(`${service.name}_linked_service`, linkedService);
+  }, [linkedService, service.name]);
 
   const handleDiscordLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
@@ -50,9 +55,95 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     window.location.href = AUTH_URL;
   };
 
-  const handleSaveChanges = () => {
-    // You will implement this function yourself
-    console.log("Save Changes clicked");
+  const handleSaveChanges = async () => {
+    const session = localStorage.getItem("session");
+    if (!session) {
+      console.error("No session found. Please log in.");
+      return;
+    }
+  
+    const areas = actionReactionButtons.map(button => {
+      let actionArguments = {};
+      if (button.action === "New repository") actionArguments.on = "new_repo";
+      else if (button.action === "New issue") actionArguments.on = "new_issue";
+      else if (button.action === "New commit") actionArguments.on = "new_commit";
+      else if (button.action === "New pull request") actionArguments.on = "new_pr";
+  
+      let reactionArguments = {};
+      if (button.reaction === "Send private message") {
+        reactionArguments.react = "private_message";
+        // You need to implement a way to get the user ID
+        reactionArguments.userId = getUserId();
+      } else if (button.reaction === "Send message in channel") {
+        reactionArguments.react = "channel_message";
+        reactionArguments.serverId = selectedServer;
+        reactionArguments.channelId = selectedChannel;
+      }
+  
+      return {
+        action: {
+          service: "github",
+          arguments: actionArguments
+        },
+        reaction: {
+          service: "discord",
+          arguments: reactionArguments
+        }
+      };
+    });
+  
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/area`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'session': session
+        },
+        body: JSON.stringify(areas)
+      });
+  
+      if (response.ok) {
+        console.log("Changes saved successfully");
+        // Optionally, you can update the UI to show a success message
+      } else {
+        console.error("Failed to save changes");
+        // Optionally, you can update the UI to show an error message
+      }
+    } catch (error) {
+      console.error("Error saving changes:", error);
+      // Optionally, you can update the UI to show an error message
+    }
+  
+    localStorage.setItem(`${service.name}_actions_reactions`, JSON.stringify(actionReactionButtons));
+  };
+  
+  const getUserId = async () => {
+    const session = localStorage.getItem("session");
+    if (!session) {
+      console.error("No session found. Please log in.");
+      return null;
+    }
+  
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/get_my_user_id`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'session': session
+        }
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        return data.userId;
+      } else {
+        console.error("Failed to get user ID");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error getting user ID:", error);
+      return null;
+    }
   };
 
   const fetchServers = async () => {
@@ -183,6 +274,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
         fetchServers();
       }
       if (isOpen && service.name === "GitHub") {
+        loadSavedState();
         await fetchRepositories();
         await fetchPullRequests();
       }
@@ -190,6 +282,13 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     console.log("Services:", services);
     fetchData();
   }, [isOpen, service.name]);
+
+  const loadSavedState = () => {
+    const savedState = localStorage.getItem(`${service.name}_actions_reactions`);
+    if (savedState) {
+      setActionReactionButtons(JSON.parse(savedState));
+    }
+  };
 
   const renderServiceContent = () => {
     switch (service.name) {
@@ -210,37 +309,37 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
               <div>
                 <h3 className="text-lg font-semibold mb-2">Your Discord Servers</h3>
                 {discordServers.length > 0 ? (
-                  <Accordion type="single" collapsible className="w-full">
-                    {discordServers.map((server) => (
-                      <AccordionItem key={server.id} value={server.id}>
-                        <AccordionTrigger onClick={() => handleServerSelect(server.id)} className="flex items-center space-x-2">
-                          {server.icon && (
-                            <img
-                              src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
-                              alt={`${server.name} icon`}
-                              className="w-6 h-6 rounded-full mr-2"
-                            />
-                          )}
-                          {server.name}
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          {discordChannels[server.id] ? (
-                            discordChannels[server.id].length > 0 ? (
-                              <ul className="space-y-1 pl-8">
-                                {discordChannels[server.id].map((channel) => (
-                                  <li key={channel.id}>{channel.name}</li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <p className="pl-8">No channels found for this server.</p>
-                            )
-                          ) : (
-                            <p className="pl-8">Loading channels...</p>
-                          )}
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
+                  <div className="space-y-4">
+                    <Select onValueChange={(value) => {
+                      setSelectedServer(value);
+                      fetchChannels(value);
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a server" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {discordServers.map((server) => (
+                          <SelectItem key={server.id} value={server.id}>
+                            {server.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedServer && discordChannels[selectedServer] && (
+                      <Select onValueChange={setSelectedChannel}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a channel" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {discordChannels[selectedServer].map((channel) => (
+                            <SelectItem key={channel.id} value={channel.id}>
+                              {channel.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
                 ) : (
                   <p>No Discord servers found.</p>
                 )}
@@ -270,31 +369,59 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="default" className="bg-primary text-primary-foreground">
-                              Action
+                              {button.action || "Action"}
                               <ChevronDown className="ml-2 h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem>Action 1</DropdownMenuItem>
-                            <DropdownMenuItem>Action 2</DropdownMenuItem>
-                            <DropdownMenuItem>Action 3</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => {
+                              const newButtons = [...actionReactionButtons];
+                              newButtons[index] = { ...newButtons[index], action: "New repository" };
+                              setActionReactionButtons(newButtons);
+                            }}>New repository</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => {
+                              const newButtons = [...actionReactionButtons];
+                              newButtons[index] = { ...newButtons[index], action: "New issue" };
+                              setActionReactionButtons(newButtons);
+                            }}>New issue</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => {
+                              const newButtons = [...actionReactionButtons];
+                              newButtons[index] = { ...newButtons[index], action: "New commit" };
+                              setActionReactionButtons(newButtons);
+                            }}>New commit</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => {
+                              const newButtons = [...actionReactionButtons];
+                              newButtons[index] = { ...newButtons[index], action: "New pull request" };
+                              setActionReactionButtons(newButtons);
+                            }}>New pull request</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="default" className="bg-primary text-primary-foreground">
-                              Reaction
+                              {button.reaction || "Reaction"}
                               <ChevronDown className="ml-2 h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem>Reaction 1</DropdownMenuItem>
-                            <DropdownMenuItem>Reaction 2</DropdownMenuItem>
-                            <DropdownMenuItem>Reaction 3</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => {
+                              const newButtons = [...actionReactionButtons];
+                              newButtons[index] = { ...newButtons[index], reaction: "Send private message" };
+                              setActionReactionButtons(newButtons);
+                            }}>Send private message</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => {
+                              const newButtons = [...actionReactionButtons];
+                              newButtons[index] = { ...newButtons[index], reaction: "Send message in channel" };
+                              setActionReactionButtons(newButtons);
+                            }}>Send message in channel</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
+                      {button.action && button.reaction && (
+                        <div className="ml-4 text-sm text-gray-600">
+                          On: "{button.action}" Do: "{button.reaction}"
+                        </div>
+                      )}
                       <Button
                         variant="destructive"
                         size="icon"
@@ -314,7 +441,6 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
                       </Button>
                     </div>
                   ))}
-
                   <div className="flex justify-center space-x-4">
                     <Button
                       variant="default"
@@ -357,13 +483,21 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="default" className="bg-primary text-primary-foreground">
-                  Link With
+                  {linkedService}
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 {services.map((service) => (
-                  <DropdownMenuItem key={service.id}>{service.name}</DropdownMenuItem>
+                  <DropdownMenuItem
+                    key={service.id}
+                    onSelect={() => {
+                      setLinkedService(service.name);
+                      localStorage.setItem(`${service.name}_linked_service`, service.name);
+                    }}
+                  >
+                    {service.name}
+                  </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -378,3 +512,4 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     </Dialog>
   )
 }
+
