@@ -34,7 +34,7 @@ class _ServerPageState extends State<ServerPage> {
     final response = await userService.getChannel(discordServer[currentServer]["id"]);
 
     if (response) {
-      GoRouter.of(context).push('/login');
+      GoRouter.of(context).push('/channel');
     }
   }
 
@@ -46,7 +46,7 @@ class _ServerPageState extends State<ServerPage> {
         children: [
           Center(
             child: ListView.builder(
-              itemCount: discordServer.length,
+              itemCount: discordServer.length + 1,
               itemBuilder:(context, index) {
                 if (index == 0) {
                   return SizedBox(
@@ -103,7 +103,7 @@ class _ServerPageState extends State<ServerPage> {
                     GestureDetector(
                       onTap: () 
                       {
-                        currentServer = index;
+                        currentServer = index - 1;
                         _channel();
                       },
                       child:Container(
@@ -115,7 +115,7 @@ class _ServerPageState extends State<ServerPage> {
                         ),
                         child: Center(
                           child: Text(
-                            discordServer[index]["name"],
+                            discordServer[index - 1]["name"],
                             style: const TextStyle(
                               fontSize: 20,
                               fontStyle: FontStyle.italic,

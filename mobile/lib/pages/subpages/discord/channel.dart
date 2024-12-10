@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
 import 'package:area/provider/auth.service.dart';
+import 'package:area/provider/action.service.dart';
 
 class ChannelPage extends StatefulWidget {
   const ChannelPage({super.key});
@@ -27,6 +28,16 @@ class _ChannelPageState extends State<ChannelPage> {
     }
   }
 
+  final actionService = ActionService();
+
+  Future<void> _action() async {
+    final response = await actionService.sendActionWithDiscordReactionChannel();
+
+    if (response) {
+      GoRouter.of(context).push('/success');
+    }
+  }
+
   @override
     Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +46,7 @@ class _ChannelPageState extends State<ChannelPage> {
         children: [
           Center(
             child: ListView.builder(
-              itemCount: discordChannel.length,
+              itemCount: discordChannel.length + 1,
               itemBuilder:(context, index) {
                 if (index == 0) {
                   return SizedBox(
@@ -92,9 +103,8 @@ class _ChannelPageState extends State<ChannelPage> {
                     GestureDetector(
                       onTap: () 
                       {
-                        currentChannel = index;
-                        GoRouter.of(context).push('/success');
-                        //result
+                        currentChannel = index - 1;
+                        _action();
                       },
                       child:Container(
                         width: 300,
@@ -105,7 +115,7 @@ class _ChannelPageState extends State<ChannelPage> {
                         ),
                         child: Center(
                           child: Text(
-                            discordChannel[index]["name"],
+                            discordChannel[index - 1]["name"],
                             style: const TextStyle(
                               fontSize: 20,
                               fontStyle: FontStyle.italic,
