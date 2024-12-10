@@ -3,14 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
 import 'package:area/provider/auth.service.dart';
 
-class MenuPage extends StatefulWidget {
-  const MenuPage({super.key});
+class ServiceReactionPage extends StatefulWidget {
+  const ServiceReactionPage({super.key});
 
   @override
-  State<MenuPage> createState() => _MenuPageState();
+  State<ServiceReactionPage> createState() => _ServiceReactionPageState();
 }
 
-class _MenuPageState extends State<MenuPage> {
+class _ServiceReactionPageState extends State<ServiceReactionPage> {
 
   @override
   void initState() {
@@ -40,9 +40,9 @@ class _MenuPageState extends State<MenuPage> {
     }
 
     if (response) {
-      currentActionService = index - 1;
+      currentReactionService = index - 1;
       services[index-1].connected = true;
-      GoRouter.of(context).push('/action');
+      GoRouter.of(context).push('/reaction');
     }
   }
 
@@ -54,7 +54,7 @@ class _MenuPageState extends State<MenuPage> {
         children: [
           Center(
             child: ListView.builder(
-              itemCount: services.length + 1,
+              itemCount: services.length + 2,
               itemBuilder:(context, index) {
                 if (index == 0) {
                   return SizedBox(
@@ -62,7 +62,17 @@ class _MenuPageState extends State<MenuPage> {
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 300.0),
+                          padding: const EdgeInsets.only(left: 25),
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: () {
+                              currentAction = 0;
+                              GoRouter.of(context).pop();
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 200.0),
                           child: PopupMenuButton<String>(
                             icon: const CircleAvatar(
                               backgroundColor: Color.fromARGB(255, 225, 220, 216),
@@ -96,14 +106,55 @@ class _MenuPageState extends State<MenuPage> {
                     ),
                   );
                 }
+                if (index == services.length + 1) {
+                  return Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () 
+                        {
+                          GoRouter.of(context).push('/success');
+                          //verify the result
+                          currentReactionService = -1;
+                        },
+                        child:Container(
+                          width: 300,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            color: buttonColor,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                spreadRadius: 5,
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "No Reaction",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      )
+                    ],
+                  );
+                }
                 return Column(
                   children: [
                     GestureDetector(
                       onTap: () 
                       {
                         if (services[index - 1].connected) {
-                          currentActionService = index - 1;
-                          GoRouter.of(context).push('/action');
+                          currentReactionService = index - 1;
+                          GoRouter.of(context).push('/reaction');
                         } else {
                           _connect(services[index - 1].name, index);
                         }
@@ -112,8 +163,6 @@ class _MenuPageState extends State<MenuPage> {
                         width: 300,
                         height: 300,
                         decoration: BoxDecoration(
-                          //couleur index
-                          //image index
                           color: services[index - 1].color,
                           image: DecorationImage(
                             image: AssetImage(services[index - 1].image),

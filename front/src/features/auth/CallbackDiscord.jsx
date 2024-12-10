@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-export const Callback = () => {
+export const CallbackDiscord = () => {
     const [status, setStatus] = useState('loading');
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -26,7 +26,7 @@ export const Callback = () => {
         }
         axios
             .post(
-                `${import.meta.env.VITE_BACKEND_CALLBACK_URL}`,
+                `${import.meta.env.VITE_BACKEND_CALLBACK_DISCORD_URL}`,
                 { code },
                 {
                     headers: {
