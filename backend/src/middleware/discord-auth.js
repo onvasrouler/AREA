@@ -1,6 +1,5 @@
 const api_formatter = require("./api-formatter.js");
 const axios = require("axios");
-const discordBot = require("../utils/discord.js");
 
 async function discordGuilds(req, res, next) {
     try {

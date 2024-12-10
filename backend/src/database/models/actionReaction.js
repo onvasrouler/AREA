@@ -1,4 +1,3 @@
-const CachedData = require("../../middleware/get-cached-data");
 const { mainDB } = require("../mongo");
 const mongoose = require("mongoose");
 

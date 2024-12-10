@@ -49,7 +49,7 @@ async function ReactionDiscord(AREA) {
                     return user.send(Arguments.message);
                 })
                 .catch(error => {
-                    console.error('Error sending message:', error);
+                    console.error("Error sending message:", error);
                 });
         }
         actionReactions.Treated = true;
@@ -66,4 +66,4 @@ async function ReactionDiscord(AREA) {
 module.exports = {
     ActionDiscord,
     ReactionDiscord
-}
+};
