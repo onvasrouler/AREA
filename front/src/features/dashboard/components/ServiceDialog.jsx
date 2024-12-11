@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { getApiClient } from "@/common/client/APIClient"
+import { Separator } from "@/components/ui/separator"
 
 export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGithubAuthenticated,
   isSpotifyAuthenticated, isOneDriveAuthenticated, isGmailAuthenticated, isInstagramAuthenticated }) {
@@ -50,18 +51,6 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
   const handleInstagramLogin = () => {
     console.log("Instagram login");
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (isOpen && service.name === "Discord") {
-        fetchServers();
-      }
-      if (isOpen && service.name === "GitHub") {
-        console.log("GitHub service opened");
-      }
-    };
-    fetchData();
-  }, [isOpen, service.name, fetchServers]);
 
   const fetchServers = async () => {
     const session = localStorage.getItem("session");
@@ -112,6 +101,17 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
       console.error("Error fetching Discord channels:", error);
     }
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isOpen && service.name === "Discord") {
+        fetchServers();
+      }
+      if (isOpen && service.name === "GitHub") {
+        console.log("Fetching Github");
+      }
+    };
+    fetchData();
+  }, [isOpen, service.name]);
 
   const renderServiceContent = () => {
     switch (service.name) {
@@ -237,7 +237,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
         )
       default:
         return (
-          <div className="p-4">
+          <div className="p-4 text-center">
             <p>Unknown service selected.</p>
           </div>
         )
@@ -248,12 +248,15 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{service.name}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-center">
+            {service.name}
+          </DialogTitle>
+          <DialogDescription className="text-center">
             {service.description}
           </DialogDescription>
         </DialogHeader>
-        {renderServiceContent()}
+        <Separator className="bg-primary" />
+          {renderServiceContent()}
       </DialogContent>
     </Dialog>
   )
