@@ -7,20 +7,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { getApiClient } from "@/common/client/APIClient"
 
-export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGithubAuthenticated }) {
+export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGithubAuthenticated,
+  isSpotifyAuthenticated, isOneDriveAuthenticated, isGmailAuthenticated, isInstagramAuthenticated }) {
   const apiClient = getApiClient();
   const [discordServers, setDiscordServers] = useState([]);
   const [discordChannels, setDiscordChannels] = useState({});
-  const [githubRepos, setGithubRepos] = useState([]);
-  const [githubPullRequests, setGithubPullRequest] = useState({});
+
 
   const handleDiscordLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
@@ -41,19 +35,33 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     window.location.href = AUTH_URL;
   };
 
+  const handleSpotifyLogin = () => {
+    console.log("Spotify login");
+  }
+
+  const handleOneDriveLogin = () => {
+    console.log("OneDrive login");
+  }
+
+  const handleGmailLogin = () => {
+    console.log("Gmail login");
+  }
+
+  const handleInstagramLogin = () => {
+    console.log("Instagram login");
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       if (isOpen && service.name === "Discord") {
         fetchServers();
       }
       if (isOpen && service.name === "GitHub") {
-        await fetchRepositories();
-        await fetchPullRequests();
+        console.log("GitHub service opened");
       }
     };
-  
     fetchData();
-  }, [isOpen, service.name]);
+  }, [isOpen, service.name, fetchServers]);
 
   const fetchServers = async () => {
     const session = localStorage.getItem("session");
@@ -105,82 +113,6 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
     }
   };
 
-  const fetchRepositories = async() => {
-    const session = localStorage.getItem("session");
-    if (session && isGithubAuthenticated) {
-      try {
-        const reposResponse = await apiClient.get("get_my_repos", {
-          session: session,
-        });
-
-        const responseData = await reposResponse.json();
-
-        if (responseData?.data?.data) {
-          const data = responseData.data.data;
-
-        setGithubRepos(data);
-    
-          console.log("Fetched Repositories:", data);
-        } else {
-          console.warn("No repositories items found in the response.");
-        }
-
-      if (responseData && responseData.data) {
-          setGithubRepos(responseData.data);
-        }
-      } catch (error) {
-        console.error("Error fetching Github repositories:", error);
-      }
-    }
-  };
-
-  const fetchPullRequests = async() => {
-    const session = localStorage.getItem("session");
-
-    if (!session) {
-      console.error("No session found. Please log in.");
-      return;
-    }
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_GITHUB_PR_FETCH_URL}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "session": session,
-          },
-        }
-      );
-      console.log(response)
-      const responseData = await response.json();
-
-      if (responseData?.data?.data?.items) {
-        const items = responseData.data.data.items;
-
-      setGithubPullRequest(items);
-  
-        console.log("Fetched Pull Requests:", items);
-      } else {
-        console.warn("No pull request items found in the response.");
-      }
-
-      if (responseData && responseData.data) {
-        setGithubPullRequest(prevPullRequest => ({
-          ...prevPullRequest,
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching Github pull requests:", error);
-    }
-  };
-
-  const handleServerSelect = (serverId) => {
-    if (!discordChannels[serverId]) {
-      fetchChannels(serverId);
-    }
-  };
-
   const renderServiceContent = () => {
     switch (service.name) {
       case "Discord":
@@ -198,42 +130,7 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
               </div>
             ) : (
               <div>
-                <h3 className="text-lg font-semibold mb-2">Your Discord Servers</h3>
-                {discordServers.length > 0 ? (
-                  <Accordion type="single" collapsible className="w-full">
-                    {discordServers.map((server) => (
-                      <AccordionItem key={server.id} value={server.id}>
-                        <AccordionTrigger onClick={() => handleServerSelect(server.id)} className="flex items-center space-x-2">
-                          {server.icon && (
-                            <img
-                              src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
-                              alt={`${server.name} icon`}
-                              className="w-6 h-6 rounded-full mr-2"
-                            />
-                          )}
-                          {server.name}
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          {discordChannels[server.id] ? (
-                            discordChannels[server.id].length > 0 ? (
-                              <ul className="space-y-1 pl-8">
-                                {discordChannels[server.id].map((channel) => (
-                                  <li key={channel.id}>{channel.name}</li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <p className="pl-8">No channels found for this server.</p>
-                            )
-                          ) : (
-                            <p className="pl-8">Loading channels...</p>
-                          )}
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                ) : (
-                  <p>No Discord servers found.</p>
-                )}
+                <h1 className="text-lg font-semibold mb-2">LOGGED IN</h1>
               </div>
             )}
           </div>
@@ -253,49 +150,90 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
               </div>
             ) : (
               <div>
-                <div className="mb-6">
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="repositories">
-                      <AccordionTrigger className="no-underline font-semibold text-lg">Your repositories</AccordionTrigger>
-                      <AccordionContent>
-                        {Object.keys(githubRepos).length > 0 ? (
-                          <ul className="space-y-1 pl-4">
-                            {Object.values(githubRepos).flat().map((repo) => (
-                              <li key={repo.id} className="list-disc">
-                                {repo.name}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="pl-4">No repositories found.</p>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-                <div>
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="pull-requests">
-                      <AccordionTrigger className="no-underline font-semibold text-lg">Your pull requests</AccordionTrigger>
-                      <AccordionContent>
-                        {Object.keys(githubPullRequests).length > 0 ? (
-                          <ul className="space-y-1 pl-4">
-                            {Object.values(githubPullRequests).flat().map((pr) => (
-                              <li key={pr.id} className="list-disc">
-                                {pr.title}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="pl-4">No pull requests found.</p>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
+                <h1 className="text-lg font-semibold mb-2">LOGGED IN</h1>
               </div>
             )}
           </div>
+        )
+      case "Spotify":
+        return (
+          <div className="p-4">
+          {!isSpotifyAuthenticated ? (
+            <div className="flex flex-col items-center">
+              <p className="mb-4">You need to log in with Spotify to access this service.</p>
+              <Button
+                onClick={handleSpotifyLogin}
+                className="font-bold py-2 px-4 rounded"
+              >
+                Login with Spotify
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <h1 className="text-lg font-semibold mb-2">LOGGED IN</h1>
+            </div>
+          )}
+        </div>
+        )
+      case "OneDrive":
+        return (
+          <div className="p-4">
+          {!isOneDriveAuthenticated ? (
+            <div className="flex flex-col items-center">
+              <p className="mb-4">You need to log in with OneDrive to access this service.</p>
+              <Button
+                onClick={handleOneDriveLogin}
+                className="font-bold py-2 px-4 rounded"
+              >
+                Login with OneDrive
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <h1 className="text-lg font-semibold mb-2">LOGGED IN</h1>
+            </div>
+          )}
+        </div>
+        )
+      case "Gmail":
+        return (
+          <div className="p-4">
+          {!isGmailAuthenticated ? (
+            <div className="flex flex-col items-center">
+              <p className="mb-4">You need to log in with Gmail to access this service.</p>
+              <Button
+                onClick={handleGmailLogin}
+                className="font-bold py-2 px-4 rounded"
+              >
+                Login with Gmail
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <h1 className="text-lg font-semibold mb-2">LOGGED IN</h1>
+            </div>
+          )}
+        </div>
+        )
+      case "Instagram":
+        return (
+          <div className="p-4">
+          {!isInstagramAuthenticated ? (
+            <div className="flex flex-col items-center">
+              <p className="mb-4">You need to log in with Instagram to access this service.</p>
+              <Button
+                onClick={handleInstagramLogin}
+                className="font-bold py-2 px-4 rounded"
+              >
+                Login with Instagram
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <h1 className="text-lg font-semibold mb-2">LOGGED IN</h1>
+            </div>
+          )}
+        </div>
         )
       default:
         return (

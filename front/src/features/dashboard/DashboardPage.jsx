@@ -17,6 +17,10 @@ export function DashboardPage() {
   const [selectedService, setSelectedService] = useState(null)
   const [isDiscordAuthenticated, setIsDiscordAuthenticated] = useState(false)
   const [isGithubAuthenticated, setIsGithubAuthenticated] = useState(false)
+  const [isSpotifyAuthenticated, setIsSpotifyAuthenticated] = useState(false)
+  const [isOneDriveAuthenticated, setIsOneDriveAuthenticated] = useState(false)
+  const [isGmailAuthenticated, setIsGmailAuthenticated] = useState(false)
+  const [isInstagramAuthenticated, setIsInstagramAuthenticated] = useState(false)
   const apiClient = getApiClient()
 
   const services = [
@@ -32,7 +36,6 @@ export function DashboardPage() {
     const fetchUserData = async () => {
       const session = localStorage.getItem("session");
       if (session) {
-        console.log("Session:", session);
         try {
           const response = await apiClient.get("sessions", {
             session: session
@@ -133,6 +136,10 @@ export function DashboardPage() {
           service={selectedService}
           isDiscordAuthenticated={isDiscordAuthenticated}
           isGithubAuthenticated={isGithubAuthenticated}
+          isSpotifyAuthenticated={isSpotifyAuthenticated}
+          isOneDriveAuthenticated={isOneDriveAuthenticated}
+          isGmailAuthenticated={isGmailAuthenticated}
+          isInstagramAuthenticated={isInstagramAuthenticated}
         />
       )}
     </div>
