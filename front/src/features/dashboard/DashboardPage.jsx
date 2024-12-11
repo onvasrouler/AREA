@@ -15,12 +15,14 @@ import { getApiClient } from "@/common/client/APIClient"
 export function DashboardPage() {
   const [username, setUsername] = useState("User")
   const [selectedService, setSelectedService] = useState(null)
-  const [isDiscordAuthenticated, setIsDiscordAuthenticated] = useState(false)
-  const [isGithubAuthenticated, setIsGithubAuthenticated] = useState(false)
-  const [isSpotifyAuthenticated, setIsSpotifyAuthenticated] = useState(false)
-  const [isOneDriveAuthenticated, setIsOneDriveAuthenticated] = useState(false)
-  const [isGmailAuthenticated, setIsGmailAuthenticated] = useState(false)
-  const [isInstagramAuthenticated, setIsInstagramAuthenticated] = useState(false)
+  const [authStatus, setAuthStatus] = useState({
+    isDiscordAuthenticated: false,
+    isGithubAuthenticated: false,
+    isSpotifyAuthenticated: false,
+    isOneDriveAuthenticated: false,
+    isGmailAuthenticated: false,
+    isInstagramAuthenticated: false
+  })
   const apiClient = getApiClient()
 
   const services = [
@@ -64,20 +66,14 @@ export function DashboardPage() {
           });
           const responseData = await response.json();
 
-          if (responseData.data && responseData.data.logged_in_discord === true) {
-            console.log("Discord authenticated");
-            setIsDiscordAuthenticated(true);
-          } else {
-            console.log("Discord not authenticated");
-            setIsDiscordAuthenticated(false);
-          }
-          if (responseData.data && responseData.data.logged_in_github === true) {
-            console.log("Github authenticated");
-            setIsGithubAuthenticated(true);
-          } else {
-            console.log("Github not authenticated");
-            setIsGithubAuthenticated(false)
-          }
+          setAuthStatus({
+            isDiscordAuthenticated: responseData.data?.logged_in_discord === true,
+            isGithubAuthenticated: responseData.data?.logged_in_github === true,
+            isSpotifyAuthenticated: false, // Add actual check when available
+            isOneDriveAuthenticated: false, // Add actual check when available
+            isGmailAuthenticated: false, // Add actual check when available
+            isInstagramAuthenticated: false // Add actual check when available
+          });
         } catch (error) {
           console.error("Error:", error);
         }
@@ -91,13 +87,12 @@ export function DashboardPage() {
   }, [apiClient]);
 
   const handleCardClick = (service) => {
-      setSelectedService(service)
+    setSelectedService(service)
   }
 
   const handleCloseDialog = () => {
     setSelectedService(null)
   }
-
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -134,15 +129,9 @@ export function DashboardPage() {
           isOpen={!!selectedService}
           onClose={handleCloseDialog}
           service={selectedService}
-          isDiscordAuthenticated={isDiscordAuthenticated}
-          isGithubAuthenticated={isGithubAuthenticated}
-          isSpotifyAuthenticated={isSpotifyAuthenticated}
-          isOneDriveAuthenticated={isOneDriveAuthenticated}
-          isGmailAuthenticated={isGmailAuthenticated}
-          isInstagramAuthenticated={isInstagramAuthenticated}
+          authStatus={authStatus}
         />
       )}
     </div>
   )
 }
-
