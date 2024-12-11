@@ -1,7 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-
+import { useState } from "react"
+import { AreaDialog } from "./AreaDialog"
 
 const handleLoginFunctions = {
   handleDiscordLogin: () => {
@@ -40,6 +41,7 @@ const handleLoginFunctions = {
 export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
   const isAuthenticated = authStatus[`is${service.name}Authenticated`]
   const handleLogin = handleLoginFunctions[`handle${service.name}Login`]
+  const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false)
 
   const renderServiceContent = () => {
     if (!isAuthenticated) {
@@ -56,30 +58,42 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
       )
     } else {
       return (
-        <div>
-          <h1 className="text-lg font-semibold mb-2">LOGGED IN</h1>
+        <div className="flex flex-col h-full">
+          <div className="flex-grow"></div>
+          <div className="flex justify-center">
+            <Button
+              onClick={() => setIsAreaDialogOpen(true)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Create AREA
+            </Button>
+          </div>
         </div>
       )
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="text-center">
-            {service.name}
-          </DialogTitle>
-          <DialogDescription className="text-center">
-            {service.description}
-          </DialogDescription>
-        </DialogHeader>
-        <Separator className="bg-primary" />
-        <div className="p-4">
-          {renderServiceContent()}
-        </div>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {service.name}
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              {service.description}
+            </DialogDescription>
+          </DialogHeader>
+          <Separator className="bg-primary" />
+            {renderServiceContent()}
+        </DialogContent>
+      </Dialog>
+      <AreaDialog
+        isOpen={isAreaDialogOpen}
+        onClose={() => setIsAreaDialogOpen(false)}
+        service={service}
+      />
+    </>
   )
 }
-
