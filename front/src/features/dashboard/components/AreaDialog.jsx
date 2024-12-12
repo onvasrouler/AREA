@@ -22,6 +22,7 @@ export function AreaDialog({ isOpen, onClose, service }) {
   const [discordChannels, setDiscordChannels] = useState({});
   const [selectedServerId, setSelectedServerId] = useState('');
   const [selectedChannelId, setSelectedChannelId] = useState('');
+  const [discordUserId, setDiscordUserId] = useState('');
   const [formData, setFormData] = useState({});
 
   const currentService = areaData.services.find(s => s.name === service.name);
@@ -82,35 +83,53 @@ export function AreaDialog({ isOpen, onClose, service }) {
     }
   };
 
+  const fetchDiscordUserId = async () => {
+    const session = localStorage.getItem("session");
+    if (!session) {
+      console.error("No session found. Please log in.");
+      return;
+    }
+    try {
+      const response = await fetch(`${import.meta.env.VITE_DISCORD_FETCH_USERID_URL}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          session: session,
+        },
+      });
+      if (!response.ok) throw new Error("Invalid response");
+      const responseData = await response.json();
+      if (responseData?.data) {
+        setDiscordUserId(responseData.data);
+      }
+    } catch (error) {
+      console.error("Error fetching Discord user ID:", error);
+    }
+  };
+
   const buildRequestBody = () => {
     const actionArguments = { on: selectedAction };
     const reactionArguments = {
       react: selectedReaction
     };
 
-    if (selectedServerId) {
-      reactionArguments.server = selectedServerId;
-    }
-    if (selectedChannelId) {
-      reactionArguments.channel = selectedChannelId;
-      console.log("Selected channel:", selectedChannelId);
+    if (selectedReaction === "message") {
+      if (selectedServerId) {
+        reactionArguments.server = selectedServerId;
+      }
+      if (selectedChannelId) {
+        reactionArguments.channel = selectedChannelId;
+      }
+    } else if (selectedReaction === "private_message") {
+      if (discordUserId) {
+        reactionArguments.userId = discordUserId;
+      }
     }
 
     Object.entries(argumentsData).forEach(([key, arg]) => {
       if (formData[key] !== undefined && formData[key] !== '') {
         reactionArguments[key] = formData[key];
       }
-    });
-
-    console.log("Request body:", {
-      action: {
-        service: service.name.toLowerCase(),
-        arguments: actionArguments,
-      },
-      reaction: {
-        service: linkedService.toLowerCase(),
-        arguments: reactionArguments,
-      },
     });
 
     return {
@@ -133,6 +152,7 @@ export function AreaDialog({ isOpen, onClose, service }) {
     }
 
     const requestBody = buildRequestBody();
+    console.log("Request body:", JSON.stringify(requestBody));
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/area`, {
         method: "POST",
@@ -156,8 +176,10 @@ export function AreaDialog({ isOpen, onClose, service }) {
     setArgumentsData({});
     setSelectedServerId('');
     setSelectedChannelId('');
+    setDiscordUserId('');
     if (linkedService === "Discord") {
       fetchServers();
+      fetchDiscordUserId();
     }
   }, [linkedService, service]);
 
@@ -169,6 +191,7 @@ export function AreaDialog({ isOpen, onClose, service }) {
       setArgumentsData(reaction?.arguments || {});
     }
   }, [selectedReaction, linkedService]);
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
