@@ -21,11 +21,17 @@ export function AreaDialog({ isOpen, onClose, service }) {
   const [discordServers, setDiscordServers] = useState([]);
   const [discordChannels, setDiscordChannels] = useState({});
   const [selectedServerId, setSelectedServerId] = useState('');
+  const [selectedChannelId, setSelectedChannelId] = useState('');
+  const [formData, setFormData] = useState({});
 
   const currentService = areaData.services.find(s => s.name === service.name);
   const services = areaData.services.filter(s => s.name !== service.name).map(s => s.name);
   const actions = currentService?.actions || [];
   const reactions = linkedService ? areaData.services.find(s => s.name === linkedService)?.reactions || [] : [];
+
+  const handleInputChange = (key, value) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
 
   const fetchServers = async () => {
     const session = localStorage.getItem("session");
@@ -76,11 +82,72 @@ export function AreaDialog({ isOpen, onClose, service }) {
     }
   };
 
+  const buildRequestBody = () => {
+    const actionArguments = { on: selectedAction };
+    const reactionArguments = {};
+
+    if (selectedServerId) {
+      reactionArguments.server = selectedServerId;
+    } else {
+      console.error("Server ID not selected");
+    }
+    if (selectedChannelId) {
+      reactionArguments.channel = selectedChannelId;
+    } else {
+      console.error("Channel ID not selected");
+    }
+    Object.entries(argumentsData).forEach(([key, arg]) => {
+      if (formData[key] !== undefined && formData[key] !== '') {
+        reactionArguments[key] = formData[key];
+      }
+    });
+
+    console.log("Reaction arguments:", reactionArguments);
+
+    return {
+      action: {
+        service: service.name.toLowerCase(),
+        arguments: actionArguments,
+      },
+      reaction: {
+        service: linkedService.toLowerCase(),
+        arguments: reactionArguments,
+      },
+    };
+  };
+
+  const handleSubmit = async () => {
+    const session = localStorage.getItem("session");
+    if (!session) {
+      console.error("No session found. Please log in.");
+      return;
+    }
+
+    const requestBody = buildRequestBody();
+    console.log("Request body:", JSON.stringify(requestBody));
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/area`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          session: session,
+        },
+        body: JSON.stringify(requestBody),
+      });
+      if (!response.ok) throw new Error("Failed to save AREA");
+      alert("AREA created successfully!");
+      onClose();
+    } catch (error) {
+      console.error("Error creating AREA:", error);
+    }
+  };
+
   useEffect(() => {
     setSelectedAction('');
     setSelectedReaction('');
     setArgumentsData({});
     setSelectedServerId('');
+    setSelectedChannelId('');
     if (linkedService === "Discord") {
       fetchServers();
     }
@@ -163,7 +230,10 @@ export function AreaDialog({ isOpen, onClose, service }) {
               </Select>
             )}
             {value.component === "Select" && key === "channelId" && selectedServerId && (
-              <Select>
+              <Select onValueChange={(channelId) => {
+                setSelectedChannelId(channelId);
+                console.log("Selected Channel ID:", channelId);
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder={value.description} />
                 </SelectTrigger>
@@ -179,7 +249,7 @@ export function AreaDialog({ isOpen, onClose, service }) {
 
         <div className="flex justify-between mt-6">
           <Button variant="destructive" onClick={onClose}>Cancel</Button>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Save</Button>
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleSubmit}>Save</Button>
         </div>
       </DialogContent>
     </Dialog>
