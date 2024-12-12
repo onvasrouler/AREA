@@ -18,16 +18,72 @@ export function AreaDialog({ isOpen, onClose, service }) {
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedReaction, setSelectedReaction] = useState('');
   const [argumentsData, setArgumentsData] = useState({});
+  const [discordServers, setDiscordServers] = useState([]);
+  const [discordChannels, setDiscordChannels] = useState({});
+  const [selectedServerId, setSelectedServerId] = useState('');
 
   const currentService = areaData.services.find(s => s.name === service.name);
   const services = areaData.services.filter(s => s.name !== service.name).map(s => s.name);
   const actions = currentService?.actions || [];
   const reactions = linkedService ? areaData.services.find(s => s.name === linkedService)?.reactions || [] : [];
 
+  const fetchServers = async () => {
+    const session = localStorage.getItem("session");
+    if (session) {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_DISCORD_SERVERS_FETCH_URL}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            session: session,
+          },
+        });
+        if (!response.ok) throw new Error("Invalid response");
+        const responseData = await response.json();
+        if (responseData?.data) {
+          setDiscordServers(responseData.data);
+        }
+      } catch (error) {
+        console.error("Error fetching Discord servers:", error);
+      }
+    }
+  };
+
+  const fetchChannels = async (serverId) => {
+    const session = localStorage.getItem("session");
+    if (!session) {
+      console.error("No session found. Please log in.");
+      return;
+    }
+    try {
+      const response = await fetch(`${import.meta.env.VITE_DISCORD_CHANNELS_FETCH_URL}${serverId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          session: session,
+        },
+      });
+      if (!response.ok) throw new Error("Invalid response");
+      const responseData = await response.json();
+      if (responseData?.data) {
+        setDiscordChannels(prevChannels => ({
+          ...prevChannels,
+          [serverId]: responseData.data,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching Discord channels:", error);
+    }
+  };
+
   useEffect(() => {
     setSelectedAction('');
     setSelectedReaction('');
     setArgumentsData({});
+    setSelectedServerId('');
+    if (linkedService === "Discord") {
+      fetchServers();
+    }
   }, [linkedService, service]);
 
   useEffect(() => {
@@ -83,29 +139,43 @@ export function AreaDialog({ isOpen, onClose, service }) {
           </Select>
         </div>
 
-        {Object.entries(argumentsData).length > 0 && (
-          <div className="p-4">
-            <ul>
-              {Object.entries(argumentsData).map(([key, value]) => (
-                <li key={key} className="mb-2">
-                  {value.component === 'TextArea' && (
-                    <div>
-                      <label className="block mb-1">{value.label}</label>
-                      <Textarea placeholder={value.description} />
-                    </div>
-                  )}
-                  {value.component === 'Select' && (
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder={value.description} />
-                      </SelectTrigger>
-                    </Select>
-                  )}
-                </li>
-              ))}
-            </ul>
+        {Object.entries(argumentsData).map(([key, value]) => (
+          <div key={key} className="mt-4">
+            {value.component === "TextArea" && (
+              <div>
+                <label className="block mb-1">{value.label}</label>
+                <Textarea placeholder={value.description} />
+              </div>
+            )}
+            {value.component === "Select" && key === "serverId" && (
+              <Select onValueChange={(serverId) => {
+                setSelectedServerId(serverId);
+                fetchChannels(serverId);
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder={value.description} />
+                </SelectTrigger>
+                <SelectContent>
+                  {discordServers.map(server => (
+                    <SelectItem key={server.id} value={server.id}>{server.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {value.component === "Select" && key === "channelId" && selectedServerId && (
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder={value.description} />
+                </SelectTrigger>
+                <SelectContent>
+                  {discordChannels[selectedServerId]?.map(channel => (
+                    <SelectItem key={channel.id} value={channel.id}>{channel.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
-        )}
+        ))}
 
         <div className="flex justify-between mt-6">
           <Button variant="destructive" onClick={onClose}>Cancel</Button>
