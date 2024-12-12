@@ -8,16 +8,32 @@
                     "type": "message",
                     "display": "Message",
                     "arguments": {
-                        "message": "Message",
-                        "serverId": "Select a server",
-                        "channelId": "Select a channel"
+                        "message": {
+                            "label": "Message",
+                            "description": "The message to send",
+                            "component": "TextArea"
+                        },
+                        "serverId": {
+                            "label": "Select a server",
+                            "description": "The server to send the message to",
+                            "component": "Select"
+                        },
+                        "channelId": {
+                            "label": "Select a channel",
+                            "description": "The channel to send the message on",
+                            "component": "Select"
+                        }
                     }
                 },
                 {
                     "type": "private_message",
                     "display": "Private Message",
                     "arguments": {
-                        "message": "Message"
+                        "message": {
+                            "label": "Message",
+                            "description": "The message to send",
+                            "component": "TextArea"
+                        }
                     }
                 }
             ]
