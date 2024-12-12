@@ -84,25 +84,34 @@ export function AreaDialog({ isOpen, onClose, service }) {
 
   const buildRequestBody = () => {
     const actionArguments = { on: selectedAction };
-    const reactionArguments = {};
+    const reactionArguments = {
+      react: selectedReaction
+    };
 
     if (selectedServerId) {
       reactionArguments.server = selectedServerId;
-    } else {
-      console.error("Server ID not selected");
     }
     if (selectedChannelId) {
       reactionArguments.channel = selectedChannelId;
-    } else {
-      console.error("Channel ID not selected");
+      console.log("Selected channel:", selectedChannelId);
     }
+
     Object.entries(argumentsData).forEach(([key, arg]) => {
       if (formData[key] !== undefined && formData[key] !== '') {
         reactionArguments[key] = formData[key];
       }
     });
 
-    console.log("Reaction arguments:", reactionArguments);
+    console.log("Request body:", {
+      action: {
+        service: service.name.toLowerCase(),
+        arguments: actionArguments,
+      },
+      reaction: {
+        service: linkedService.toLowerCase(),
+        arguments: reactionArguments,
+      },
+    });
 
     return {
       action: {
@@ -124,7 +133,6 @@ export function AreaDialog({ isOpen, onClose, service }) {
     }
 
     const requestBody = buildRequestBody();
-    console.log("Request body:", JSON.stringify(requestBody));
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/area`, {
         method: "POST",
@@ -211,7 +219,10 @@ export function AreaDialog({ isOpen, onClose, service }) {
             {value.component === "TextArea" && (
               <div>
                 <label className="block mb-1">{value.label}</label>
-                <Textarea placeholder={value.description} />
+                <Textarea
+                  placeholder={value.description}
+                  onChange={(e) => handleInputChange(key, e.target.value)}
+                />
               </div>
             )}
             {value.component === "Select" && key === "serverId" && (
@@ -232,7 +243,6 @@ export function AreaDialog({ isOpen, onClose, service }) {
             {value.component === "Select" && key === "channelId" && selectedServerId && (
               <Select onValueChange={(channelId) => {
                 setSelectedChannelId(channelId);
-                console.log("Selected Channel ID:", channelId);
               }}>
                 <SelectTrigger>
                   <SelectValue placeholder={value.description} />
