@@ -68,7 +68,7 @@ export function DashboardPage() {
 
           setAuthStatus({
             isDiscordAuthenticated: responseData.data?.logged_in_discord === true,
-            isGithubAuthenticated: responseData.data?.logged_in_github === true,
+            isGitHubAuthenticated: responseData.data?.logged_in_github === true,
             isSpotifyAuthenticated: false, // Add actual check when available
             isOneDriveAuthenticated: false, // Add actual check when available
             isGmailAuthenticated: false, // Add actual check when available

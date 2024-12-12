@@ -73,9 +73,13 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
     }
   }
 
+  const handleAreaDialogClose = () => {
+    setIsAreaDialogOpen(false)
+  }
+
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={isOpen && !isAreaDialogOpen} onOpenChange={onClose}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-center">
@@ -86,14 +90,15 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
             </DialogDescription>
           </DialogHeader>
           <Separator className="bg-primary" />
-            {renderServiceContent()}
+          {renderServiceContent()}
         </DialogContent>
       </Dialog>
       <AreaDialog
         isOpen={isAreaDialogOpen}
-        onClose={() => setIsAreaDialogOpen(false)}
+        onClose={handleAreaDialogClose}
         service={service}
       />
     </>
   )
 }
+
