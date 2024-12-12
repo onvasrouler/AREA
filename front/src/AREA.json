@@ -1,0 +1,54 @@
+{
+    "Discord": {
+        "actions": {
+        },
+        "reactions": {
+            "message": {
+                "arguments": {
+                    "message": "Message",
+                    "serverId": "Select a server",
+                    "channelId": "Select a channel"
+                }
+            },
+            "private_message": {
+                "arguments": {
+                    "message": "Message"
+                }
+            }
+        }
+    },
+    "GitHub": {
+        "actions": {
+            "new_issue": "New Issue",
+            "new_pr": "New Pull Request",
+            "new_commit": "New Commit",
+            "new_repository": "New Repository"
+        },
+        "reactions": {
+        }
+    },
+    "Spotify": {
+        "actions": {
+        },
+        "reactions": {
+        }
+    },
+    "OneDrive": {
+        "actions": {
+        },
+        "reactions": {
+        }
+    },
+    "Gmail": {
+        "actions": {
+        },
+        "reactions": {
+        }
+    },
+    "Instagram": {
+        "actions": {
+        },
+        "reactions": {
+        }
+    }
+}

@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { AreaDialog } from "./AreaDialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const handleLoginFunctions = {
   handleDiscordLogin: () => {
@@ -90,7 +91,9 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
             </DialogDescription>
           </DialogHeader>
           <Separator className="bg-primary" />
-          {renderServiceContent()}
+          <ScrollArea>
+            {renderServiceContent()}
+          </ScrollArea>
         </DialogContent>
       </Dialog>
       <AreaDialog
