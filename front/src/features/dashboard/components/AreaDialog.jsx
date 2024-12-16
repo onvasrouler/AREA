@@ -111,11 +111,9 @@ export function AreaDialog({ isOpen, onClose, service }) {
     const actionArguments = {
       on: selectedAction || ""
     };
-  
     const reactionArguments = {
       react: selectedReaction || ""
     };
-  
     if (selectedReaction === "message") {
       if (selectedServerId) {
         reactionArguments.serverId = selectedServerId;
@@ -128,14 +126,12 @@ export function AreaDialog({ isOpen, onClose, service }) {
         reactionArguments.userId = discordUserId;
       }
     }
-  
-    // Ajout des arguments supplémentaires saisis dans le formulaire
     Object.entries(argumentsData).forEach(([key, arg]) => {
       if (formData[key] !== undefined && formData[key] !== '') {
         reactionArguments[key] = formData[key];
       }
     });
-  
+
     return {
       action: {
         service: service.name.toLowerCase(),

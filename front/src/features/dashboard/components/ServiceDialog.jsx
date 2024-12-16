@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { AreaDialog } from "./AreaDialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Trash2 } from 'lucide-react'
 
 const handleLoginFunctions = {
   handleDiscordLogin: () => {
@@ -65,16 +66,32 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
     }
   }, [isOpen, isAuthenticated, service.name]);
 
+  const handleAreaDeletion = (area) => {
+    console.log("Area to be deleted:", area);
+  }
+
   const AccordionItems = (
-    <Accordion type="single" collapsible className="w-full">
+    <Accordion type="single" collapsible className="w-full pr-2">
       {areas.map(area => (
-        <AccordionItem key={area.id} value={area.id}>
+        <AccordionItem key={area.id} value={area.id} className="pr-8 relative">
           <AccordionTrigger>{area.id}</AccordionTrigger>
           <AccordionContent>
             <pre className="whitespace-pre-wrap text-left">
               {JSON.stringify(area, null, 2)}
             </pre>
           </AccordionContent>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-0 top-2 -mr-6"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAreaDeletion(area);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">Delete area</span>
+          </Button>
         </AccordionItem>
       ))}
     </Accordion>
@@ -94,11 +111,10 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
         </div>
       )
     } else {
-
       return (
         <div className="flex flex-col h-full">
           {areas.length > 5 ? (
-            <ScrollArea className="h-[300px] w-full pr-4">
+            <ScrollArea className="h-[300px] w-full pr-6">
               {AccordionItems}
             </ScrollArea>
           ) : (
@@ -151,3 +167,4 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
     </>
   )
 }
+
