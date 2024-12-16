@@ -108,30 +108,34 @@ export function AreaDialog({ isOpen, onClose, service }) {
   };
 
   const buildRequestBody = () => {
-    const actionArguments = { on: selectedAction };
-    const reactionArguments = {
-      react: selectedReaction
+    const actionArguments = {
+      on: selectedAction || ""
     };
-
+  
+    const reactionArguments = {
+      react: selectedReaction || ""
+    };
+  
     if (selectedReaction === "message") {
       if (selectedServerId) {
-        reactionArguments.server = selectedServerId;
+        reactionArguments.serverId = selectedServerId;
       }
       if (selectedChannelId) {
-        reactionArguments.channel = selectedChannelId;
+        reactionArguments.channelId = selectedChannelId;
       }
     } else if (selectedReaction === "private_message") {
       if (discordUserId) {
         reactionArguments.userId = discordUserId;
       }
     }
-
+  
+    // Ajout des arguments supplémentaires saisis dans le formulaire
     Object.entries(argumentsData).forEach(([key, arg]) => {
       if (formData[key] !== undefined && formData[key] !== '') {
         reactionArguments[key] = formData[key];
       }
     });
-
+  
     return {
       action: {
         service: service.name.toLowerCase(),
@@ -154,7 +158,7 @@ export function AreaDialog({ isOpen, onClose, service }) {
     const requestBody = buildRequestBody();
     console.log("Request body:", JSON.stringify(requestBody));
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/area`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
