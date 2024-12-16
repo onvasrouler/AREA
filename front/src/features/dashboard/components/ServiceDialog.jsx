@@ -51,7 +51,7 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
     if (isOpen && isAuthenticated) {
       const session = localStorage.getItem("session");
 
-      fetch("http://localhost:8080/area", {
+      fetch(`${import.meta.VITE_BACKEND_URL}area`, {
         method: "GET",
         headers: {
           "session": session
@@ -66,7 +66,28 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
     }
   }, [isOpen, isAuthenticated, service.name]);
 
-  const handleAreaDeletion = (area) => {
+  const handleAreaDeletion = async (area) => {
+    try {
+      const session = localStorage.getItem("session");
+      const body = JSON.stringify({ id: area.id });
+      const headers = {
+        "Content-Type": "application/json",
+        "session": session
+      };
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
+        method: "DELETE",
+        headers,
+        body
+      })
+      if (!response.ok) {
+        throw new Error("Error deleting area");
+      } else {
+        const newAreas = areas.filter(item => item.id !== area.id);
+        setAreas(newAreas);
+      }
+    } catch (error) {
+      console.error("Error deleting area:", error);
+    }
     console.log("Area to be deleted:", area);
   }
 
