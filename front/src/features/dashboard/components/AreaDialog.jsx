@@ -126,7 +126,7 @@ export function AreaDialog({ isOpen, onClose, service }) {
         reactionArguments.userId = discordUserId;
       }
     }
-    Object.entries(argumentsData).forEach(([key, arg]) => {
+    Object.entries(argumentsData).forEach(([key/*, arg*/]) => {
       if (formData[key] !== undefined && formData[key] !== '') {
         reactionArguments[key] = formData[key];
       }
