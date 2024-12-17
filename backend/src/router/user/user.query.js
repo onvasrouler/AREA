@@ -1,6 +1,6 @@
 const useractions = require("./user.js");
 const checkAuthenticated = require("../../middleware/auth.js");
-const enableTestEndpoint = process.env.ENABLE_TEST_ENDPOINT == "true"
+const enableTestEndpoint = process.env.ENABLE_TEST_ENDPOINT == "true";
 
 module.exports = function (app) {
     if (enableTestEndpoint)
@@ -11,7 +11,7 @@ module.exports = function (app) {
 
     app.post("/login", useractions.login);
 
-    app.post("/auth/google", useractions.googleAuth);
+    app.post("/sign/google", useractions.googleAuth);
 
     app.post("/logout", checkAuthenticated, useractions.logout);
     app.post("/logouteverywhere", checkAuthenticated, useractions.logouteverywhere);
