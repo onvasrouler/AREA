@@ -112,6 +112,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup docker env files
+        run: |
+          touch ./front/.env.docker ./backend/.env.docker
+
       - name: Build docker container
         run: |
           docker compose build || { echo "Docker build failed"; exit 1; }
