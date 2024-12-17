@@ -9,7 +9,7 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  application-server:
+  server:
     build:
       context: backend/
     ports:
@@ -17,29 +17,24 @@ services:
     volumes:
       - ./backend:/app
     command: npm start
-    environment:
-      MONGO_URI: mongodb://mongo:27017/area-db
     depends_on:
       - mongo
+    env_file:
+      - ./backend/.env.docker
 
-  # mobile-client:
-  #   build:
-  #     context: mobile/
-  #   volumes:
-  #     - shared-volume:/shared
-  #   - command: ????
-
-  web-client:
+  client_web:
     build:
       context: ./front
     ports:
       - "8081:8081"
-    depends_on:
-      # - mobile-client
-      - application-server
     volumes:
       - shared-volume:/shared
     command: npm run dev
+    depends_on:
+      # - mobile-client
+      - server
+    env_file:
+      - ./front/.env.docker
 
 volumes:
   shared-volume:
