@@ -100,7 +100,6 @@ WORKDIR /app
 
 # Copy the file from your host to your current location
 COPY package.json /app
-COPY package-lock.json /app
 
 # Install the dependencies
 RUN npm i
@@ -119,7 +118,7 @@ CMD ["npm", "start"]
 1. **Base Image**: Uses the latest Node.js image.
 2. **Work Directory**: Sets the working directory to `/app`.
 3. **Dependencies**:
-   - Copies `package.json` and `package-lock.json` to install required packages.
+   - Copies `package.json` to install required packages.
 4. **Source Code**: Copies all backend source code into the container.
 5. **Port Exposure**: Exposes port `8080` for external communication.
 6. **Startup Command**: Executes `npm start`.
@@ -139,7 +138,6 @@ WORKDIR /app
 
 # Copy the file from your host to your current location
 COPY package.json /app
-COPY package-lock.json /app
 
 # Install the dependencies
 RUN npm i
@@ -158,7 +156,7 @@ CMD ["npm", "start"]
 1. **Base Image**: Uses the latest Node.js image.
 2. **Work Directory**: Sets the working directory to `/app`.
 3. **Dependencies**:
-   - Copies `package.json` and `package-lock.json` to install required packages.
+   - Copies `package.json` to install required packages.
 4. **Source Code**: Copies all frontend source code into the container.
 5. **Port Exposure**: Exposes port `8081` for external communication.
 6. **Startup Command**: Executes `npm start`.

@@ -6,7 +6,6 @@ WORKDIR /app
 
 # Copy the file from your host to your current location
 COPY package.json /app
-COPY package-lock.json /app
 
 # Install the dependencies
 RUN npm i
