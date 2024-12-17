@@ -134,6 +134,7 @@ jobs:
       - frontend
       - backend
       - mobile
+      - docker
     steps:
       - uses: actions/checkout@v4
 
