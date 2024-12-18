@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaUser } from "react-icons/fa";
+import { User, Settings, LogOut } from 'lucide-react';
 import AreaLogo from "../../../assets/AREA.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,7 +63,7 @@ export function Navbar({ username, services, onServiceSelect }) {
           </div>
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <span className="text-lg font-medium whitespace-nowrap">
-              Welcome back {username}
+              Welcome back, {username}
             </span>
           </div>
           <div className="flex items-center space-x-4">
@@ -100,9 +101,20 @@ export function Navbar({ username, services, onServiceSelect }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <div className="text-center">
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
