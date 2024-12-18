@@ -60,13 +60,11 @@ export function Navbar({ username, services, onServiceSelect }) {
             <img src={AreaLogo} alt="AREA Logo" className="w-8 h-8 mr-2" />
             <span className="text-2xl font-bold">AREA</span>
           </div>
-          
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <span className="text-lg font-medium whitespace-nowrap">
-              Welcome back, {username}
+              Welcome back {username}
             </span>
           </div>
-
           <div className="flex items-center space-x-4">
             <div className="relative" ref={dropdownRef}>
               <Input
