@@ -51,9 +51,8 @@ export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated
         await fetchPullRequests();
       }
     };
-  
     fetchData();
-  }, [isOpen, service.name]);
+  }, [isOpen, service.name, fetchServers, fetchRepositories]);
 
   const fetchServers = async () => {
     const session = localStorage.getItem("session");

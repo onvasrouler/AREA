@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaUser } from "react-icons/fa";
 import { User, Settings, LogOut } from 'lucide-react';
 import AreaLogo from "../../../assets/AREA.png";
@@ -15,7 +15,7 @@ import { ServiceDialog } from "./ServiceDialog";
 import { useNavigate } from "react-router-dom";
 import { getApiClient } from "@/common/client/APIClient"
 
-export function Navbar({ username, services, onServiceSelect }) {
+export function Navbar({ username, services }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
