@@ -46,7 +46,6 @@ export function Navbar({ username, services, onServiceSelect }) {
     setSelectedService(service);
     setSearchTerm("");
     setIsDropdownOpen(false);
-    onServiceSelect(service);
   };
 
   const handleCloseDialog = () => {
