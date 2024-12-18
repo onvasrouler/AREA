@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ServiceDialog } from "./ServiceDialog";
 import { useNavigate } from "react-router-dom";
+import { getApiClient } from "@/common/client/APIClient"
 
 export function Navbar({ username, services, onServiceSelect }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,6 +21,7 @@ export function Navbar({ username, services, onServiceSelect }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const apiClient = getApiClient();
 
   const filteredServices = services.filter((service) =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -52,6 +54,22 @@ export function Navbar({ username, services, onServiceSelect }) {
 
   const handleCloseDialog = () => {
     setSelectedService(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await apiClient.post("logout", {
+        session: localStorage.getItem("session"),
+      });
+      if (response.status === 200) {
+        localStorage.removeItem("session");
+        navigate("/login");
+      } else {
+        console.error("Failed to logout");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -111,7 +129,7 @@ export function Navbar({ username, services, onServiceSelect }) {
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleLogout()}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
