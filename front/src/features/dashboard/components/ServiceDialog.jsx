@@ -41,7 +41,7 @@ const handleLoginFunctions = {
   }
 }
 
-export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
+export function ServiceDialog({ isOpen, onClose, service, authStatus, isDiscordAuthenticated }) {
   const isAuthenticated = authStatus[`is${service.name}Authenticated`]
   const handleLogin = handleLoginFunctions[`handle${service.name}Login`]
   const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false)
@@ -51,7 +51,7 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
     if (isOpen && isAuthenticated) {
       const session = localStorage.getItem("session");
 
-      fetch(`${import.meta.VITE_BACKEND_URL}area`, {
+      fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
         method: "GET",
         headers: {
           "session": session
@@ -184,6 +184,7 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
         isOpen={isAreaDialogOpen}
         onClose={handleAreaDialogClose}
         service={service}
+        isDiscordAuthenticated={authStatus.isDiscordAuthenticated}
       />
     </>
   )
