@@ -72,6 +72,9 @@ npm run dev
 # run in production
 npm run start
 
+# run a list of tests that will check that the account managment system still work
+npm run test
+
 # check lint errors
 npm run lint
 

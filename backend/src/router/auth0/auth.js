@@ -1,7 +1,7 @@
 const api_formatter = require("../../middleware/api-formatter.js");
 const discordBot = require("../../utils/discord.js");
 const axios = require("axios");
-const areaModel = require("../../models/area.js");
+const AreaModel = require("../../database/models/actionReaction.js");
 
 exports.discordCallback = async (req, res) => {
     try {

@@ -23,7 +23,6 @@
   "main": "index.js",
   "scripts": {
     "test": "node tests/api_tester.js",
-    "run-test": "concurrently --kill-others \"npm run start\" \"npm run test\"",
     "dev": "nodemon index.js",
     "lint": "eslint .",
     "lintfix": "eslint --fix .",
