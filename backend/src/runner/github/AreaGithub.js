@@ -57,7 +57,7 @@ async function ActionGithub(AREA) {
             }
 
         } else if (TriggerEvent == "new_repo") {
-            if (actionReactions.CachedData[0].id === Datas[0].id && actionReactions.CachedData.length === Datas.length) {
+            if (actionReactions.CachedData[0] && actionReactions.CachedData[0].id === Datas[0].id && actionReactions.CachedData.length === Datas.length) {
                 actionReactions.Treated = true;
             } else if (actionReactions.CachedData.length < Datas.length) {
                 actionReactions.Treated = false;

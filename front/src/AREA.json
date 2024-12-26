@@ -1,0 +1,84 @@
+{
+    "services": [
+        {
+            "name": "Discord",
+            "actions": [],
+            "reactions": [
+                {
+                    "type": "message",
+                    "display": "Message",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "The message to send",
+                            "component": "TextArea"
+                        },
+                        "serverId": {
+                            "label": "Select a server",
+                            "description": "The server to send the message to",
+                            "component": "Select"
+                        },
+                        "channelId": {
+                            "label": "Select a channel",
+                            "description": "The channel to send the message on",
+                            "component": "Select"
+                        }
+                    }
+                },
+                {
+                    "type": "private_message",
+                    "display": "Private Message",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "The message to send",
+                            "component": "TextArea"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "GitHub",
+            "actions": [
+                {
+                    "type": "new_issue",
+                    "display": "New Issue"
+                },
+                {
+                    "type": "new_pr",
+                    "display": "New Pull Request"
+                },
+                {
+                    "type": "new_commit",
+                    "display": "New Commit"
+                },
+                {
+                    "type": "new_repository",
+                    "display": "New Repository"
+                }
+            ],
+            "reactions": []
+        },
+        {
+            "name": "Spotify",
+            "actions": [],
+            "reactions": []
+        },
+        {
+            "name": "OneDrive",
+            "actions": [],
+            "reactions": []
+        },
+        {
+            "name": "Gmail",
+            "actions": [],
+            "reactions": []
+        },
+        {
+            "name": "Instagram",
+            "actions": [],
+            "reactions": []
+        }
+    ]
+}

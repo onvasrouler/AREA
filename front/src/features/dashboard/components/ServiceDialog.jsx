@@ -1,322 +1,191 @@
-import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import { getApiClient } from "@/common/client/APIClient"
+import { useEffect, useState } from "react"
+import { AreaDialog } from "./AreaDialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Trash2 } from 'lucide-react'
 
-export function ServiceDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGithubAuthenticated }) {
-  const apiClient = getApiClient();
-  const [discordServers, setDiscordServers] = useState([]);
-  const [discordChannels, setDiscordChannels] = useState({});
-  const [githubRepos, setGithubRepos] = useState([]);
-  const [githubPullRequests, setGithubPullRequest] = useState({});
-
-  const handleDiscordLogin = () => {
+const handleLoginFunctions = {
+  handleDiscordLogin: () => {
     const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
     const REDIRECT_URI = import.meta.env.VITE_DISCORD_REDIRECT_URI;
     const AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
         REDIRECT_URI
     )}&response_type=code&scope=identify%20guilds`;
-
     window.location.href = AUTH_URL;
-  };
+  },
+  handleGitHubLogin: () => {
+      const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
+      const SCOPE = "repo user";
+      const CALLBACK_URI = import.meta.env.VITE_GITHUB_REDIRECT_URI;
+      const AUTH_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${CALLBACK_URI}&scope=${SCOPE}`;
+      window.location.href = AUTH_URL;
+  },
+  handleSpotifyLogin: () => {
+    // Implement Spotify login logic
+    console.log("Spotify login")
+  },
+  handleOneDriveLogin: () => {
+    // Implement OneDrive login logic
+    console.log("OneDrive login")
+  },
+  handleGmailLogin: () => {
+    // Implement Gmail login logic
+    console.log("Gmail login")
+  },
+  handleInstagramLogin: () => {
+    // Implement Instagram login logic
+    console.log("Instagram login")
+  }
+}
 
-  const handleGithubLogin = () => {
-    const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
-    const SCOPE = "repo user";
-    const CALLBACK_URI = import.meta.env.VITE_GITHUB_REDIRECT_URI;
-    const AUTH_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${CALLBACK_URI}&scope=${SCOPE}`;
-
-    window.location.href = AUTH_URL;
-  };
+export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
+  const isAuthenticated = authStatus[`is${service.name}Authenticated`]
+  const handleLogin = handleLoginFunctions[`handle${service.name}Login`]
+  const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false)
+  const [areas, setAreas] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (isOpen && service.name === "Discord") {
-        fetchServers();
-      }
-      if (isOpen && service.name === "GitHub") {
-        await fetchRepositories();
-        await fetchPullRequests();
-      }
-    };
-  
-    fetchData();
-  }, [isOpen, service.name]);
+    if (isOpen && isAuthenticated) {
+      const session = localStorage.getItem("session");
 
-  const fetchServers = async () => {
-    const session = localStorage.getItem("session");
-
-    if (session && isDiscordAuthenticated) {
-      try {
-        const serversResponse = await apiClient.get("get_my_discord_server", {
-          session: session,
-        });
-
-        const responseData = await serversResponse.json();
-
-        if (responseData && responseData.data) {
-          setDiscordServers(responseData.data);
+      fetch(`${import.meta.VITE_BACKEND_URL}area`, {
+        method: "GET",
+        headers: {
+          "session": session
         }
-      } catch (error) {
-        console.error("Error fetching Discord servers:", error);
-      }
+      })
+        .then(res => res.json())
+        .then(data => {
+          const filteredAreas = data.data.filter(item => item.action.service === service.name.toLowerCase());
+          setAreas(filteredAreas);
+        })
+        .catch(err => console.error("Error fetching areas:", err));
     }
-  };
+  }, [isOpen, isAuthenticated, service.name]);
 
-  const fetchChannels = async (serverId) => {
-    const session = localStorage.getItem("session");
-    if (!session) {
-      console.error("No session found. Please log in.");
-      return;
-    }
+  const handleAreaDeletion = async (area) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_DISCORD_CHANNELS_FETCH_URL}${serverId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "session": session,
-          },
-        }
-      );
-      const responseData = await response.json();
-
-      if (responseData && responseData.data) {
-        setDiscordChannels(prevChannels => ({
-          ...prevChannels,
-          [serverId]: responseData.data
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching Discord channels:", error);
-    }
-  };
-
-  const fetchRepositories = async() => {
-    const session = localStorage.getItem("session");
-    if (session && isGithubAuthenticated) {
-      try {
-        const reposResponse = await apiClient.get("get_my_repos", {
-          session: session,
-        });
-
-        const responseData = await reposResponse.json();
-
-        if (responseData?.data?.data) {
-          const data = responseData.data.data;
-
-        setGithubRepos(data);
-    
-          console.log("Fetched Repositories:", data);
-        } else {
-          console.warn("No repositories items found in the response.");
-        }
-
-      if (responseData && responseData.data) {
-          setGithubRepos(responseData.data);
-        }
-      } catch (error) {
-        console.error("Error fetching Github repositories:", error);
-      }
-    }
-  };
-
-  const fetchPullRequests = async() => {
-    const session = localStorage.getItem("session");
-
-    if (!session) {
-      console.error("No session found. Please log in.");
-      return;
-    }
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_GITHUB_PR_FETCH_URL}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "session": session,
-          },
-        }
-      );
-      console.log(response)
-      const responseData = await response.json();
-
-      if (responseData?.data?.data?.items) {
-        const items = responseData.data.data.items;
-
-      setGithubPullRequest(items);
-  
-        console.log("Fetched Pull Requests:", items);
+      const session = localStorage.getItem("session");
+      const body = JSON.stringify({ id: area.id });
+      const headers = {
+        "Content-Type": "application/json",
+        "session": session
+      };
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
+        method: "DELETE",
+        headers,
+        body
+      })
+      if (!response.ok) {
+        throw new Error("Error deleting area");
       } else {
-        console.warn("No pull request items found in the response.");
-      }
-
-      if (responseData && responseData.data) {
-        setGithubPullRequest(prevPullRequest => ({
-          ...prevPullRequest,
-        }));
+        const newAreas = areas.filter(item => item.id !== area.id);
+        setAreas(newAreas);
       }
     } catch (error) {
-      console.error("Error fetching Github pull requests:", error);
+      console.error("Error deleting area:", error);
     }
-  };
+    console.log("Area to be deleted:", area);
+  }
 
-  const handleServerSelect = (serverId) => {
-    if (!discordChannels[serverId]) {
-      fetchChannels(serverId);
-    }
-  };
+  const AccordionItems = (
+    <Accordion type="single" collapsible className="w-full pr-2">
+      {areas.map(area => (
+        <AccordionItem key={area.id} value={area.id} className="pr-8 relative">
+          <AccordionTrigger>{area.id}</AccordionTrigger>
+          <AccordionContent>
+            <pre className="whitespace-pre-wrap text-left">
+              {JSON.stringify(area, null, 2)}
+            </pre>
+          </AccordionContent>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-0 top-2 -mr-6"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAreaDeletion(area);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">Delete area</span>
+          </Button>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  )
 
   const renderServiceContent = () => {
-    switch (service.name) {
-      case "Discord":
-        return (
-          <div className="p-4">
-            {!isDiscordAuthenticated ? (
-              <div className="flex flex-col items-center">
-                <p className="mb-4">You need to log in with Discord to access this service.</p>
-                <Button
-                  onClick={handleDiscordLogin}
-                  className="font-bold py-2 px-4 rounded"
-                >
-                  Login with Discord
-                </Button>
-              </div>
-            ) : (
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Your Discord Servers</h3>
-                {discordServers.length > 0 ? (
-                  <Accordion type="single" collapsible className="w-full">
-                    {discordServers.map((server) => (
-                      <AccordionItem key={server.id} value={server.id}>
-                        <AccordionTrigger onClick={() => handleServerSelect(server.id)} className="flex items-center space-x-2">
-                          {server.icon && (
-                            <img
-                              src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
-                              alt={`${server.name} icon`}
-                              className="w-6 h-6 rounded-full mr-2"
-                            />
-                          )}
-                          {server.name}
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          {discordChannels[server.id] ? (
-                            discordChannels[server.id].length > 0 ? (
-                              <ul className="space-y-1 pl-8">
-                                {discordChannels[server.id].map((channel) => (
-                                  <li key={channel.id}>{channel.name}</li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <p className="pl-8">No channels found for this server.</p>
-                            )
-                          ) : (
-                            <p className="pl-8">Loading channels...</p>
-                          )}
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                ) : (
-                  <p>No Discord servers found.</p>
-                )}
-              </div>
-            )}
-          </div>
-        )
-      case "GitHub":
-        return (
-          <div className="p-4">
-            {!isGithubAuthenticated ? (
-              <div className="flex flex-col items-center">
-                <p className="mb-4">You need to log in with Github to access this service.</p>
-                <Button
-                  onClick={handleGithubLogin}
-                  className="font-bold py-2 px-4 rounded"
-                >
-                  Login with Github
-                </Button>
-              </div>
-            ) : (
-              <div>
-                <div className="mb-6">
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="repositories">
-                      <AccordionTrigger className="no-underline font-semibold text-lg">Your repositories</AccordionTrigger>
-                      <AccordionContent>
-                        {Object.keys(githubRepos).length > 0 ? (
-                          <ul className="space-y-1 pl-4">
-                            {Object.values(githubRepos).flat().map((repo) => (
-                              <li key={repo.id} className="list-disc">
-                                {repo.name}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="pl-4">No repositories found.</p>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-                <div>
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="pull-requests">
-                      <AccordionTrigger className="no-underline font-semibold text-lg">Your pull requests</AccordionTrigger>
-                      <AccordionContent>
-                        {Object.keys(githubPullRequests).length > 0 ? (
-                          <ul className="space-y-1 pl-4">
-                            {Object.values(githubPullRequests).flat().map((pr) => (
-                              <li key={pr.id} className="list-disc">
-                                {pr.title}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="pl-4">No pull requests found.</p>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              </div>
-            )}
-          </div>
-        )
-      default:
-        return (
-          <div className="p-4">
-            <p>Unknown service selected.</p>
-          </div>
-        )
+    if (!isAuthenticated) {
+      return (
+        <div className="flex flex-col items-center p-4">
+          <p className="mb-4">You need to log in with {service.name} to access this service.</p>
+          <Button
+            onClick={handleLogin}
+            className="font-bold py-2 px-4 rounded"
+          >
+            Login with {service.name}
+          </Button>
+        </div>
+      )
+    } else {
+      return (
+        <div className="flex flex-col h-full">
+          {areas.length > 5 ? (
+            <ScrollArea className="h-[300px] w-full pr-6">
+              {AccordionItems}
+            </ScrollArea>
+          ) : (
+            AccordionItems
+          )}
+        </div>
+      )
     }
   }
 
+  const handleAreaDialogClose = () => {
+    setIsAreaDialogOpen(false)
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{service.name}</DialogTitle>
-          <DialogDescription>
-            {service.description}
-          </DialogDescription>
-        </DialogHeader>
-        {renderServiceContent()}
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={isOpen && !isAreaDialogOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-md w-full max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {service.name}
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              {service.description}
+            </DialogDescription>
+          </DialogHeader>
+          <Separator className="bg-primary" />
+          <ScrollArea className="flex-grow">
+            <div className="p-4">
+              {renderServiceContent()}
+            </div>
+          </ScrollArea>
+          {isAuthenticated && (
+            <div className="mt-4 flex justify-center">
+              <Button
+                onClick={() => setIsAreaDialogOpen(true)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                Create AREA
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      <AreaDialog
+        isOpen={isAreaDialogOpen}
+        onClose={handleAreaDialogClose}
+        service={service}
+      />
+    </>
   )
 }
+
