@@ -4,9 +4,11 @@ const crypto = require("crypto");
 
 exports.postArea = async (req, res) => {
     try {
-        const { action, reaction } = req.body;
+        const { action, reaction, name } = req.body;
+        if (!name)
+            return api_formatter(req, res, 400, "MissingInfos", "Missing area name", null);
         if (!action || !reaction)
-            return api_formatter(req, res, 400, "error", "Missing required fields", null);
+            return api_formatter(req, res, 400, "MissingInfos", "Missing required fields", null);
         if (action.service == "github" && req.user.github_token == null)
             return api_formatter(req, res, 400, "error", "You need to connect your github account to use github's action", null);
         if (action.service == "discord" && req.user.discord_token == null)
@@ -27,6 +29,7 @@ exports.postArea = async (req, res) => {
         }`;
         const newActionReaction = new ActionReactionModel({
             unique_id: crypto.randomBytes(16).toString("hex"),
+            Name: name,
             creator_id: req.user.unique_id,
             Action: action,
             Reaction: reaction,
@@ -46,9 +49,9 @@ exports.postArea = async (req, res) => {
 exports.getArea = async (req, res) => {
     try {
         const actionReactions = await ActionReactionModel.find({ creator_id: req.user.unique_id });
-        console.log(actionReactions);
         const parsedData = actionReactions.map(actionReaction => ({
             id: actionReaction.unique_id,
+            name: actionReaction.Name,
             action: actionReaction.Action,
             reaction: actionReaction.Reaction
         }));
