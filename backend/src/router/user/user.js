@@ -128,8 +128,9 @@ exports.register = async (req, res) => {
             })
                 .then(() => { // if the email is sent
                     return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
-                }).catch((err) => {
+                }).catch(async (err) => {
                     console.error(err);
+                    await UserModel.deleteOne({ unique_id: savedUser.unique_id }); // delete the user
                     return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
                 });
 
