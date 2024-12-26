@@ -1,0 +1,41 @@
+name: area
+
+services:
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  server:
+    build:
+      context: backend/
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+    command: npm start
+    depends_on:
+      - mongo
+    env_file:
+      - ./backend/.env.docker
+
+  client_web:
+    build:
+      context: ./front
+    ports:
+      - "8081:8081"
+    volumes:
+      - shared-volume:/shared
+    command: npm run dev
+    depends_on:
+      # - mobile-client
+      - server
+    env_file:
+      - ./front/.env.docker
+
+volumes:
+  shared-volume:
+  mongo-data:
