@@ -61,6 +61,7 @@ npm run lintfix
 - **USAGE**:
     ```json 
     {
+      "name": "*",
       "action": {
         "service": "discord",
         "arguments": {
@@ -90,20 +91,21 @@ npm run lintfix
 - **example**:
   ```json
   {
-      "action": {
-          "service": "discord",
-          "arguments": {
-              "on": "/repo",
-              "userId": "431930188255854613"
-          }
-      },
-      "reaction": {
-          "service": "github",
-          "arguments": {
-              "content": "repo",
-              "prefix": "here is your repos:"
-          }
-      }
+    "name": "getmyrepos",
+    "action": {
+        "service": "discord",
+        "arguments": {
+            "on": "/repo",
+            "userId": "431930188255854613"
+        }
+    },
+    "reaction": {
+        "service": "github",
+        "arguments": {
+            "content": "repo",
+            "prefix": "here is your repos:"
+        }
+    }
   }
   ```
   - **explanation**
@@ -117,6 +119,7 @@ npm run lintfix
 - **USAGE 2**:
   ```json
     {
+      "name": "*",
       "action": {
           "service": [
               "github"
@@ -155,20 +158,21 @@ npm run lintfix
 - **example**:
   ```json
     {
-        "action": {
-            "service": "github",
-            "arguments": {
-                "on": "new_issue"
-            }
-        },
-        "reaction": {
-            "service": "discord",
-            "arguments": {
-                "react": "private_message",
-                "userId": "431930188255854613",
-                "message": "A new issue has been opened!"
-            }
-        }
+      "name": "alertissue",
+      "action": {
+          "service": "github",
+          "arguments": {
+              "on": "new_issue"
+          }
+      },
+      "reaction": {
+          "service": "discord",
+          "arguments": {
+              "react": "private_message",
+              "userId": "431930188255854613",
+              "message": "A new issue has been opened!"
+          }
+      }
     }
     ```
   - **explanation**
