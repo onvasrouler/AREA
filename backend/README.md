@@ -56,6 +56,129 @@ npm run lint
 npm run lintfix
 ```
 
+## AREA examples 
+
+- **USAGE**:
+    ```json 
+    {
+      "action": {
+        "service": "discord",
+        "arguments": {
+          "on": [
+            "/repo",
+            "/pr",
+            "/issue",
+            "/commit"
+          ],
+          "userId": "*"
+        }
+      },
+      "reaction": {
+        "service": "github",
+        "arguments": {
+          "content": [
+            "issues",
+            "pr",
+            "commit",
+            "repo"
+          ],
+          "prefix": "*"
+        }
+      }
+    }
+    ```
+- **example**:
+  ```json
+  {
+      "action": {
+          "service": "discord",
+          "arguments": {
+              "on": "/repo",
+              "userId": "431930188255854613"
+          }
+      },
+      "reaction": {
+          "service": "github",
+          "arguments": {
+              "content": "repo",
+              "prefix": "here is your repos:"
+          }
+      }
+  }
+  ```
+  - **explanation**
+  - for action:
+      first for action arguments on will be the command that trigger the action in this case it is /repo
+      userId will link the action reaction to a specific discord user by default set your discord id
+  - for reaction:
+      we have the content, this define what will be returned in this case it will be the user's repo
+      the prefix will be a message sent before every other
+
+- **USAGE 2**:
+  ```json
+    {
+      "action": {
+          "service": [
+              "github"
+          ],
+          "arguments": {
+              "on": [
+                  "new_issue",
+                  "new_repo",
+                  "new_commit",
+                  "new_pr"
+              ]
+          }
+      },
+      "reaction": {
+          "service": [
+              "discord"
+          ],
+          "arguments": {
+              "react": [
+                  "message",
+                  "private_message"
+              ],
+              "server": "*",
+              "channel":"*",
+              "userID": "*"
+              "message": [
+                  "A new PR has been opened!",
+                  "A new issue has been opened!",
+                  "A new commit has been pushed!",
+                  "A new repo has been created!"
+              ]
+          }
+      }
+  }
+  ```
+- **example**:
+  ```json
+    {
+        "action": {
+            "service": "github",
+            "arguments": {
+                "on": "new_issue"
+            }
+        },
+        "reaction": {
+            "service": "discord",
+            "arguments": {
+                "react": "private_message",
+                "userId": "431930188255854613",
+                "message": "A new issue has been opened!"
+            }
+        }
+    }
+    ```
+  - **explanation**
+  - action
+      in this example we define the argument on to new issue so the reaction will be triggered when a new issue is created
+  - reaction
+      here we define the argument so the bot will send a private message
+      then we define the id of the user that will receive the message
+      finally the message that will be sent
+    
 ## API Endpoints
 
 ### User Registration and Authentication
