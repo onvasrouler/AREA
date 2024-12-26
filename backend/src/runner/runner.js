@@ -13,7 +13,7 @@ class runner {
             setInterval(async () => {
                 console.log("Running main function");
                 await this.mainFunction();
-            }, 60000);
+            }, process.env.RUNNER_INTERVAL);
         }
 
     }
