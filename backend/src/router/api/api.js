@@ -149,7 +149,7 @@ exports.manage_discord = async (req, res) => {
         const code = req.query.code;
 
         if (!code)
-            return api_formatter(req, res, 400, "Missing code", "you didn't provide any code", null, error, null);
+            return api_formatter(req, res, 400, "Missing code", "you didn't provide any code");
 
         return res.redirect(`${process.env.MOBILE_APP_NAME}://discord?code=${code}`);
     } catch (error) {
