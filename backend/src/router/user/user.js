@@ -396,10 +396,9 @@ exports.deleteaccount = async (req, res) => {
 
         const deleteAccountToken = await createToken(req.user.unique_id, "emailVerification", 15); // use req.user.unique_id
 
-        const deleteUrl = `${process.env.FRONT_URL}profile/delete/${deleteAccountToken}`; // create the delete url
         const mailContent = `<p>You are receiving this because you (or someone else) have requested the deletion of your account.</p>
-            <p>Please click on the following link, or paste this into your browser to complete the process:</p>
-            <a href="${deleteUrl}" target="_blank">${deleteUrl}</a>\n\n
+            <p>copy past the following caracters in the text box on the website or application:</p>
+            <h2>${deleteAccountToken}</h2>\n\n
             <p>If you did not request this, please ignore this email and your account will remain unchanged.</p>`; // create the mail content
 
         await sendEmail({ // send the email
@@ -600,11 +599,12 @@ exports.forgotpassword = async (req, res) => {
             return api_formatter(req, res, 404, "notfound", "no user found with the provided email", null, null, null); // return an error message
 
         const resetToken = await createToken(user.unique_id, "emailVerification", 15);
-        const resetUrl = `${process.env.FRONT_URL}/resetpassword/${resetToken}`; // create the reset url
+
         const mailContent = `<p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
-        <p>Please click on the following link, or paste this into your browser to complete the process:</p>
-        <a href="${resetUrl}" target="_blank">${resetUrl}</a>\n\n
-        <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`; // create the mail content
+        <p>copy past the following caracters in the text box on the website or application:</p>
+        <h2>${resetToken}</h2>\n\n
+        <p>If you did not request this, please ignore this email and your account will remain unchanged.</p>`; // create the mail content
+
 
         await sendEmail({ // send the email
             to: user.email,

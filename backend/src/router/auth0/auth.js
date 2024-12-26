@@ -1,6 +1,7 @@
 const api_formatter = require("../../middleware/api-formatter.js");
 const discordBot = require("../../utils/discord.js");
 const axios = require("axios");
+const areaModel = require("../../models/area.js");
 
 exports.discordCallback = async (req, res) => {
     try {
@@ -24,6 +25,8 @@ exports.discordCallback = async (req, res) => {
                 },
             });
             let parsedData = await response.json();
+            if (!parsedData.access_token)
+                return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, parsedData);
             if (parsedData.access_token) {
                 parsedData.expires_at = Date.now() + (parsedData.expires_in * 1000);
                 req.user.discord_token = parsedData;
@@ -69,8 +72,17 @@ exports.discordRefresh = async (req, res) => {
                 },
             });
             const parsedData = await response.json();
+            if (!parsedData.access_token)
+                return api_formatter(req, res, 500, "error", "An error occurred while trying to refresh the discord token", null, parsedData);
             req.user.discord_token = parsedData;
             await req.user.save();
+            const areas = await AreaModel.find({ creator_id: req.user.unique_id });
+            for (const area of areas) {
+                if (area.service == "discord") {
+                    area.tokens.discord = req.user.discord_token.access_token;
+                    await area.save();
+                }
+            }
             return api_formatter(req, res, 200, "success", "Discord token has been saved");
         } catch (error) {
             console.error(error.response?.data);
@@ -107,6 +119,8 @@ exports.discordCallbackMobile = async (req, res) => {
                 },
             });
             let parsedData = await response.json();
+            if (!parsedData.access_token)
+                return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token on mobile", null, parsedData);
             if (parsedData.access_token) {
                 parsedData.expires_at = Date.now() + (parsedData.expires_in * 1000);
                 req.user.discord_token = parsedData;
@@ -152,8 +166,17 @@ exports.discordRefreshMobile = async (req, res) => {
                 },
             });
             const parsedData = await response.json();
+            if (!parsedData.access_token)
+                return api_formatter(req, res, 500, "error", "An error occurred while trying to refresh the discord token", null, parsedData);
             req.user.discord_token = parsedData;
             await req.user.save();
+            const areas = await AreaModel.find({ creator_id: req.user.unique_id });
+            for (const area of areas) {
+                if (area.service == "discord") {
+                    area.tokens.discord = req.user.discord_token.access_token;
+                    await area.save();
+                }
+            }
             return api_formatter(req, res, 200, "success", "Discord token has been saved for the mobile client");
         } catch (error) {
             console.error(error.response?.data);
@@ -232,6 +255,13 @@ exports.githubRefresh = async (req, res) => {
 
             req.user.github_token = parsedData;
             await req.user.save();
+            const areas = await AreaModel.find({ creator_id: req.user.unique_id });
+            for (const area of areas) {
+                if (area.service == "github") {
+                    area.tokens.github = req.user.github_token.access_token;
+                    await area.save();
+                }
+            }
             return api_formatter(req, res, 200, "success", "Github token has been refreshed");
         } catch (error) {
             console.error(error.response?.data);
