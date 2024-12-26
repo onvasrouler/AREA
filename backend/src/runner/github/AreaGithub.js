@@ -29,21 +29,21 @@ async function ActionGithub(AREA) {
         const TriggerEvent = actionReactions.Action.arguments.on;
         let Datas = "";
         switch (TriggerEvent) {
-        case "new_issue":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
-            break;
-        case "new_pr":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
-            break;
-        case "new_commit":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
-            break;
-        case "new_repo":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
-            break;
-        default:
-            console.error("Unknown action");
-            Datas = "error";
+            case "new_issue":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
+                break;
+            case "new_pr":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
+                break;
+            case "new_commit":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
+                break;
+            case "new_repo":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "error";
         }
         if (Datas == "error")
             return;
@@ -75,7 +75,51 @@ async function ActionGithub(AREA) {
 }
 
 async function ReactionGithub(AREA) {
-    console.log("treating Github Reaction : " + AREA.unique_id);
+    const actionReactions = await ActionReactionModel.findOne({ "unique_id": AREA.unique_id });
+    try {
+        if (!actionReactions) {
+            console.error("ActionReaction not found");
+            return;
+        }
+        if (actionReactions.Reaction.service != "github") {
+            console.error("Action service is not github");
+            return;
+        }
+        if (actionReactions.tokens.github == null) {
+            console.error("Github token is missing");
+            return;
+        }
+
+        let Datas = "";
+        switch (actionReactions.Reaction.arguments.content) {
+            case "issues":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
+                break;
+            case "pr":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
+                break;
+            case "commit":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
+                break;
+            case "repo":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "error";
+        }
+        if (Datas == "error")
+            return;
+
+        actionReactions.CachedData = Datas;
+        actionReactions.CachedData.content = actionReactions.Reaction.arguments.content;
+        await actionReactions.save();
+        return;
+    } catch (err) {
+        console.error(err);
+        console.error(err.response?.data);
+        return;
+    }
 }
 
 module.exports = {
