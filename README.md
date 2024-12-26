@@ -61,11 +61,22 @@ The project includes three main services configured via `docker-compose`:
 - `client_web`: Web client (port 8081).
 - `client_mobile`: Mobile client.
 
-### Commands
+### STEPS
 
-- **Build services**: `docker-compose build`
+- **Setup env files**:
+```bash
+touch backend/.env.docker
+touch front/.env.docker
+```
+fill them following the .env.example
+- **Build services**:
+```bash
+docker compose build
+```
 - **Run services**: `docker-compose up`
-
+```bash
+docker compose up
+```
 ### Notes:
 
 - `client_web` depends on `client_mobile` and `server`.
