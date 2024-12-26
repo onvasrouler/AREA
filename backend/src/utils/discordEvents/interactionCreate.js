@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'interactionCreate',
+    name: "interactionCreate",
     async execute(interaction, client) {
         console.log(`${interaction} in #${interaction.channel.name} triggered an interaction.`);
         if (!interaction.isCommand()) return;
@@ -12,9 +12,9 @@ module.exports = {
         } catch (error) {
             console.error(error);
             if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({ content: 'There was an error executing this command!', ephemeral: true });
+                await interaction.followUp({ content: "There was an error executing this command!", ephemeral: true });
             } else {
-                await interaction.reply({ content: 'There was an error executing this command!', ephemeral: true });
+                await interaction.reply({ content: "There was an error executing this command!", ephemeral: true });
             }
         }
     },

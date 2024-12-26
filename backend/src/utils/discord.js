@@ -1,14 +1,14 @@
-const { Client, Collection, GatewayIntentBits, REST, Routes } = require('discord.js');
-const fs = require('fs');
-const path = require('path');
+const { Client, Collection, GatewayIntentBits, REST, Routes } = require("discord.js");
+const fs = require("fs");
+const path = require("path");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMessageReactions] });
 
 client.commands = new Collection();
 
 // Load commands dynamically
-const commandsPath = path.join(__dirname, 'discordCommands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+const commandsPath = path.join(__dirname, "discordCommands");
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
 
 const commands = []; // Array for slash commands data
 
@@ -30,8 +30,8 @@ for (const file of commandFiles) {
 }
 
 // Load events dynamically
-const eventsPath = path.join(__dirname, 'discordEvents');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const eventsPath = path.join(__dirname, "discordEvents");
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith(".js"));
 
 for (const file of eventFiles) {
     const filePath = path.join(eventsPath, file);
@@ -43,19 +43,19 @@ for (const file of eventFiles) {
     }
 }
 
-const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
+const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 (async () => {
     try {
         await rest.put(
             Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
             { body: commands }
         );
-        console.log('Successfully reloaded application commands.');
+        console.log("Successfully reloaded application commands.");
 
         // Log in to Discord after commands are registered
         await client.login(process.env.DISCORD_TOKEN);
     } catch (error) {
-        console.error('Error registering application commands:', error);
+        console.error("Error registering application commands:", error);
     }
 })();
 

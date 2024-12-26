@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'ready',
+    name: "ready",
     once: false,
     async execute(client) {
         console.log(`Discord logged in as ${client.user.tag}!`);

@@ -29,21 +29,21 @@ async function ActionGithub(AREA) {
         const TriggerEvent = actionReactions.Action.arguments.on;
         let Datas = "";
         switch (TriggerEvent) {
-            case "new_issue":
-                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
-                break;
-            case "new_pr":
-                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
-                break;
-            case "new_commit":
-                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
-                break;
-            case "new_repo":
-                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
-                break;
-            default:
-                console.error("Unknown action");
-                Datas = "error";
+        case "new_issue":
+            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
+            break;
+        case "new_pr":
+            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
+            break;
+        case "new_commit":
+            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
+            break;
+        case "new_repo":
+            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
+            break;
+        default:
+            console.error("Unknown action");
+            Datas = "error";
         }
         if (Datas == "error")
             return;
@@ -92,21 +92,21 @@ async function ReactionGithub(AREA) {
 
         let Datas = "";
         switch (actionReactions.Reaction.arguments.content) {
-            case "issues":
-                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
-                break;
-            case "pr":
-                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
-                break;
-            case "commit":
-                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
-                break;
-            case "repo":
-                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
-                break;
-            default:
-                console.error("Unknown action");
-                Datas = "error";
+        case "issues":
+            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
+            break;
+        case "pr":
+            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
+            break;
+        case "commit":
+            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
+            break;
+        case "repo":
+            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
+            break;
+        default:
+            console.error("Unknown action");
+            Datas = "error";
         }
         if (Datas == "error")
             return;

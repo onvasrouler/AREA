@@ -1,25 +1,25 @@
-const AreaModel = require('../../database/models/actionReaction.js');
+const AreaModel = require("../../database/models/actionReaction.js");
 
 module.exports = {
     data: {
-        name: 'pr',
-        description: 'get the list of pull requests',
+        name: "pr",
+        description: "get the list of pull requests",
         default_member_permissions: null, // No specific permissions required
     },
     async execute(interaction) {
         const AREA = await AreaModel.findOne({
-            'Action.arguments.userId': interaction.user.id,
-            'Action.arguments.on': '/pr'
+            "Action.arguments.userId": interaction.user.id,
+            "Action.arguments.on": "/pr"
         });
         if (AREA === null || AREA.length === 0)
-            return await interaction.reply('You have no actions set up for the pr');
+            return await interaction.reply("You have no actions set up for the pr");
 
         if (AREA.CachedData == undefined || AREA.CachedData.items == undefined)
-            return await interaction.reply('wait for the data to be fetched');
+            return await interaction.reply("wait for the data to be fetched");
 
         const Datas = AREA.CachedData.items;
         if (Datas.length === 0)
-            return await interaction.reply('No pull requests found');
+            return await interaction.reply("No pull requests found");
         const parsedData = Datas.map(data => ({
             title: data.title,
             state: data.state,
@@ -32,13 +32,13 @@ module.exports = {
             Messages.push(`Title: ${data.title}\nState: ${data.state}\nUser: ${data.user}\n\n`);
         });
 
-        let finalMessage = '';
+        let finalMessage = "";
         const avatarUrl = Datas[0].user.avatar_url;
         await interaction.reply(`${AREA.Reaction.arguments.prefix} ${avatarUrl}`);
         for (const message of Messages) {
             if ((finalMessage + message).length > 1500) {
                 await interaction.followUp(finalMessage);
-                finalMessage = '';
+                finalMessage = "";
             }
             finalMessage += message;
         }
