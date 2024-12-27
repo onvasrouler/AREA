@@ -39,6 +39,29 @@ npm install --save-dev nodemon # or using yarn: yarn add nodemon -D
 ```
 <br/>
 
+## Complete the .env file :
+
+- PORT  this is used to decide the port the server will run on
+- SERVER_URL  this is used for the tests ( npm run test ) it is used to decide where it will send the requests 
+- SECRET  this is used to hash the password when stored in the do so put something strong ( like 32 random char )
+- GOOGLE_CLIENT_ID  this is used for google auth0 enter the google app id with the permission to get email and username
+- MONGO_URI  this is the mongodb URL the server will connect to
+- PROD_DB_NAME when the NODE_ENV is prod it will use this db
+- DEV_DB_NAME  when the NODE_ENV is dev it will use this db
+- TEST_USERNAME this is the username used for the test be sure no account exists with this username
+- TEST_PASSWORD this is the password used for the test
+- TEST_EMAIL this is the email used for the test be sure no account exists with this email
+- ENABLE_TEST_ENDPOINT this will enable endpoint like /fastregister allowing the tests to create account without email verification
+- EMAILER_EMAIL this will be the email adress used for the bot to send emails
+- EMAILER_PASSWORD this will be the email password used for the bot to send emails
+- DISCORD_TOKEN this is the discord bot's token
+- DISCORD_SECRET this is the discord secret used for auth0
+- DISCORD_REDIRECT_URI this is the redirect uri used by discord auth0
+- DISCORD_REDIRECT_URI_MOBILE this is the redirect uri for the mobile app used by discord auth0
+- MOBILE_APP_NAME this is the name of the mobile app, this is used to return to the mobile app after auth0
+- GITHUB_CLIENT_ID this is the github client ID used with auth0
+- GITHUB_SECRET this is the github client secret used with auth0
+
 ## Usage
 
 possible commands are : 
@@ -48,6 +71,9 @@ npm run dev
 
 # run in production
 npm run start
+
+# run a list of tests that will check that the account managment system still work
+npm run test
 
 # check lint errors
 npm run lint
@@ -527,6 +553,54 @@ npm run lintfix
     }
     ```
 
+- **POST /mobileauth/callback/discord**
+  - **Description**: Handle Discord OAuth callback.
+  - **body**:
+    ```json
+    {
+      "code": "authorization_code"
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Discord token has been saved for the mobile client",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /mobileauth/refresh/discord**
+  - **Description**: Refresh Discord OAuth token.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Discord token has been saved for the mobile client",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
 - **POST /auth/callback/github**
   - **Description**: Handle GitHub OAuth callback.
   - **body**:
@@ -618,6 +692,27 @@ npm run lintfix
     }
     ```
 
+- **GET /get_my_user_id**
+  - **Description**: Return the discord userid of the connected user.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "user id get with success",
+      "data": "req.discordUser.id",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
 - **GET /get_list_of_channels**
   - **Description**: Return a list of the text channels of a discord server ( if the bot is present in this server).
     - **query**:
@@ -649,6 +744,17 @@ npm run lintfix
       "username": null
     }
     ```
+
+- **GET /discord_manager**
+  - **Description**: endpoint used to log in the mobile frontend using discord ( more precisely to redirect the user to the app ).
+  - **query**:
+    ```json
+    {
+      "code": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    Redirection to MOBILE_APP_NAME://discord?code=code
 
 ### Github endpoint
 
@@ -688,6 +794,122 @@ npm run lintfix
       "messageStatus": "success",
       "message": "your github repository have been fetched with succes",
       "data": "user's repo list",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+### AREA Endpoint
+
+- **POST /area**
+  - **Description**: Used to create a new action reaction.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **body**:
+      ```json
+      {
+        "action": {
+          "service": [
+            "github"
+          ],
+          "arguments": {
+            "on": [
+              "new_issue",
+              "new_repo",
+              "new_commit",
+              "new_pr"
+            ]
+          }
+        },
+        "reaction": {
+          "service": [
+            "discord"
+          ],
+          "arguments": {
+            "react": [
+              "message",
+              "private_message"
+            ],
+            "server": "*",
+            "channel":"*",
+            "userID": "*",
+            "message": [
+                "A new PR has been opened!",
+                "A new issue has been opened!",
+                "A new commit has been pushed!",
+                "A new repo has been created!"
+            ]
+          }
+        }
+      }
+      ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Action Reaction saved",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **GET /area**
+  - **Description**: Return the list of the action reaction the user has created.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Action Reaction found",
+      "data": {
+        {
+          "id": "action reaction id",
+          "action": "display the same data as what you post to create an action",
+          "reaction": "display the same data as what you post to create a reaction"
+
+        }
+      },
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **DELETE /area**
+  - **Description**: Delete an action reaction using the area id.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **body**:
+    ```json
+    {
+      "id": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Action Reaction deleted",
+      "data": null,
       "error": null,
       "session": null,
       "username": null
@@ -903,6 +1125,24 @@ All API responses will be returned in the following format:
   - **Message**: "An error occured while trying to get the discord token"
   - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to discord.
 
+- **POST /mobileauth/callback/discord**
+  - **Status**: 400
+  - **Message**: "code is required when trying to generate a token with the mobile client"
+  - **Reason**: no code provided in the request body.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the discord token on mobile"
+  - **Reason**: probably because the given code is invalid so the back couldn't turn it in a token try again or check logs.
+
+- **POST /mobileauth/refresh/discord**
+  - **Status**: 400
+  - **Message**: "you first have to login to discord with the mobile client to be able to refresh your token"
+  - **Reason**: you first have to login to discord.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the discord token re log-in discord with the mobile"
+  - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to discord.
+
 - **POST /auth/callback/github**
   - **Status**: 400
   - **Message**: "code is required"
@@ -928,6 +1168,11 @@ All API responses will be returned in the following format:
   - **Message**: "your discord token is expired"
   - **Reason**: your discord token is expired you'll have to refresh it.
 
+- **GET /get_my_user_id**
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the user id"
+  - **Reason**: this can have many cause check log or try again.
+
 - **GET /get_list_of_channels**
   - **Status**: 401
   - **Message**: "you are not logged in using discord"
@@ -945,6 +1190,15 @@ All API responses will be returned in the following format:
   - **Message**: "you are not admin of this guild or the bot is not present there"
   - **Reason**: the given guild id correspond to a guild where the user isn't admin or the bot isn't present or the guild simply doesn't exist.
 
+- **GET /discord_manager**
+  - **Status**: 400
+  - **Message**: "you didn't provide any code"
+  - **Reason**: the user didn't prvide any code in the query
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to manage discord"
+  - **Reason**: this can have many cause check log or try again.
+
 - **GET /get_pull_requests**
   - **Status**: 401
   - **Message**: "you are not logged in using github"
@@ -954,3 +1208,44 @@ All API responses will be returned in the following format:
   - **Status**: 401
   - **Message**: "you are not logged in using github"
   - **Reason**: ther user didn't logged in using github 0auth.
+
+  ### AREA Endpoint
+
+- **POST /area**
+  - **Status**: 400
+  - **Message**: "Missing required fields"
+  - **Reason**: either the field action or reaction isn't provided in the request body
+
+  - **Status**: 401
+  - **Message**: "You need to connect your github account to use github's action"
+  - **Reason**: the action use github but the user isn't logged in using github .
+
+  - **Status**: 401
+  - **Message**: "You need to connect your discord account to use discord's reaction"
+  - **Reason**: the action use discord but the user isn't logged in using discord.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to create the area"
+  - **Reason**: an unexpected error happend on the back check log and try again
+
+- **GET /area**
+  - **Status**: 404
+  - **Message**: "Action Reaction not found"
+  - **Reason**: probably happend because the user didn't create any area
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the user's area"
+  - **Reason**: an unexpected error happend on the back check log and try again
+
+- **DELETE /area**
+  - **Status**: 400
+  - **Message**: "Missing required fields"
+  - **Reason**: the user didn't provide an area id in the request body
+
+  - **Status**: 404
+  - **Message**: "Action Reaction not found"
+  - **Reason**: no area found with the provided id
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the user's area"
+  - **Reason**: an unexpected error happend on the back check log and try again
