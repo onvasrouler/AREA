@@ -14,6 +14,10 @@ const actionReactionSchema = new mongoose.Schema({
         type: Object,
         default: {}
     },
+    Name: { // this will be the Name
+        type: String,
+        required: [true, "Name is required"],
+    },
     Action: { // this will be the action
         type: Object,
         required: [true, "action is required"],
