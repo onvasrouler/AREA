@@ -41,7 +41,7 @@ const handleLoginFunctions = {
   }
 }
 
-export function ServiceDialog({ isOpen, onClose, service, authStatus, isDiscordAuthenticated }) {
+export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
   const isAuthenticated = authStatus[`is${service.name}Authenticated`]
   const handleLogin = handleLoginFunctions[`handle${service.name}Login`]
   const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false)
