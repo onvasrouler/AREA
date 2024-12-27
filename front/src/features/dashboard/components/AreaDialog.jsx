@@ -10,10 +10,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from 'lucide-react';
 
 import areaData from '@/AREA.json';
 
-export function AreaDialog({ isOpen, onClose, service }) {
+export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated }) {
   const [linkedService, setLinkedService] = useState('');
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedReaction, setSelectedReaction] = useState('');
@@ -24,6 +26,7 @@ export function AreaDialog({ isOpen, onClose, service }) {
   const [selectedChannelId, setSelectedChannelId] = useState('');
   const [discordUserId, setDiscordUserId] = useState('');
   const [formData, setFormData] = useState({});
+  const [authError, setAuthError] = useState('');
 
   const currentService = areaData.services.find(s => s.name === service.name);
   const services = areaData.services.filter(s => s.name !== service.name).map(s => s.name);
@@ -32,6 +35,24 @@ export function AreaDialog({ isOpen, onClose, service }) {
 
   const handleInputChange = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const checkServiceAuth = (serviceName) => {
+    switch (serviceName) {
+      case 'Discord':
+        return isDiscordAuthenticated;
+      default:
+        return false;
+    }
+  };
+
+  const handleLinkedServiceChange = (value) => {
+    setLinkedService(value);
+    if (!checkServiceAuth(value)) {
+      setAuthError(`You need to authenticate with ${value} before creating an AREA.`);
+    } else {
+      setAuthError('');
+    }
   };
 
   const fetchServers = async () => {
@@ -202,7 +223,15 @@ export function AreaDialog({ isOpen, onClose, service }) {
         </DialogHeader>
         <Separator className="bg-primary" />
 
-        <Select value={linkedService} onValueChange={setLinkedService}>
+        {authError && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Authentication Error</AlertTitle>
+            <AlertDescription>{authError}</AlertDescription>
+          </Alert>
+        )}
+
+        <Select value={linkedService} onValueChange={handleLinkedServiceChange}>
           <SelectTrigger>
             <SelectValue placeholder="Link With" />
           </SelectTrigger>
@@ -280,9 +309,15 @@ export function AreaDialog({ isOpen, onClose, service }) {
           </div>
         ))}
 
-        <div className="flex justify-between mt-6">
+          <div className="flex justify-between mt-6">
           <Button variant="destructive" onClick={onClose}>Cancel</Button>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleSubmit}>Save</Button>
+          <Button
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={handleSubmit}
+            disabled={!!authError}
+          >
+            Save
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

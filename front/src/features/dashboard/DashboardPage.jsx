@@ -138,6 +138,7 @@ export function DashboardPage() {
           onClose={handleCloseDialog}
           service={selectedService}
           authStatus={authStatus}
+          isDiscordAuthenticated={authStatus.isDiscordAuthenticated}
         />
       )}
     </div>
