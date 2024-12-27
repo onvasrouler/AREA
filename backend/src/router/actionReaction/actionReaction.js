@@ -17,10 +17,8 @@ exports.postArea = async (req, res) => {
             return api_formatter(req, res, 400, "error", "You need to connect your discord account to use discord's reaction", null);
         if (reaction.service == "github" && req.user.github_token == null)
             return api_formatter(req, res, 400, "error", "You need to connect your github account to use github's reaction", null);
-
         const actionToken = action.service == "github" ? req.user.github_token.access_token :
             action.service == "discord" ? req.user.discord_token.access_token : "";
-
         const reactionToken = reaction.service == "github" ? req.user.github_token.access_token :
             reaction.service == "discord" ? req.user.discord_token.access_token : "";
         const tokens = `{
@@ -42,13 +40,15 @@ exports.postArea = async (req, res) => {
     }
     catch (err) {
         console.error(err);
-        return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to create the area", null, err);
     }
 };
 
 exports.getArea = async (req, res) => {
     try {
         const actionReactions = await ActionReactionModel.find({ creator_id: req.user.unique_id });
+        if (actionReactions.length === 0)
+            return api_formatter(req, res, 404, "notFound", "Action Reaction not found");
         const parsedData = actionReactions.map(actionReaction => ({
             id: actionReaction.unique_id,
             name: actionReaction.Name,
@@ -59,7 +59,7 @@ exports.getArea = async (req, res) => {
     }
     catch (err) {
         console.error(err);
-        return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to get the user's area", null, err);
     }
 };
 
@@ -68,6 +68,8 @@ exports.deleteArea = async (req, res) => {
         const { id } = req.body;
         if (!id)
             return api_formatter(req, res, 400, "error", "Missing required fields", null);
+        if (!await ActionReactionModel.exists({ unique_id: id }))
+            return api_formatter(req, res, 404, "notFound", "Action Reaction not found");
         await ActionReactionModel.deleteOne({ unique_id: id });
         return api_formatter(req, res, 200, "success", "Action Reaction deleted");
     }

@@ -1,7 +1,0 @@
-refresh token stored in db actionreaction when user refresh his token
-return the list of discord user the user could user for the bot to send a message to
-UPDATE README
-    post /area
-    get /area
-    delete /area
-    get /get_my_user_id

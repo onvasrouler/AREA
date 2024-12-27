@@ -145,12 +145,14 @@ exports.getMyRepos = async (req, res) => {
 };
 
 exports.manage_discord = async (req, res) => {
-    const code = req.query.code;
+    try {
+        const code = req.query.code;
 
-    if (!code) {
-        return res.status(400).send("Missing code");
+        if (!code)
+            return api_formatter(req, res, 400, "Missing code", "you didn't provide any code");
+
+        return res.redirect(`${process.env.MOBILE_APP_NAME}://discord?code=${code}`);
+    } catch (error) {
+        return api_formatter(req, res, 500, "error", "An error occured while trying to manage discord", null, error, null);
     }
-
-
-    res.redirect(`myapp://discord?code=${code}`);
 };
