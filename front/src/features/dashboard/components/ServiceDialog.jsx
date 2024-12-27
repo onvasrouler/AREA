@@ -51,7 +51,7 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
     if (isOpen && isAuthenticated) {
       const session = localStorage.getItem("session");
 
-      fetch(`${import.meta.VITE_BACKEND_URL}area`, {
+      fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
         method: "GET",
         headers: {
           "session": session

@@ -54,7 +54,7 @@
                     "display": "New Commit"
                 },
                 {
-                    "type": "new_repository",
+                    "type": "new_repo",
                     "display": "New Repository"
                 }
             ],
