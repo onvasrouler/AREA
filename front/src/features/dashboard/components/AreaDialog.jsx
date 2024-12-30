@@ -28,7 +28,6 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
   const [formData, setFormData] = useState({});
   const [authError, setAuthError] = useState('');
   const [areaName, setAreaName] = useState('');
-  const [githubUserId, setGithubUserId] = useState('');
 
   const currentService = areaData.services.find(s => s.name === service.name);
   const services = areaData.services.filter(s => s.name !== service.name).map(s => s.name);
@@ -132,30 +131,6 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     }
   };
 
-  const fetchGitHubUserId = async () => {
-    const session = localStorage.getItem("session");
-    if (!session) {
-      console.error("No session found. Please log in.");
-      return;
-    }
-    try {
-      const response = await fetch(`${import.meta.env.VITE_GITHUB_FETCH_USERID_URL}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          session: session,
-        },
-      });
-      if (!response.ok) throw new Error("Invalid response");
-      const responseData = await response.json();
-      if (responseData?.data) {
-        setGithubUserId(responseData.data);
-      }
-    } catch (error) {
-      console.error("Error fetching GitHub user ID:", error);
-    }
-  };
-
   const buildRequestBody = () => {
     const actionArguments = {
       on: selectedAction || ""
@@ -183,8 +158,8 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
       }
     } else if (linkedService === "GitHub") {
       reactionArguments.content = selectedReaction;
-      if (githubUserId) {
-        reactionArguments.userId = githubUserId;
+      if (discordUserId) {
+        reactionArguments.userId = discordUserId;
       }
     }
 
@@ -240,12 +215,10 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     setSelectedServerId('');
     setSelectedChannelId('');
     setDiscordUserId('');
-    setGithubUserId('');
     if (linkedService === "Discord") {
       fetchServers();
-      fetchDiscordUserId();
     } else if (linkedService === "GitHub") {
-      fetchGitHubUserId();
+      fetchDiscordUserId();
     }
   }, [linkedService, service]);
 
