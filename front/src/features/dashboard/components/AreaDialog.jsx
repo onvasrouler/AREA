@@ -15,7 +15,7 @@ import { AlertCircle } from 'lucide-react';
 
 import areaData from '@/AREA.json';
 
-export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated }) {
+export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated }) {
   const [linkedService, setLinkedService] = useState('');
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedReaction, setSelectedReaction] = useState('');
@@ -28,6 +28,7 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
   const [formData, setFormData] = useState({});
   const [authError, setAuthError] = useState('');
   const [areaName, setAreaName] = useState('');
+  const [githubUserId, setGithubUserId] = useState('');
 
   const currentService = areaData.services.find(s => s.name === service.name);
   const services = areaData.services.filter(s => s.name !== service.name).map(s => s.name);
@@ -42,6 +43,8 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     switch (serviceName) {
       case 'Discord':
         return isDiscordAuthenticated;
+      case 'GitHub':
+        return isGitHubAuthenticated;
       default:
         return false;
     }
@@ -129,6 +132,30 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     }
   };
 
+  const fetchGitHubUserId = async () => {
+    const session = localStorage.getItem("session");
+    if (!session) {
+      console.error("No session found. Please log in.");
+      return;
+    }
+    try {
+      const response = await fetch(`${import.meta.env.VITE_GITHUB_FETCH_USERID_URL}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          session: session,
+        },
+      });
+      if (!response.ok) throw new Error("Invalid response");
+      const responseData = await response.json();
+      if (responseData?.data) {
+        setGithubUserId(responseData.data);
+      }
+    } catch (error) {
+      console.error("Error fetching GitHub user ID:", error);
+    }
+  };
+
   const buildRequestBody = () => {
     const actionArguments = {
       on: selectedAction || ""
@@ -136,18 +163,31 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     const reactionArguments = {
       react: selectedReaction || ""
     };
-    if (selectedReaction === "message") {
-      if (selectedServerId) {
-        reactionArguments.serverId = selectedServerId;
+
+    if (service.name === "Discord") {
+      actionArguments.userId = discordUserId;
+    }
+
+    if (linkedService === "Discord") {
+      if (selectedReaction === "message") {
+        if (selectedServerId) {
+          reactionArguments.serverId = selectedServerId;
+        }
+        if (selectedChannelId) {
+          reactionArguments.channelId = selectedChannelId;
+        }
+      } else if (selectedReaction === "private_message") {
+        if (discordUserId) {
+          reactionArguments.userId = discordUserId;
+        }
       }
-      if (selectedChannelId) {
-        reactionArguments.channelId = selectedChannelId;
-      }
-    } else if (selectedReaction === "private_message") {
-      if (discordUserId) {
-        reactionArguments.userId = discordUserId;
+    } else if (linkedService === "GitHub") {
+      reactionArguments.content = selectedReaction;
+      if (githubUserId) {
+        reactionArguments.userId = githubUserId;
       }
     }
+
     Object.entries(argumentsData).forEach(([key]) => {
       if (formData[key] !== undefined && formData[key] !== '') {
         reactionArguments[key] = formData[key];
@@ -200,9 +240,12 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     setSelectedServerId('');
     setSelectedChannelId('');
     setDiscordUserId('');
+    setGithubUserId('');
     if (linkedService === "Discord") {
       fetchServers();
       fetchDiscordUserId();
+    } else if (linkedService === "GitHub") {
+      fetchGitHubUserId();
     }
   }, [linkedService, service]);
 
@@ -288,34 +331,38 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
                 />
               </div>
             )}
-            {value.component === "Select" && key === "serverId" && (
-              <Select onValueChange={(serverId) => {
-                setSelectedServerId(serverId);
-                fetchChannels(serverId);
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder={value.description} />
-                </SelectTrigger>
-                <SelectContent>
-                  {discordServers.map(server => (
-                    <SelectItem key={server.id} value={server.id}>{server.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            {value.component === "Select" && key === "channelId" && selectedServerId && (
-              <Select onValueChange={(channelId) => {
-                setSelectedChannelId(channelId);
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder={value.description} />
-                </SelectTrigger>
-                <SelectContent>
-                  {discordChannels[selectedServerId]?.map(channel => (
-                    <SelectItem key={channel.id} value={channel.id}>{channel.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {value.component === "Select" && linkedService === "Discord" && (
+              <>
+                {key === "serverId" && (
+                  <Select onValueChange={(serverId) => {
+                    setSelectedServerId(serverId);
+                    fetchChannels(serverId);
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={value.description} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {discordServers.map(server => (
+                        <SelectItem key={server.id} value={server.id}>{server.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                {key === "channelId" && selectedServerId && (
+                  <Select onValueChange={(channelId) => {
+                    setSelectedChannelId(channelId);
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={value.description} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {discordChannels[selectedServerId]?.map(channel => (
+                        <SelectItem key={channel.id} value={channel.id}>{channel.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </>
             )}
           </div>
         ))}
@@ -334,4 +381,3 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     </Dialog>
   );
 }
-

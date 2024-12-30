@@ -185,6 +185,7 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
         onClose={handleAreaDialogClose}
         service={service}
         isDiscordAuthenticated={authStatus.isDiscordAuthenticated}
+        isGitHubAuthenticated={authStatus.isGitHubAuthenticated}
       />
     </>
   )
