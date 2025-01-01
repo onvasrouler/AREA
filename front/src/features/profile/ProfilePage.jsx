@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FaUser } from 'react-icons/fa';
-import { User, Settings, LogOut } from 'lucide-react';
+import { Settings, LogOut, LayoutDashboard } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -56,6 +56,26 @@ export function ProfilePage() {
     fetchUserData();
   }, [apiClient]);
 
+  const handleLogout = async () => {
+    try {
+      const session = localStorage.getItem('session');
+      if (session) {
+        const response = await apiClient.post("logout", {
+          session: session
+        });
+        if (response.ok) {
+          navigate('/login');
+        } else {
+          console.error('Failed to logout');
+        }
+      } else {
+        console.error('No session found');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   const handleProfileEdit = () => {
     // Implement profile edit logic here
     console.log('Profile edit submitted');
@@ -103,20 +123,22 @@ export function ProfilePage() {
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Logout</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
+            <DropdownMenuContent align="end">
+                <div className="text-center">
+                  <DropdownMenuItem className="hover:bg-primary hover:text-white" onClick={() => navigate("/dashboard")}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-primary hover:text-white" onClick={() => navigate("/settings")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-primary hover:text-white" onClick={() => handleLogout()}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </div>
+              </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>

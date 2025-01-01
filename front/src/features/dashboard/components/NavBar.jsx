@@ -121,15 +121,15 @@ export function Navbar({ username, services }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <div className="text-center">
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  <DropdownMenuItem className="hover:bg-primary hover:text-white" onClick={() => navigate("/profile")}>
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/settings")}>
+                  <DropdownMenuItem className="hover:bg-primary hover:text-white" onClick={() => navigate("/settings")}>
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLogout()}>
+                  <DropdownMenuItem className="hover:bg-primary hover:text-white" onClick={() => handleLogout()}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
