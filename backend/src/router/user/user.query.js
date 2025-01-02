@@ -32,5 +32,5 @@ module.exports = function (app) {
     app.post("/forgotpassword", useractions.forgotpassword);
     app.post("/resetpassword", useractions.resetpassword);
 
-
+    app.patch("/profile", checkAuthenticated, useractions.updateprofile);
 };

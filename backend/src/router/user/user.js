@@ -660,3 +660,34 @@ exports.resetpassword = async (req, res) => {
         return api_formatter(req, res, 500, "error", "Error while resetting password", null, err, null);
     }
 };
+
+exports.updateprofile = async (req, res) => {
+    try {
+        if (!req.user || req.user == null) // if the user is not logged in
+            return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null, null); // return an error message
+
+        const updateData = req.body; // get the update data
+        if (await check_json_data(updateData)) // check if one data is missing
+            return api_formatter(req, res, 400, "missing_informations", "some of the information were not provided", null, null, null, req.user.username); // return an error message
+
+        if (updateData.email && updateData.email != req.user.email) { // if the email is provided
+            if (await UserModel.emailExists(updateData.email)) // check if the email already exist
+                return api_formatter(req, res, 400, "email_already_exist", "an account with the provided email already exist", null, null, null, req.user.username); // return an error message
+        }
+
+        if (updateData.username && updateData.username != req.user.username) { // if the username is provided
+            if (await UserModel.usernameExists(updateData.username)) // check if the username already exist
+                return api_formatter(req, res, 400, "username_already_exist", "an account with the provided username already exist", null, null, null, req.user.username); // return an error message
+        }
+
+        await req.user.updateOne(updateData).then(() => { // update the user
+            return api_formatter(req, res, 200, "success", "profile updated successfully", null, null, null, req.user.username); // return a success message
+        }).catch((err) => { // if an error occured while updating the user
+            console.error(err);
+            return api_formatter(req, res, 500, "error", "Error while updating profile", null, err, null, req.user.username); // return an error message
+        });
+    } catch (err) { // if an error occured while updating the profile
+        console.error(err);
+        return api_formatter(req, res, 500, "error", "Error while updating profile", null, err, null, req.user.username); // return an error message
+    }
+};
