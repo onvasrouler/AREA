@@ -9,18 +9,25 @@ exports.postArea = async (req, res) => {
             return api_formatter(req, res, 400, "MissingInfos", "Missing area name", null);
         if (!action || !reaction)
             return api_formatter(req, res, 400, "MissingInfos", "Missing required fields", null);
-        if (action.service == "github" && req.user.github_token == null)
-            return api_formatter(req, res, 400, "error", "You need to connect your github account to use github's action", null);
-        if (action.service == "discord" && req.user.discord_token == null)
-            return api_formatter(req, res, 400, "error", "You need to connect your discord account to use discord's action", null);
-        if (reaction.service == "discord" && req.user.discord_token == null)
-            return api_formatter(req, res, 400, "error", "You need to connect your discord account to use discord's reaction", null);
-        if (reaction.service == "github" && req.user.github_token == null)
-            return api_formatter(req, res, 400, "error", "You need to connect your github account to use github's reaction", null);
-        const actionToken = action.service == "github" ? req.user.github_token.access_token :
-            action.service == "discord" ? req.user.discord_token.access_token : "";
-        const reactionToken = reaction.service == "github" ? req.user.github_token.access_token :
-            reaction.service == "discord" ? req.user.discord_token.access_token : "";
+        const services = ["github", "discord", "spotift"];
+        const messages = {
+            "github": "You need to connect your github account to use github's",
+            "discord": "You need to connect your discord account to use discord's",
+            "spotify": "You need to connect your spotify account to use spotify's"
+        };
+
+        for (const service of services) {
+            if (action.service == service && req.user[`${service}_token`] == null)
+                return api_formatter(req, res, 400, "error", `${messages[service]} action`, null);
+            if (reaction.service == service && req.user[`${service}_token`] == null)
+                return api_formatter(req, res, 400, "error", `${messages[service]} reaction`, null);
+        }
+
+        const getToken = (service) => req.user[`${service}_token`] ? req.user[`${service}_token`].access_token : "";
+
+        const actionToken = getToken(action.service);
+        const reactionToken = getToken(reaction.service);
+
         const tokens = `{
             "${action.service}": "${actionToken}",
             "${reaction.service}": "${reactionToken}"
