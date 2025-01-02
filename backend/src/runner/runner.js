@@ -1,6 +1,7 @@
 const ActionReactionModel = require("../database/models/actionReaction");
 const { ActionDiscord, ReactionDiscord } = require("./discord/AreaDiscord");
 const { ActionGithub, ReactionGithub } = require("./github/AreaGithub.js");
+const { ActionSpotify, ReactionSpotify } = require("./spotify/AreaSpotify.js");
 
 class runner {
     constructor() {
@@ -33,6 +34,8 @@ class runner {
             return ActionDiscord(AREA);
         else if (Action.service === "github")
             return ActionGithub(AREA);
+        else if (Action.service === "spotify")
+            return ActionSpotify(AREA);
         else {
             console.log("Service not found : " + Action.service + " for action " + Action);
             return "ERROR: Service not found : " + Action.service + " for action " + Action;
@@ -42,9 +45,11 @@ class runner {
     treatReaction(AREA) {
         const Reaction = AREA.Reaction;
         if (Reaction.service === "discord")
-            ReactionDiscord(AREA);
+            return ReactionDiscord(AREA);
         else if (Reaction.service === "github")
-            ReactionGithub(AREA);
+            return ReactionGithub(AREA);
+        else if (Reaction.service === "spotify")
+            return ReactionSpotify(AREA);
         else {
             console.log("Service not found : " + Reaction.service + " for reaction " + Reaction);
             return "ERROR: Service not found : " + Reaction.service + " for reaction " + Reaction;
