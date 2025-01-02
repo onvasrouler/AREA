@@ -32,38 +32,43 @@ export function ProfilePage() {
   const apiClient = getApiClient();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const session = localStorage.getItem('session');
-      if (session) {
-        try {
-          const response = await apiClient.get("profile_info", {
-            session: session
-          });
-          if (response.ok) {
-            const data = await response.json();
-            setUsername(data.username);
-            setEmail(data.data.email);
-          }
-        } catch (error) {
-          console.error('Error:', error);
+  const fetchUserData = async () => {
+    const session = localStorage.getItem('session');
+    if (session) {
+      try {
+        const response = await apiClient.get("profile_info", {
+          session: session
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUsername(data.username);
+          setEmail(data.data.email);
         }
-      } else {
-        console.error('No session found');
+      } catch (error) {
+        console.error('Error:', error);
       }
-    };
+    } else {
+      console.error('No session found');
+    }
+  };
 
+  useEffect(() => {
     fetchUserData();
-  }, [apiClient]);
+  }, [fetchUserData]);
 
   const handleLogout = async () => {
     try {
       const session = localStorage.getItem('session');
       if (session) {
-        const response = await apiClient.post("logout", {
-          session: session
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Session': session
+          }
         });
         if (response.ok) {
+          localStorage.removeItem('session');
           navigate('/login');
         } else {
           console.error('Failed to logout');
@@ -76,8 +81,28 @@ export function ProfilePage() {
     }
   };
 
-  const handleProfileEdit = () => {
-    // Implement profile edit logic here
+  const handleProfileEdit = async () => {
+    try {
+      const session = localStorage.getItem('session');
+      if (session) {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Session': session
+          }
+        })
+        if (response.ok) {
+          console.log('Profile edited successfully');
+        } else {
+          console.error('Failed to edit profile');
+        }
+      } else {
+        console.error('No session found');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
     console.log('Profile edit submitted');
   };
 
@@ -86,14 +111,19 @@ export function ProfilePage() {
     console.log('Profile deletion requested');
   };
 
-  const handleLogoutAllDevices = () => {
+  const handleLogoutAllDevices = async () => {
     try {
       const session = localStorage.getItem('session');
       console.log('Session:', session);
       if (session) {
-        const response = apiClient.post("logouteverywhere", {
-          session: session
-        });
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}logouteverywhere`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Session': session
+          }
+        })
+        localStorage.removeItem('session');
         if (response.ok) {
           navigate('/login');
         } else {
@@ -125,15 +155,15 @@ export function ProfilePage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <div className="text-center">
-                  <DropdownMenuItem className="hover:bg-primary hover:text-white" onClick={() => navigate("/dashboard")}>
+                  <DropdownMenuItem className="focus:bg-primary focus:text-primary-foreground cursor-pointer" onClick={() => navigate("/dashboard")}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-primary hover:text-white" onClick={() => navigate("/settings")}>
+                  <DropdownMenuItem className="focus:bg-primary focus:text-primary-foreground cursor-pointer" onClick={() => navigate("/settings")}>
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-primary hover:text-white" onClick={() => handleLogout()}>
+                  <DropdownMenuItem className="focus:bg-primary focus:text-primary-foreground cursor-pointer" onClick={() => handleLogout()}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
@@ -260,4 +290,3 @@ export function ProfilePage() {
     </div>
   );
 }
-
