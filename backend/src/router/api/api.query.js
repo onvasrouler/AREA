@@ -16,4 +16,7 @@ module.exports = function (app) {
 
     app.get("/get_pull_requests", checkAuthenticated, getCachedData, api_interactions.getPullRequests);
     app.get("/get_my_repos", checkAuthenticated, getCachedData, api_interactions.getMyRepos);
+
+    app.get("/get_my_liked_tracks", checkAuthenticated, getCachedData, api_interactions.getMyLikedTracks);
+    app.get("/get_currently_playing", checkAuthenticated, getCachedData, api_interactions.getCurrentlyPlaying);
 };

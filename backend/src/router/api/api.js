@@ -81,6 +81,19 @@ exports.getListOfChannels = async (req, res) => {
     }
 };
 
+exports.manage_discord = async (req, res) => {
+    try {
+        const code = req.query.code;
+
+        if (!code)
+            return api_formatter(req, res, 400, "Missing code", "you didn't provide any code");
+
+        return res.redirect(`${process.env.MOBILE_APP_NAME}://discord?code=${code}`);
+    } catch (error) {
+        return api_formatter(req, res, 500, "error", "An error occured while trying to manage discord", null, error, null);
+    }
+};
+
 exports.getPullRequests = async (req, res) => {
     try {
         let githubCachedData = req.cachedData.data.githubPrCachedData;
@@ -144,15 +157,65 @@ exports.getMyRepos = async (req, res) => {
     }
 };
 
-exports.manage_discord = async (req, res) => {
+exports.getMyLikedTracks = async (req, res) => {
     try {
-        const code = req.query.code;
-
-        if (!code)
-            return api_formatter(req, res, 400, "Missing code", "you didn't provide any code");
-
-        return res.redirect(`${process.env.MOBILE_APP_NAME}://discord?code=${code}`);
+        const { limit } = req.query || 10;
+        if (limit < 1 || limit > 50)
+            return api_formatter(req, res, 400, "invalid limit", "limit should be between 1 and 50", null, null, null);
+        let spotifyCachedData = req.cachedData.data.spotifyLikedTracksCachedData;
+        if (!spotifyCachedData || (spotifyCachedData.updatedAt + 10000) < Date.now()) {
+            const token = req.user.spotify_token.access_token;
+            if (!token)
+                return api_formatter(req, res, 401, "notloggedin", "you are not logged in using spotify", null, null, null);
+            const likedTracksResponse = await axios.get(
+                "https://api.spotify.com/v1/me/tracks?limit=" + limit,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const SpotifyData = {
+                data: likedTracksResponse.data,
+                updatedAt: Date.now(),
+            };
+            req.cachedData.data = {
+                ...req.cachedData.data,
+                spotifyLikedTracksCachedData: SpotifyData
+            };
+            await req.cachedData.save();
+            spotifyCachedData = SpotifyData.data;
+        }
+        return api_formatter(req, res, 200, "success", "your liked tracks have been fetched with success", spotifyCachedData, null, null); // return the user informations
     } catch (error) {
-        return api_formatter(req, res, 500, "error", "An error occured while trying to manage discord", null, error, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to get the liked tracks", null, error, null);
     }
-};
+}
+
+exports.getCurrentlyPlaying = async (req, res) => {
+    try {
+        let spotifyCachedData = req.cachedData.data.spotifyCurrentlyPlayingCachedData;
+        if (!spotifyCachedData || (spotifyCachedData.updatedAt + 10000) < Date.now()) {
+            const token = req.user.spotify_token.access_token;
+            if (!token)
+                return api_formatter(req, res, 401, "notloggedin", "you are not logged in using spotify", null, null, null);
+            const currentlyPlayingResponse = await axios.get(
+                "https://api.spotify.com/v1/me/player/currently-playing",
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const SpotifyData = {
+                data: currentlyPlayingResponse.data,
+                updatedAt: Date.now(),
+            };
+            req.cachedData.data = {
+                ...req.cachedData.data,
+                spotifyCurrentlyPlayingCachedData: SpotifyData
+            };
+            await req.cachedData.save();
+            spotifyCachedData = SpotifyData.data;
+        }
+        return api_formatter(req, res, 200, "success", "your currently playing track has been fetched with success", spotifyCachedData, null, null); // return the user informations
+    } catch (error) {
+        return api_formatter(req, res, 500, "error", "An error occured while trying to get the currently playing track", null, error, null);
+    }
+}
