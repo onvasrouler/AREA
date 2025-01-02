@@ -16,7 +16,7 @@ for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     const command = require(filePath);
 
-    if (command.data.name && command.data.description) {
+    if (command.data && command.data.name && command.data.description) {
         client.commands.set(command.data.name, command);
 
         commands.push({
