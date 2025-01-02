@@ -54,7 +54,7 @@ export function ProfilePage() {
 
   useEffect(() => {
     fetchUserData();
-  }, [fetchUserData]);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -180,7 +180,7 @@ export function ProfilePage() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="account" className="w-full">
-              <TabsList className="flex space-x-4">
+              <TabsList className="flex space-x-4 bg-white">
                 <TabsTrigger
                   value="account"
                   className="data-[state=active]:bg-primary data-[state=active]:text-white"
