@@ -208,7 +208,65 @@ npm run lintfix
       here we define the argument so the bot will send a private message
       then we define the id of the user that will receive the message
       finally the message that will be sent
-    
+
+- **USAGE 3**:
+```json
+    {
+      "name": "*",
+      "action": {
+          "service": [
+              "discord"
+          ],
+          "arguments": {
+              "on": [
+                  "/likedtrack",
+                  "/spotiplaying"
+              ],
+              "userId": "*"
+          }
+      },
+      "reaction": {
+          "service": [
+              "spotify"
+          ],
+          "arguments": {
+              "content": [
+                  "liked_track",
+                  "currently_playing"
+              ],
+              "prefix": "*"
+          }
+      }
+  }
+  ```
+- **example**:
+  ```json
+  {
+      "name": "listMyLikedTrack",
+      "action": {
+          "service": "discord",
+          "arguments": {
+              "on": "/likedtrack",
+              "userId": "431930188255854613"
+          }
+      },
+      "reaction": {
+          "service": "spotify",
+          "arguments": {
+              "content": "liked_track",
+              "prefix": "your song marked as favourite are :"
+          }
+      }
+  }
+  ```
+  - **explanation**
+  - for action:
+      first for action arguments on will be the command that trigger the action in this case it is /likedtrack
+      userId will link the action reaction to a specific discord user by default set your discord id
+  - for reaction:
+      we have the content, this define what will be returned in this case it will be the user's liked_track
+      the prefix will be a message sent before every other
+
 ## API Endpoints
 
 ### User Registration and Authentication
@@ -707,27 +765,6 @@ npm run lintfix
     }
     ```
 
-- **POST /mobileauth/refresh/discord**
-  - **Description**: Refresh Discord OAuth token.
-  - **header**:
-    ```json
-    {
-      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
-    }
-    ```
-  - **Response**:
-    ```json
-    {
-      "status": 200,
-      "messageStatus": "success",
-      "message": "Discord token has been saved for the mobile client",
-      "data": null,
-      "error": null,
-      "session": null,
-      "username": null
-    }
-    ```
-
 - **POST /auth/callback/github**
   - **Description**: Handle GitHub OAuth callback.
   - **body**:
@@ -769,6 +806,81 @@ npm run lintfix
       "status": 200,
       "messageStatus": "success",
       "message": "Github token has been refreshed",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /auth/callback/spotify**
+  - **Description**: Handle Spotify OAuth callback.
+  - **body**:
+    ```json
+    {
+      "code": "authorization_code"
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Spotify token has been saved",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /auth/refresh/Spotify**
+  - **Description**: Refresh Spotify OAuth token.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Spotify token has been refreshed",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /mobileauth/callback/Spotify**
+  - **Description**: Handle Spotify OAuth callback.
+  - **body**:
+    ```json
+    {
+      "code": "authorization_code"
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Spotify token has been saved using mobile auth",
       "data": null,
       "error": null,
       "session": null,
@@ -921,6 +1033,56 @@ npm run lintfix
       "messageStatus": "success",
       "message": "your github repository have been fetched with succes",
       "data": "user's repo list",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+### Spotify endpoint
+
+- **GET /get_my_liked_tracks**
+  - **Description**: Return a list of the user's liked track.
+  - **query**:
+   ```json
+    {
+      "limit": 10
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "your liked tracks have been fetched with success",
+      "data": "the list of the user's liked track limited to the size precised in the query",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **GET /get_currently_playing**
+  - **Description**: Return the infos of the song the user is currently playing.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "your currently playing track has been fetched with success",
+      "data": "the data about the song the user is currently listening",
       "error": null,
       "session": null,
       "username": null
@@ -1261,15 +1423,6 @@ All API responses will be returned in the following format:
   - **Message**: "An error occured while trying to get the discord token on mobile"
   - **Reason**: probably because the given code is invalid so the back couldn't turn it in a token try again or check logs.
 
-- **POST /mobileauth/refresh/discord**
-  - **Status**: 400
-  - **Message**: "you first have to login to discord with the mobile client to be able to refresh your token"
-  - **Reason**: you first have to login to discord.
-
-  - **Status**: 500
-  - **Message**: "An error occured while trying to get the discord token re log-in discord with the mobile"
-  - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to discord.
-
 - **POST /auth/callback/github**
   - **Status**: 400
   - **Message**: "code is required"
@@ -1283,6 +1436,33 @@ All API responses will be returned in the following format:
   - **Status**: 500
   - **Message**: "An error occured while trying to get the github token"
   - **Reason**: the back couldn't refresh the token in this case delete the github token.
+
+- **POST /auth/callback/spotify**
+  - **Status**: 400
+  - **Message**: "code is required"
+  - **Reason**: no code provided in the request body.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the spotify token"
+  - **Reason**: probably because the given code is invalid so the back couldn't turn it in a token.
+
+- **POST /auth/refresh/spotify**
+  - **Status**: 400
+  - **Message**: "you first have to login to spotify to be able to refresh your token"
+  - **Reason**: you first have to login to spotify.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the spotify token"
+  - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to spotify.
+
+- **POST /mobileauth/callback/spotify**
+  - **Status**: 400
+  - **Message**: "code is required when trying to generate a token with the mobile client"
+  - **Reason**: no code provided in the request body.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the spotify token on mobile"
+  - **Reason**: probably because the given code is invalid so the back couldn't turn it in a token try again or check logs.
 
 ### API endpoint
 
@@ -1330,6 +1510,16 @@ All API responses will be returned in the following format:
   - **Status**: 401
   - **Message**: "you are not logged in using github"
   - **Reason**: ther user didn't logged in using github 0auth.
+
+- **GET /get_my_liked_tracks**
+  - **Status**: 401
+  - **Message**: "you are not logged in using spotify"
+  - **Reason**: ther user didn't logged in using spotify 0auth.
+
+- **GET /get_currently_playing**
+  - **Status**: 401
+  - **Message**: "you are not logged in using spotify"
+  - **Reason**: ther user didn't logged in using spotify 0auth.
 
 - **GET /get_my_repos**
   - **Status**: 401
