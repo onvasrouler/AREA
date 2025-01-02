@@ -39,7 +39,7 @@ exports.spotifyCallback = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the spotify token", null, err);
     }
-}
+};
 
 exports.spotifyRefresh = async (req, res) => {
     try {
@@ -87,7 +87,7 @@ exports.spotifyRefresh = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to refresh the spotify token", null, err);
     }
-}
+};
 
 exports.spotifyCallbackMobile = async (req, res) => {
     try {
@@ -126,4 +126,4 @@ exports.spotifyCallbackMobile = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the spotify token on mobile", null, err);
     }
-}
+};

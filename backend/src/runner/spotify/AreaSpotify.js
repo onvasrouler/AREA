@@ -33,15 +33,15 @@ async function ReactionSpotify(AREA) {
 
         let Datas = "";
         switch (actionReactions.Reaction.arguments.content) {
-            case "currently_playing":
-                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
-                break;
-            case "liked_track":
-                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, `https://api.spotify.com/v1/me/tracks?limit=31`);
-                break;
-            default:
-                console.error("Unknown action");
-                Datas = "error";
+        case "currently_playing":
+            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
+            break;
+        case "liked_track":
+            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+            break;
+        default:
+            console.error("Unknown action");
+            Datas = "error";
         }
         if (Datas == "error")
             return;

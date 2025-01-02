@@ -188,7 +188,7 @@ exports.getMyLikedTracks = async (req, res) => {
     } catch (error) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the liked tracks", null, error, null);
     }
-}
+};
 
 exports.getCurrentlyPlaying = async (req, res) => {
     try {
@@ -218,4 +218,4 @@ exports.getCurrentlyPlaying = async (req, res) => {
     } catch (error) {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the currently playing track", null, error, null);
     }
-}
+};
