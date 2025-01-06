@@ -22,6 +22,16 @@ import {
 import { getApiClient } from "@/common/client/APIClient"
 import AreaLogo from "../../assets/AREA.png";
 import { useNavigate } from "react-router-dom";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import ServicesInfos from "@features/ServicesInfos"
 
 export function ProfilePage() {
   const [username, setUsername] = useState('');
@@ -31,6 +41,7 @@ export function ProfilePage() {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const apiClient = getApiClient();
   const navigate = useNavigate();
+  const [loggedInServices, setLoggedInServices] = useState([]);
 
   const fetchUserData = async () => {
     const session = localStorage.getItem('session');
@@ -43,6 +54,12 @@ export function ProfilePage() {
           const data = await response.json();
           setUsername(data.username);
           setEmail(data.data.email);
+          setLoggedInServices({
+            discord: data.data.logged_in_discord,
+            github: data.data.logged_in_github,
+            // Add other services here as they become available in the API response
+          });
+          console.log(data);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -258,7 +275,35 @@ export function ProfilePage() {
                 </form>
               </TabsContent>
               <TabsContent value="services">
-                <p>Services</p>
+                <Table>
+                  <TableCaption>Your connected services</TableCaption>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Service</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {ServicesInfos.map((service) => (
+                      <TableRow key={service.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center">
+                            {service.name}
+                          </div>
+                        </TableCell>
+                        <TableCell>{service.description}</TableCell>
+                        <TableCell>
+                          {loggedInServices[service.name.toLowerCase()] ? (
+                            <span className="text-green-600">Connected</span>
+                          ) : (
+                            <span className="text-red-600">Not Connected</span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </TabsContent>
             </Tabs>
 
