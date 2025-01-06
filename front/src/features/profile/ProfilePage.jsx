@@ -36,12 +36,13 @@ import ServicesInfos from "@features/ServicesInfos"
 export function ProfilePage() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
+  const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const apiClient = getApiClient();
   const navigate = useNavigate();
   const [loggedInServices, setLoggedInServices] = useState([]);
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
 
   const fetchUserData = async () => {
     const session = localStorage.getItem('session');
@@ -154,6 +155,27 @@ export function ProfilePage() {
     }
   };
 
+  const handleRequestPasswordChange = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}forgotpassword`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+        }),
+      });
+      if (response.ok) {
+        console.log('Password change request sent');
+      } else {
+        console.error('Failed to request password change');
+      }
+    } catch {
+      console.error('Error requesting password change');
+    }
+  };
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between h-16 relative">
@@ -241,38 +263,50 @@ export function ProfilePage() {
                 </form>
               </TabsContent>
               <TabsContent value="security">
-                <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="current-password">Current Password</Label>
-                    <Input
-                      id="current-password"
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="Enter your current password"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="new-password">New Password</Label>
-                    <Input
-                      id="new-password"
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Enter your new password"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-new-password">Confirm New Password</Label>
-                    <Input
-                      id="confirm-new-password"
-                      type="password"
-                      value={confirmNewPassword}
-                      onChange={(e) => setConfirmNewPassword(e.target.value)}
-                      placeholder="Confirm your new password"
-                    />
-                  </div>
-                </form>
+                <div className="flex justify-center mb-6">
+                  <Button onClick={() => {
+                    handleRequestPasswordChange();
+                    setShowPasswordFields(true);
+                  }}>
+                    Request password change
+                  </Button>
+                </div>
+                {showPasswordFields && (
+                  <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+                    <div className="space-y-2 flex justify-center">
+                      A reset token has been sent to your email. Please enter it below.
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="resetToken">Reset Token</Label>
+                      <Input
+                        id="resetToken"
+                        value={resetToken}
+                        onChange={(e) => setResetToken(e.target.value)}
+                        placeholder="Enter the received reset token"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="new-password">New Password</Label>
+                      <Input
+                        id="new-password"
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Enter your new password"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+                      <Input
+                        id="confirm-new-password"
+                        type="password"
+                        value={confirmNewPassword}
+                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        placeholder="Confirm your new password"
+                      />
+                    </div>
+                  </form>
+                )}
               </TabsContent>
               <TabsContent value="services">
                 <Table>
