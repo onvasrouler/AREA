@@ -2,6 +2,16 @@ const api_formatter = require("../../../middleware/api-formatter.js");
 const axios = require("axios");
 const AreaModel = require("../../../database/models/actionReaction.js");
 
+async function updateUserAreas(AreaUser, UserToken) {
+    let areas = await AreaModel.find({ creator_id: AreaUser.unique_id });
+    for (let area of areas)
+        if (area.tokens && area.tokens.spotify)
+            await AreaModel.updateOne(
+                { unique_id: area.unique_id },
+                { $set: { "tokens.spotify": UserToken } }
+            );
+}
+
 exports.spotifyCallback = async (req, res) => {
     try {
         const { code } = req.body;
@@ -28,6 +38,7 @@ exports.spotifyCallback = async (req, res) => {
 
             req.user.spotify_token = tokenResponse.data;
             await req.user.save();
+            await updateUserAreas(req.user, tokenResponse.data.access_token)
             return api_formatter(req, res, 200, "success", "Spotify token has been saved");
         } catch (error) {
             console.error(error);
@@ -54,8 +65,8 @@ exports.spotifyRefresh = async (req, res) => {
                 "https://accounts.spotify.com/api/token",
                 new URLSearchParams({
                     client_id: process.env.SPOTIFY_CLIENT_ID,
-                    client_secret: process.env.SPOTIFY_SECRET,
                     refresh_token: refresh_token,
+                    client_secret: process.env.SPOTIFY_SECRET,
                     grant_type: "refresh_token",
                 }),
                 {
@@ -66,16 +77,11 @@ exports.spotifyRefresh = async (req, res) => {
             );
             if (!tokenResponse.data.access_token)
                 return api_formatter(req, res, 500, "error", "An error occured while trying to refresh the spotify token", null, tokenResponse.data);
-
+            if (!tokenResponse.data.refresh_token)
+                tokenResponse.data.refresh_token = refresh_token
             req.user.spotify_token = tokenResponse.data;
             await req.user.save();
-            const areas = await AreaModel.find({ creator_id: req.user.unique_id });
-            for (const area of areas) {
-                if (area.service == "spotify") {
-                    area.tokens.spotify = req.user.spotify_token.access_token;
-                    await area.save();
-                }
-            }
+            await updateUserAreas(req.user, tokenResponse.data.access_token)
             return api_formatter(req, res, 200, "success", "Spotify token has been refreshed");
         } catch (error) {
             console.error(error);
@@ -115,6 +121,7 @@ exports.spotifyCallbackMobile = async (req, res) => {
 
             req.user.spotify_token = tokenResponse.data;
             await req.user.save();
+            await updateUserAreas(req.user, tokenResponse.data.access_token)
             return api_formatter(req, res, 200, "success", "Spotify token has been saved using mobile auth");
         } catch (error) {
             console.error(error);
