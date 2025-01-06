@@ -29,7 +29,8 @@ module.exports = {
 
         if (AREA.CachedData == undefined)
             return await interaction.reply("No liked track found");
-
+        if (AREA.CachedData.content == "error")
+            return await interaction.reply(`An error occured while fetching the liked track : ${AREA.CachedData.error.message || ""}`);
         const Datas = AREA.CachedData.items;
         if (Datas.length === 0)
             return await interaction.reply("you don't have any liked track");
@@ -60,4 +61,3 @@ module.exports = {
         return;
     }
 };
-
