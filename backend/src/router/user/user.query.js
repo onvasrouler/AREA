@@ -11,7 +11,7 @@ module.exports = function (app) {
 
     app.post("/login", useractions.login);
 
-    app.post("/sign/google", useractions.googleAuth);
+    app.post("/auth/google", useractions.googleAuth);
 
     app.post("/logout", checkAuthenticated, useractions.logout);
     app.post("/logouteverywhere", checkAuthenticated, useractions.logouteverywhere);
