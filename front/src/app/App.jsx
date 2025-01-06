@@ -1,7 +1,7 @@
 import { AppRoutes } from "./routes.jsx";
-import { AuthProvider } from "@features/auth/hooks/auth.hook";
 import { Toaster } from "@/components/ui/Toaster";
 import { ToastProvider } from "@/components/ui/toast";
+import { AuthProvider } from "@features/auth/hooks/auth.hook";
 
 export const App = () => {
   return (

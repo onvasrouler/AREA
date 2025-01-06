@@ -35,6 +35,8 @@ import {
 import { getApiClient } from "@/common/client/APIClient";
 import { useToast } from "@/hooks/use-toast";
 import { PasswordResetComponent } from "./PasswordResetComponent"
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -189,31 +191,35 @@ export function LoginPage() {
     }
   };
 
-  const handleOAuthLogin = async () => {
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
-      const response = await apiClient.post("auth/google", {});
-      if (response.status === 200) {
-        const data = await response.json();
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}auth/google`, {
+            token: credentialResponse.credential,
+        });
+        const data = response.data;
         localStorage.setItem('session', data.session_token);
         toast({
-          title: "Google Login Successful",
-          description: "You have been logged in successfully with Google.",
+            title: "Google Login Successful",
+            description: "You have been logged in successfully with Google.",
         });
         window.location.href = "/dashboard";
-      } else {
+    } catch (error) {
+        console.error(error);
         toast({
-          variant: "destructive",
-          title: "Google Login Failed",
-          description: "An error occurred during Google login. Please try again.",
+            variant: "destructive",
+            title: "Google Login Error",
+            description: "An error occurred during Google login. Please try again later.",
         });
-      }
-    } catch {
-      toast({
-        variant: "destructive",
-        title: "Google Login Error",
-        description: "An error occurred during Google login. Please try again later.",
-      });
     }
+  };
+
+  const handleGoogleLoginError = (error) => {
+      console.error(error);
+      toast({
+          variant: "destructive",
+          title: "Google Login Error",
+          description: "Google login failed. Please try again.",
+      });
   };
 
   return (
@@ -298,18 +304,11 @@ export function LoginPage() {
               <Button type="submit" className="w-full">
                 {isLogin ? "Login" : "Sign Up"}
               </Button>
-              <Button
-                type="button"
-                className="w-full flex items-center justify-center"
-                onClick={() => handleOAuthLogin()}
-              >
-                <img
-                  src="src/assets/google.png"
-                  alt="Google logo"
-                  className="w-5 h-5 mr-2"
-                />
-                {isLogin ? "Login with Google" : "Sign Up with Google"}
-              </Button>
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginError}
+                useOneTap
+              />
             </form>
           </Form>
         </CardContent>
