@@ -14,9 +14,12 @@ module.exports = {
         if (AREA === null || AREA.length === 0)
             return await interaction.reply("You have no action/reaction setted up for the music currently playing");
 
+
         if (AREA.CachedData == undefined)
             return await interaction.reply("Not currently listening to anything");
 
+        if (AREA.CachedData.content == "error")
+            return await interaction.reply(`An error occured while fetching the music you are listening : ${AREA.CachedData.error.message || ""}`);
         const Datas = AREA.CachedData.item;
         let message;
         if (AREA.CachedData.currently_playing_type === "track")
