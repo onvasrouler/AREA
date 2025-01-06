@@ -39,10 +39,11 @@ export function ProfilePage() {
   const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [activeTab, setActiveTab] = useState('account');
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [loggedInServices, setLoggedInServices] = useState([]);
   const apiClient = getApiClient();
   const navigate = useNavigate();
-  const [loggedInServices, setLoggedInServices] = useState([]);
-  const [showPasswordFields, setShowPasswordFields] = useState(false);
 
   const fetchUserData = async () => {
     const session = localStorage.getItem('session');
@@ -58,9 +59,7 @@ export function ProfilePage() {
           setLoggedInServices({
             discord: data.data.logged_in_discord,
             github: data.data.logged_in_github,
-            // Add other services here as they become available in the API response
           });
-          console.log(data);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -91,8 +90,6 @@ export function ProfilePage() {
         } else {
           console.error('Failed to logout');
         }
-      } else {
-        console.error('No session found');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -108,50 +105,53 @@ export function ProfilePage() {
           headers: {
             'Content-Type': 'application/json',
             'Session': session
-          }
-        })
+          },
+          body: JSON.stringify({
+            username,
+            email
+          })
+        });
         if (response.ok) {
           console.log('Profile edited successfully');
         } else {
           console.error('Failed to edit profile');
         }
-      } else {
-        console.error('No session found');
       }
     } catch (error) {
       console.error('Error:', error);
     }
-    console.log('Profile edit submitted');
   };
 
-  const handleProfileDeletion = () => {
-    // Implement profile deletion logic here
-    console.log('Profile deletion requested');
-  };
-
-  const handleLogoutAllDevices = async () => {
+  const handlePasswordChange = async () => {
     try {
-      const session = localStorage.getItem('session');
-      console.log('Session:', session);
-      if (session) {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}logouteverywhere`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Session': session
-          }
-        })
-        localStorage.removeItem('session');
-        if (response.ok) {
-          navigate('/login');
-        } else {
-          console.error('Failed to logout from all devices');
-        }
+      if (newPassword !== confirmNewPassword) {
+        console.error('Passwords do not match');
+        return;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}resetpassword`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          resetToken: resetToken,
+          newPassword: newPassword,
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Password changed successfully');
+        setShowPasswordFields(false);
+        setResetToken('');
+        setNewPassword('');
+        setConfirmNewPassword('');
       } else {
-        console.error('No session found');
+        console.log(response);
+        console.error('Failed to change password');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error changing password:', error);
     }
   };
 
@@ -167,12 +167,46 @@ export function ProfilePage() {
         }),
       });
       if (response.ok) {
+        setShowPasswordFields(true);
         console.log('Password change request sent');
       } else {
         console.error('Failed to request password change');
       }
     } catch {
       console.error('Error requesting password change');
+    }
+  };
+
+  const handleProfileDeletion = () => {
+    console.log('Profile deletion requested');
+  };
+
+  const handleLogoutAllDevices = async () => {
+    try {
+      const session = localStorage.getItem('session');
+      if (session) {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}logouteverywhere`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Session': session
+          }
+        });
+        localStorage.removeItem('session');
+        if (response.ok) {
+          navigate('/login');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleSaveChanges = () => {
+    if (activeTab === 'security') {
+      handlePasswordChange();
+    } else {
+      handleProfileEdit();
     }
   };
 
@@ -193,21 +227,30 @@ export function ProfilePage() {
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <div className="text-center">
-                  <DropdownMenuItem className="focus:bg-primary focus:text-primary-foreground cursor-pointer" onClick={() => navigate("/dashboard")}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="focus:bg-primary focus:text-primary-foreground cursor-pointer" onClick={() => navigate("/settings")}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="focus:bg-primary focus:text-primary-foreground cursor-pointer" onClick={() => handleLogout()}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </div>
-              </DropdownMenuContent>
+              <div className="text-center">
+                <DropdownMenuItem 
+                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer" 
+                  onClick={() => navigate("/dashboard")}
+                >
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer" 
+                  onClick={() => navigate("/settings")}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer" 
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </div>
+            </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
@@ -218,7 +261,12 @@ export function ProfilePage() {
             <CardTitle>Edit Profile</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="account" className="w-full">
+            <Tabs 
+              defaultValue="account" 
+              className="w-full" 
+              value={activeTab}
+              onValueChange={setActiveTab}
+            >
               <TabsList className="flex space-x-4 bg-white">
                 <TabsTrigger
                   value="account"
@@ -264,10 +312,7 @@ export function ProfilePage() {
               </TabsContent>
               <TabsContent value="security">
                 <div className="flex justify-center mb-6">
-                  <Button onClick={() => {
-                    handleRequestPasswordChange();
-                    setShowPasswordFields(true);
-                  }}>
+                  <Button onClick={handleRequestPasswordChange}>
                     Request password change
                   </Button>
                 </div>
@@ -342,8 +387,12 @@ export function ProfilePage() {
             </Tabs>
 
             <div className="flex justify-between mt-6">
-              <Button onClick={handleProfileEdit} className="mr-2">Save Changes</Button>
-              <Button onClick={handleLogoutAllDevices} variant="outline">Logout from All Devices</Button>
+              <Button onClick={handleSaveChanges} className="mr-2">
+                Save Changes
+              </Button>
+              <Button onClick={handleLogoutAllDevices} variant="outline">
+                Logout from All Devices
+              </Button>
             </div>
 
             <AlertDialog>
@@ -369,3 +418,4 @@ export function ProfilePage() {
     </div>
   );
 }
+
