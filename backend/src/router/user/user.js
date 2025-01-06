@@ -395,7 +395,7 @@ exports.deleteaccount = async (req, res) => {
         if (!req.user.comparePassword(req.body.password)) // if the password is incorrect
             return api_formatter(req, res, 401, "incorrect_password", "the provided password is incorrect for this account", null, null, null); // return an error message
 
-        const deleteAccountToken = await createToken(req.user.unique_id, "emailVerification", 15); // use req.user.unique_id
+        const deleteAccountToken = await createToken(req.user.unique_id, "deleteAccount", 15); // use req.user.unique_id
 
         const mailContent = `<p>You are receiving this because you (or someone else) have requested the deletion of your account.</p>
             <p>copy past the following caracters in the text box on the website or application:</p>
@@ -599,7 +599,7 @@ exports.forgotpassword = async (req, res) => {
         if (!user) // if the user is not found
             return api_formatter(req, res, 404, "notfound", "no user found with the provided email", null, null, null); // return an error message
 
-        const resetToken = await createToken(user.unique_id, "emailVerification", 15);
+        const resetToken = await createToken(user.unique_id, "resetPassword", 15);
 
         const mailContent = `<p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
         <p>copy past the following caracters in the text box on the website or application:</p>
