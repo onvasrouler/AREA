@@ -2,6 +2,17 @@ const api_formatter = require("../../../middleware/api-formatter.js");
 const axios = require("axios");
 const AreaModel = require("../../../database/models/actionReaction.js");
 
+
+async function updateUserAreas(AreaUser, UserToken) {
+    let areas = await AreaModel.find({ creator_id: AreaUser.unique_id });
+    for (let area of areas)
+        if (area.tokens && area.tokens.github)
+            await AreaModel.updateOne(
+                { unique_id: area.unique_id },
+                { $set: { "tokens.github": UserToken } }
+            );
+}
+
 exports.githubCallback = async (req, res) => {
     try {
         const { code } = req.body;
@@ -24,6 +35,7 @@ exports.githubCallback = async (req, res) => {
 
             req.user.github_token = tokenResponse.data;
             await req.user.save();
+            await updateUserAreas(req.user, tokenResponse.data.access_token)
             return api_formatter(req, res, 200, "success", "Github token has been saved");
         } catch (error) {
             console.error(error);
@@ -65,13 +77,8 @@ exports.githubRefresh = async (req, res) => {
 
             req.user.github_token = parsedData;
             await req.user.save();
-            const areas = await AreaModel.find({ creator_id: req.user.unique_id });
-            for (const area of areas) {
-                if (area.service == "github") {
-                    area.tokens.github = req.user.github_token.access_token;
-                    await area.save();
-                }
-            }
+            await updateUserAreas(req.user, tokenResponse.data.access_token)
+
             return api_formatter(req, res, 200, "success", "Github token has been refreshed");
         } catch (error) {
             console.error(error.response?.data);
