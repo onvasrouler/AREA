@@ -106,8 +106,8 @@ useEffect(() => {
   const AccordionItems = (
     <Accordion type="single" collapsible className="w-full pr-2">
       {areas.map(area => (
-        <AccordionItem key={area.id} value={area.id} className="pr-8 relative">
-          <AccordionTrigger>{area.id}</AccordionTrigger>
+        <AccordionItem key={area.name} value={area.name} className="pr-8 relative">
+          <AccordionTrigger>{area.name}</AccordionTrigger>
           <AccordionContent>
             <pre className="whitespace-pre-wrap text-left">
               {JSON.stringify(area, null, 2)}
