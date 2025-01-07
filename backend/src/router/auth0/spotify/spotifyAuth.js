@@ -38,7 +38,7 @@ exports.spotifyCallback = async (req, res) => {
 
             req.user.spotify_token = tokenResponse.data;
             await req.user.save();
-            await updateUserAreas(req.user, tokenResponse.data.access_token)
+            await updateUserAreas(req.user, tokenResponse.data.access_token);
             return api_formatter(req, res, 200, "success", "Spotify token has been saved");
         } catch (error) {
             console.error(error);
@@ -78,10 +78,10 @@ exports.spotifyRefresh = async (req, res) => {
             if (!tokenResponse.data.access_token)
                 return api_formatter(req, res, 500, "error", "An error occured while trying to refresh the spotify token", null, tokenResponse.data);
             if (!tokenResponse.data.refresh_token)
-                tokenResponse.data.refresh_token = refresh_token
+                tokenResponse.data.refresh_token = refresh_token;
             req.user.spotify_token = tokenResponse.data;
             await req.user.save();
-            await updateUserAreas(req.user, tokenResponse.data.access_token)
+            await updateUserAreas(req.user, tokenResponse.data.access_token);
             return api_formatter(req, res, 200, "success", "Spotify token has been refreshed");
         } catch (error) {
             console.error(error);
@@ -121,7 +121,7 @@ exports.spotifyCallbackMobile = async (req, res) => {
 
             req.user.spotify_token = tokenResponse.data;
             await req.user.save();
-            await updateUserAreas(req.user, tokenResponse.data.access_token)
+            await updateUserAreas(req.user, tokenResponse.data.access_token);
             return api_formatter(req, res, 200, "success", "Spotify token has been saved using mobile auth");
         } catch (error) {
             console.error(error);
