@@ -10,7 +10,7 @@ class runner {
 
     run() {
         if (this.is_active) {
-            console.log("Running runner");
+            console.log("Starting runner...");
             setInterval(async () => {
                 console.log("Running main function");
                 await this.mainFunction();
@@ -22,6 +22,9 @@ class runner {
     async mainFunction() {
         await ActionReactionModel.find({}).then(async (actionReactions) => {
             for (const actionReaction of actionReactions) {
+                if (actionReaction.active === false)
+                    continue;
+                console.log("Treat action and reaction for : " + actionReaction.unique_id + " with area name : " + actionReaction.Name);
                 await this.treatAction(actionReaction);
                 await this.treatReaction(actionReaction);
             }
@@ -29,6 +32,7 @@ class runner {
     }
 
     treatAction(AREA) {
+        console.log("Treating Action : " + AREA.unique_id + " with area name : " + AREA.Name);
         const Action = AREA.Action;
         if (Action.service === "discord")
             return ActionDiscord(AREA);
@@ -43,6 +47,7 @@ class runner {
     }
 
     treatReaction(AREA) {
+        console.log("Treating Reaction : " + AREA.unique_id + " with area name : " + AREA.Name);
         const Reaction = AREA.Reaction;
         if (Reaction.service === "discord")
             return ReactionDiscord(AREA);
