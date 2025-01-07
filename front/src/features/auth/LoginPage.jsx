@@ -35,7 +35,7 @@ import {
 import { getApiClient } from "@/common/client/APIClient";
 import { useToast } from "@/hooks/use-toast";
 import { PasswordResetComponent } from "./PasswordResetComponent"
-import { GoogleLogin } from '@react-oauth/google';
+import { CustomGoogleLogin } from "@/components/ui/CustomGoogleLogin";
 import axios from 'axios';
 
 const loginSchema = z.object({
@@ -193,11 +193,13 @@ export function LoginPage() {
 
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
+      console.log(credentialResponse);
         const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}auth/google`, {
             token: credentialResponse.credential,
         });
         const data = response.data;
-        localStorage.setItem('session', data.session_token);
+        console.log(data.session)
+        localStorage.setItem('session', data.session);
         toast({
             title: "Google Login Successful",
             description: "You have been logged in successfully with Google.",
@@ -301,10 +303,10 @@ export function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full rounded-sm">
                 {isLogin ? "Login" : "Sign Up"}
               </Button>
-              <GoogleLogin
+              <CustomGoogleLogin
                 onSuccess={handleGoogleLoginSuccess}
                 onError={handleGoogleLoginError}
                 useOneTap
