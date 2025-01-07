@@ -27,6 +27,7 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
   const [discordUserId, setDiscordUserId] = useState('');
   const [formData, setFormData] = useState({});
   const [authError, setAuthError] = useState('');
+  const [areaName, setAreaName] = useState('');
 
   const currentService = areaData.services.find(s => s.name === service.name);
   const services = areaData.services.filter(s => s.name !== service.name).map(s => s.name);
@@ -147,13 +148,14 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
         reactionArguments.userId = discordUserId;
       }
     }
-    Object.entries(argumentsData).forEach(([key/*, arg*/]) => {
+    Object.entries(argumentsData).forEach(([key]) => {
       if (formData[key] !== undefined && formData[key] !== '') {
         reactionArguments[key] = formData[key];
       }
     });
 
     return {
+      name: areaName,
       action: {
         service: service.name.toLowerCase(),
         arguments: actionArguments,
@@ -222,6 +224,15 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
           <DialogDescription className="text-center">Set up your automation for {service.name}</DialogDescription>
         </DialogHeader>
         <Separator className="bg-primary" />
+
+        <div className="mt-4">
+          <label className="block mb-1">AREA Name</label>
+          <Textarea
+            placeholder="Enter a name for your AREA"
+            value={areaName}
+            onChange={(e) => setAreaName(e.target.value)}
+          />
+        </div>
 
         {authError && (
           <Alert variant="destructive">
@@ -309,7 +320,7 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
           </div>
         ))}
 
-          <div className="flex justify-between mt-6">
+        <div className="flex justify-between mt-6">
           <Button variant="destructive" onClick={onClose}>Cancel</Button>
           <Button
             className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -323,3 +334,4 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     </Dialog>
   );
 }
+
