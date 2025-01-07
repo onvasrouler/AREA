@@ -35,7 +35,7 @@ exports.githubCallback = async (req, res) => {
 
             req.user.github_token = tokenResponse.data;
             await req.user.save();
-            await updateUserAreas(req.user, tokenResponse.data.access_token)
+            await updateUserAreas(req.user, tokenResponse.data.access_token);
             return api_formatter(req, res, 200, "success", "Github token has been saved");
         } catch (error) {
             console.error(error);
@@ -77,12 +77,12 @@ exports.githubRefresh = async (req, res) => {
 
             req.user.github_token = parsedData;
             await req.user.save();
-            await updateUserAreas(req.user, tokenResponse.data.access_token)
+            await updateUserAreas(req.user, parsedData.access_token);
 
             return api_formatter(req, res, 200, "success", "Github token has been refreshed");
         } catch (error) {
-            console.error(error.response?.data);
-            return api_formatter(req, res, 500, "error", "An error occured while trying to refresh the github token", null, error);
+            console.error(error.response?.data || error);
+            return api_formatter(req, res, 500, "error", "An error occured while trying to refresh the github token", null, error.response?.data || error);
         }
     }
     catch (err) {
