@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ServiceDialog } from "./ServiceDialog";
 import { useNavigate } from "react-router-dom";
 
-export function Navbar({ username, services }) {
+export function Navbar({ username, services, authStatus }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -151,8 +151,10 @@ export function Navbar({ username, services }) {
           isOpen={!!selectedService}
           onClose={handleCloseDialog}
           service={selectedService}
+          authStatus={authStatus}
         />
       )}
     </nav>
   );
 }
+

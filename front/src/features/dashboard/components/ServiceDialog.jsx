@@ -42,29 +42,41 @@ const handleLoginFunctions = {
 }
 
 export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
-  const isAuthenticated = authStatus[`is${service.name}Authenticated`]
+  const isAuthenticated = authStatus && authStatus[`is${service.name}Authenticated`]
   const handleLogin = handleLoginFunctions[`handle${service.name}Login`]
   const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false)
   const [areas, setAreas] = useState([]);
 
-  useEffect(() => {
-    if (isOpen && isAuthenticated) {
-      const session = localStorage.getItem("session");
+useEffect(() => {
+  if (isOpen && isAuthenticated) {
+    const session = localStorage.getItem("session");
 
-      fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
-        method: "GET",
-        headers: {
-          "session": session
-        }
+    fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
+      method: "GET",
+      headers: {
+        "session": session
+      }
+    })
+      .then(res => {
+        return res.json();
       })
-        .then(res => res.json())
-        .then(data => {
+      .then(data => {
+        if (data?.data) {
           const filteredAreas = data.data.filter(item => item.action.service === service.name.toLowerCase());
           setAreas(filteredAreas);
-        })
-        .catch(err => console.error("Error fetching areas:", err));
-    }
-  }, [isOpen, isAuthenticated, service.name]);
+        } else {
+          setAreas([]);
+        }
+      })
+      .catch(err => {
+        if (err instanceof TypeError) {
+          console.error("Error fetching areas:", err.message);
+        } else {
+          console.error("Unexpected error:", err);
+        }
+      });
+  }
+}, [isOpen, isAuthenticated, service.name]);
 
   const handleAreaDeletion = async (area) => {
     try {
