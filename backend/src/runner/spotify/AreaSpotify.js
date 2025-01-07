@@ -2,17 +2,23 @@ const ActionReactionModel = require("../../database/models/actionReaction");
 const axios = require("axios");
 
 async function getSpotifyUserData(token, url) { // type can be pr or issue
-    const Response = await axios.get(
-        url,
-        {
-            headers: { Authorization: `Bearer ${token}` },
-        }
-    );
-    return Response.data;
+    try {
+        const Response = await axios.get(
+            url,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+
+        return Response.data;
+    } catch (err) {
+        return { "ErrorOnSpotiFetch": err.response?.data ? err.response?.data : err };
+    }
 }
 
 async function ActionSpotify(AREA) {
     const actionReactions = await ActionReactionModel.findOne({ "unique_id": AREA.unique_id });
+    let Datas = "";
     try {
         if (!actionReactions) {
             console.error("ActionReaction not found");
@@ -27,23 +33,32 @@ async function ActionSpotify(AREA) {
             return;
         }
         const TriggerEvent = actionReactions.Action.arguments.on;
-        let Datas = "";
         switch (TriggerEvent) {
-            case "currently_playing":
-                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
-                break;
-            case "liked_track":
-                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
-                break;
-            case "new_liked_track":
-                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
-                break;
-            default:
-                console.error("Unknown action");
-                Datas = "error";
+        case "currently_playing":
+            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
+            break;
+        case "liked_track":
+            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+            break;
+        case "new_liked_track":
+            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+            break;
+        default:
+            console.error("Unknown action");
+            Datas = "UnknownAction";
         }
-        if (Datas == "error")
+        if (Datas == "UnknownAction")
             return;
+        if (Datas.ErrorOnSpotiFetch) {
+            if (actionReactions.CachedData != "error")
+                actionReactions.Treated = false;
+            else
+                actionReactions.Treated = true;
+            actionReactions.Errors = Datas.ErrorOnSpotiFetch.error ? Datas.ErrorOnSpotiFetch.error : Datas.ErrorOnSpotiFetch;
+            actionReactions.CachedData = "error";
+            await actionReactions.save();
+            return;
+        }
 
         //avoid treating the same data twice and avoid treating data that has already been treated and avoid treating data when it decrease
         if (TriggerEvent == "new_liked_track") {
@@ -69,8 +84,8 @@ async function ActionSpotify(AREA) {
         await actionReactions.save();
         return;
     } catch (err) {
-        console.error(err);
-        console.error(err.response?.data);
+        console.error("An error occured :\n" + err + "\nWith data :\n" + Datas);
+
         return;
     }
 }
@@ -93,19 +108,28 @@ async function ReactionSpotify(AREA) {
 
         let Datas = "";
         switch (actionReactions.Reaction.arguments.content) {
-            case "currently_playing":
-                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
-                break;
-            case "liked_track":
-                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
-                break;
-            default:
-                console.error("Unknown action");
-                Datas = "error";
+        case "currently_playing":
+            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
+            break;
+        case "liked_track":
+            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+            break;
+        default:
+            console.error("Unknown action");
+            Datas = "UnknownAction";
         }
-        if (Datas == "error")
+        if (Datas == "UnknownAction")
             return;
-
+        if (Datas.ErrorOnSpotiFetch) {
+            if (actionReactions.CachedData != "error")
+                actionReactions.Treated = false;
+            else
+                actionReactions.Treated = true;
+            actionReactions.Errors = Datas.ErrorOnSpotiFetch.error ? Datas.ErrorOnSpotiFetch.error : Datas.ErrorOnSpotiFetch;
+            actionReactions.CachedData = "error";
+            await actionReactions.save();
+            return;
+        }
         actionReactions.CachedData = Datas;
         actionReactions.CachedData.content = actionReactions.Reaction.arguments.content;
         await actionReactions.save();
