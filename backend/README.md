@@ -41,26 +41,51 @@ npm install --save-dev nodemon # or using yarn: yarn add nodemon -D
 
 ## Complete the .env file :
 
+# MAIN
 - PORT  this is used to decide the port the server will run on
 - SERVER_URL  this is used for the tests ( npm run test ) it is used to decide where it will send the requests 
+- RUNNER_INTERVAL  time in ms between each runner's round ( each time all the data will be fetched from the api and treated)
+
+# JWT
 - SECRET  this is used to hash the password when stored in the do so put something strong ( like 32 random char )
-- GOOGLE_CLIENT_ID  this is used for google auth0 enter the google app id with the permission to get email and username
+
+# DATABASE
 - MONGO_URI  this is the mongodb URL the server will connect to
 - PROD_DB_NAME when the NODE_ENV is prod it will use this db
 - DEV_DB_NAME  when the NODE_ENV is dev it will use this db
+
+# TESTS
 - TEST_USERNAME this is the username used for the test be sure no account exists with this username
 - TEST_PASSWORD this is the password used for the test
 - TEST_EMAIL this is the email used for the test be sure no account exists with this email
 - ENABLE_TEST_ENDPOINT this will enable endpoint like /fastregister allowing the tests to create account without email verification
+
+# MAILS
 - EMAILER_EMAIL this will be the email adress used for the bot to send emails
 - EMAILER_PASSWORD this will be the email password used for the bot to send emails
+
+# GOOGLE
+- GOOGLE_CLIENT_ID  this is used for google auth0 enter the google app id with the permission to get email and username
+
+
+# AREA RELATED
+# DISCORD
+- DISCORD_CLIENT_ID this is the discord bot's client id
 - DISCORD_TOKEN this is the discord bot's token
 - DISCORD_SECRET this is the discord secret used for auth0
 - DISCORD_REDIRECT_URI this is the redirect uri used by discord auth0
 - DISCORD_REDIRECT_URI_MOBILE this is the redirect uri for the mobile app used by discord auth0
 - MOBILE_APP_NAME this is the name of the mobile app, this is used to return to the mobile app after auth0
+
+# GITHUB
 - GITHUB_CLIENT_ID this is the github client ID used with auth0
 - GITHUB_SECRET this is the github client secret used with auth0
+
+# SPOTIFY
+- SPOTIFY_CLIENT_ID this is the spotify client ID used with auth0
+- SPOTIFY_SECRET this is the spotify client secret used with auth0
+- SPOTIFY_REDIRECT_URI this is the redirect uri used by spotify auth0
+- SPOTIFY_REDIRECT_URI_MOBILE this is the redirect uri for the mobile app used by spotify auth0
 
 ## Usage
 
@@ -109,11 +134,16 @@ npm run lintfix
             "commit",
             "repo"
           ],
-          "prefix": "*"
+          "message": "*"
         }
       }
     }
     ```
+  - **action possibilities**:
+    - /repo: this will list the last 10 user's repo created
+    - /pr: this will list the last 10 user's pr created
+    - /issue: this will list the last 10 user's issue made
+    - /commit: this will list the last 10 user's commit
 - **example**:
   ```json
   {
@@ -129,7 +159,7 @@ npm run lintfix
         "service": "github",
         "arguments": {
             "content": "repo",
-            "prefix": "here is your repos:"
+            "message": "here is your repos:"
         }
     }
   }
@@ -140,7 +170,7 @@ npm run lintfix
       userId will link the action reaction to a specific discord user by default set your discord id
   - for reaction:
       we have the content, this define what will be returned in this case it will be the user's repo
-      the prefix will be a message sent before every other
+      the message will be a message sent before every other
 
 - **USAGE 2**:
   ```json
@@ -170,7 +200,7 @@ npm run lintfix
               ],
               "server": "*",
               "channel":"*",
-              "userID": "*"
+              "userID": "*",
               "message": [
                   "A new PR has been opened!",
                   "A new issue has been opened!",
@@ -181,6 +211,11 @@ npm run lintfix
       }
   }
   ```
+  - **action possibilities**:
+    - new_issue: this will send something when a new issue is opened
+    - new_repo: this will send something when a new repo is created
+    - new_commit: this will send something when a new commit is made
+    - new_pr: this will send something when a new pr is opened
 - **example**:
   ```json
     {
@@ -234,11 +269,14 @@ npm run lintfix
                   "liked_track",
                   "currently_playing"
               ],
-              "prefix": "*"
+              "message": "*"
           }
       }
   }
   ```
+  - **action possibilities**:
+    - /likedtrack: this will list the last 10 music of the user's liked track
+    - /spotiplaying: this will send the music the user is currently listening to
 - **example**:
   ```json
   {
@@ -254,7 +292,7 @@ npm run lintfix
           "service": "spotify",
           "arguments": {
               "content": "liked_track",
-              "prefix": "your song marked as favourite are :"
+              "message": "your song marked as favourite are :"
           }
       }
   }
@@ -265,7 +303,75 @@ npm run lintfix
       userId will link the action reaction to a specific discord user by default set your discord id
   - for reaction:
       we have the content, this define what will be returned in this case it will be the user's liked_track
-      the prefix will be a message sent before every other
+      the message will be a message sent before every other
+
+- **USAGE 4**:
+```json
+    {
+      "name": "*",
+      "action": {
+          "service": [
+              "spotify"
+          ],
+          "arguments": {
+              "on": [
+                  "liked_track",
+                  "new_liked_track",
+                  "currently_playing"
+              ],
+          }
+      },
+      "reaction": {
+          "service": [
+              "discord"
+          ],
+          "arguments": {
+              "react": [
+                  "message",
+                  "private_message"
+              ],
+              "server": "*",
+              "channel":"*",
+              "userID": "*",
+              "message": [
+                  "Liked track updated !",
+                  "New sound on liked track !",
+                  "I'm currently listening something !",
+              ]
+          }
+      }
+  }
+  ```
+  - **action possibilities**:
+    - liked_track: will list the last 10 music of the user's spotify liked track when it is updated ( a song is added or removed)
+    - new_liked_track: will send the music if a music is added to the liked track
+    - currently_playing: if the user is currently listening to something send the music
+- **example**:
+  ```json
+  {
+      "name": "send message when listening to something",
+      "action": {
+          "service": "spotify",
+          "arguments": {
+              "on": "currently_playing",
+          }
+      },
+      "reaction": {
+          "service": "discord",
+          "arguments": {
+            "react": "message",
+            "server": "1308348420037279747",
+            "channel": "1325848053206352018",
+            "message": "I'm currently playing :"
+          }
+      }
+  }
+  ```
+  - **explanation**
+  - for action:
+      first for action arguments on will be a modification in spotify data that trigger the reaction in this case it is currently_playing so if the music the user is currently playing change it will trigger the reaction
+  - for reaction:
+      we have the content, this define what will be returned in this case it will define wether it is a private message or not ( not in this case ) then the server and the channel where the message will be send is precised the message argument is a text that will be  sent before every other
 
 ## API Endpoints
 
