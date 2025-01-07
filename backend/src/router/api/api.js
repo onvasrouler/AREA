@@ -7,16 +7,26 @@ exports.profile = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return a 401 error
-        let logged_in_discord = req.user.discord_token &&
-            req.user.discord_token.access_token ? true : false;
-        if (logged_in_discord && req.user.discord_token.expires_at < Date.now())
-            logged_in_discord = "session_expired";
+        const services = ["discord", "github", "spotify"];
+        const logged_in_status = {};
+
+        services.forEach(service => {
+            let logged_in = req.user[`${service}_token`] && req.user[`${service}_token`].access_token ? true : false;
+            if (logged_in && req.user[`${service}_token`].expires_at < Date.now())
+                logged_in = "session_expired";
+            logged_in_status[`logged_in_${service}`] = logged_in;
+        });
+
+        const { logged_in_discord, logged_in_github, logged_in_spotify } = logged_in_status;
+
+
         const user_infos = { // this will store the user informations
             "username": req.user.username,
             "email": req.user.email,
             "account_type": req.user.accountType,
             "logged_in_discord": logged_in_discord,
-            "logged_in_github": req.user.github_token && req.user.github_token.access_token ? true : false,
+            "logged_in_github": logged_in_github,
+            "logged_in_spotify": logged_in_spotify
         };
         return api_formatter(req, res, 200, "success", "You are authenticated", user_infos, null, null); // return the user informations
     } catch (err) {

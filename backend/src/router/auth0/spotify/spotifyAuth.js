@@ -37,6 +37,7 @@ exports.spotifyCallback = async (req, res) => {
                 return api_formatter(req, res, 500, "error", "An error occured while trying to get the spotify token", null, tokenResponse.data);
 
             req.user.spotify_token = tokenResponse.data;
+            req.user.spotify_token.expires_at = Date.now() + tokenResponse.data.expires_in * 1000;
             await req.user.save();
             await updateUserAreas(req.user, tokenResponse.data.access_token);
             return api_formatter(req, res, 200, "success", "Spotify token has been saved");
@@ -80,6 +81,7 @@ exports.spotifyRefresh = async (req, res) => {
             if (!tokenResponse.data.refresh_token)
                 tokenResponse.data.refresh_token = refresh_token;
             req.user.spotify_token = tokenResponse.data;
+            req.user.spotify_token.expires_at = Date.now() + tokenResponse.data.expires_in * 1000;
             await req.user.save();
             await updateUserAreas(req.user, tokenResponse.data.access_token);
             return api_formatter(req, res, 200, "success", "Spotify token has been refreshed");
@@ -120,6 +122,7 @@ exports.spotifyCallbackMobile = async (req, res) => {
                 return api_formatter(req, res, 500, "error", "An error occured while trying to get the spotify token on mobile", null, tokenResponse.data);
 
             req.user.spotify_token = tokenResponse.data;
+            req.user.spotify_token.expires_at = Date.now() + tokenResponse.data.expires_in * 1000;
             await req.user.save();
             await updateUserAreas(req.user, tokenResponse.data.access_token);
             return api_formatter(req, res, 200, "success", "Spotify token has been saved using mobile auth");
