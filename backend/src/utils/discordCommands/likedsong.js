@@ -26,7 +26,8 @@ module.exports = {
         }
         if (AREA === null || AREA.length === 0)
             return await interaction.reply("You have no action/reaction setted up for the liked track");
-
+        if (AREA.active === false)
+            return await interaction.reply("The action is not active");
         if (AREA.CachedData == undefined)
             return await interaction.reply("No liked track found");
         if (AREA.CachedData.content == "error")
@@ -43,7 +44,7 @@ module.exports = {
         const Messages = [];
 
         parsedData.forEach(data => {
-            Messages.push(`Artist: ${data.artists}\nTrack name: ${data.name}\nTrack duration: ${data.duration}s\n\n`);
+            Messages.push(`Artist: **${data.artists}**\nTrack name: **${data.name}**\nTrack duration: **${data.duration}s**\n\n`);
         });
 
         let finalMessage = "";
