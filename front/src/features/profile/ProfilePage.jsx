@@ -81,7 +81,7 @@ export function ProfilePage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Session': session
+            'session': session
           }
         });
         if (response.ok) {
@@ -189,7 +189,7 @@ export function ProfilePage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Session': session
+            'session': session
           }
         });
         localStorage.removeItem('session');

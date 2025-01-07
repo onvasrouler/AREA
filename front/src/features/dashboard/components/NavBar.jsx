@@ -62,7 +62,7 @@ export function Navbar({ username, services }) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Session': session
+            'session': session
           }
         });
         if (response.ok) {
