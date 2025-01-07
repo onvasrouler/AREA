@@ -104,7 +104,7 @@ export function ProfilePage() {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Session': session
+            'session': session
           },
           body: JSON.stringify({
             username,
