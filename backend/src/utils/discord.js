@@ -50,8 +50,10 @@ const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
             Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
             { body: commands }
         );
-        console.log("Successfully reloaded application commands.");
-
+        console.log("Successfully reloaded application commands.\nthe list of command is : ");
+        for (const cmd of commands) {
+            console.log(`- /${cmd.name}: ${cmd.description}`);
+        }
         // Log in to Discord after commands are registered
         await client.login(process.env.DISCORD_TOKEN);
     } catch (error) {
