@@ -7,7 +7,7 @@ module.exports = {
             {
                 name: "amount",
                 description: "The amount of messages to delete",
-                type: "INTEGER",
+                type: 4,
                 required: true,
             },
         ],
@@ -16,10 +16,23 @@ module.exports = {
         const { options } = interaction;
         const amount = options.getInteger("amount");
         if (amount <= 0 || amount > 100) {
-            return await interaction.reply("The amount must be between 1 and 100");
+            return await interaction.reply({
+                content: "The amount must be between 1 and 100.",
+                ephemeral: true,
+            });
         }
-        await interaction.channel.bulkDelete(amount);
-
-        await interaction.reply("Messages have been deleted");
+        try {
+            await interaction.channel.bulkDelete(amount, true);
+            await interaction.reply({
+                content: `${amount} message(s) have been deleted.`,
+                ephemeral: true,
+            });
+        } catch (error) {
+            console.error("Error deleting messages:", error);
+            await interaction.reply({
+                content: "An error occurred while trying to delete messages.",
+                ephemeral: true,
+            });
+        }
     }
 };

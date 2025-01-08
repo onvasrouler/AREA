@@ -237,6 +237,7 @@ useEffect(() => {
         onClose={handleAreaDialogClose}
         service={service}
         isDiscordAuthenticated={authStatus.isDiscordAuthenticated}
+        isGitHubAuthenticated={authStatus.isGitHubAuthenticated}
       />
     </>
   )

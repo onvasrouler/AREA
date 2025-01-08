@@ -17,12 +17,12 @@ async function checkAuthenticated(req, res, next) {
         var decodedSession = null; // this will be used to store the decoded session
         req.user = null; // we reset the user
         req.session = null; // we reset the session
-        
+
         try {
             decodedSession = await jwt.verify(GivenSession, process.env.SECRET); // this will verify the session
         } catch (err) { // if an error occured because the session is invalid
             decodedSession = null; // this will reset the decoded session
-            throw err; 
+            throw err;
         }
         if (!decodedSession) // if the session is invalid
             return invalid_session(req, res);
@@ -80,7 +80,7 @@ function invalid_session(req, res) {
     req.user = null; // we reset the user
     req.session = null; // we reset the session
     return sendApiData(req, res, 401, "invalidSession", "It appears that your session is invalid", null, null, null, null); // we return an invalid session
-    
+
 }
 
 // we export the function

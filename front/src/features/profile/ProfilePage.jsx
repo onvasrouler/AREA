@@ -391,7 +391,7 @@ export function ProfilePage() {
                 Save Changes
               </Button>
               <Button onClick={handleLogoutAllDevices} variant="outline">
-                Logout from All Devices
+                Logout from all devices
               </Button>
             </div>
 

@@ -16,7 +16,7 @@ for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     const command = require(filePath);
 
-    if (command.data.name && command.data.description) {
+    if (command.data && command.data.name && command.data.description) {
         client.commands.set(command.data.name, command);
 
         commands.push({
@@ -50,8 +50,10 @@ const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
             Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
             { body: commands }
         );
-        console.log("Successfully reloaded application commands.");
-
+        console.log("Successfully reloaded application commands.\nthe list of command is : ");
+        for (const cmd of commands) {
+            console.log(`- /${cmd.name}: ${cmd.description}`);
+        }
         // Log in to Discord after commands are registered
         await client.login(process.env.DISCORD_TOKEN);
     } catch (error) {

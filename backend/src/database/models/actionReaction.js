@@ -14,6 +14,10 @@ const actionReactionSchema = new mongoose.Schema({
         type: Object,
         default: {}
     },
+    active: {
+        type: Boolean,
+        default: true
+    },
     Name: { // this will be the Name
         type: String,
         required: [true, "Name is required"],
@@ -35,8 +39,8 @@ const actionReactionSchema = new mongoose.Schema({
         default: true
     },
     Errors: { // this will be used to store the errors
-        type: String,
-        default: ""
+        type: Object,
+        default: {}
     },
     LastModificationDate: { // this will be used to know when the actionReaction's data was last modified
         type: Date,

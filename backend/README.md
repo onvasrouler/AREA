@@ -41,26 +41,51 @@ npm install --save-dev nodemon # or using yarn: yarn add nodemon -D
 
 ## Complete the .env file :
 
+# MAIN
 - PORT  this is used to decide the port the server will run on
 - SERVER_URL  this is used for the tests ( npm run test ) it is used to decide where it will send the requests 
+- RUNNER_INTERVAL  time in ms between each runner's round ( each time all the data will be fetched from the api and treated)
+
+# JWT
 - SECRET  this is used to hash the password when stored in the do so put something strong ( like 32 random char )
-- GOOGLE_CLIENT_ID  this is used for google auth0 enter the google app id with the permission to get email and username
+
+# DATABASE
 - MONGO_URI  this is the mongodb URL the server will connect to
 - PROD_DB_NAME when the NODE_ENV is prod it will use this db
 - DEV_DB_NAME  when the NODE_ENV is dev it will use this db
+
+# TESTS
 - TEST_USERNAME this is the username used for the test be sure no account exists with this username
 - TEST_PASSWORD this is the password used for the test
 - TEST_EMAIL this is the email used for the test be sure no account exists with this email
 - ENABLE_TEST_ENDPOINT this will enable endpoint like /fastregister allowing the tests to create account without email verification
+
+# MAILS
 - EMAILER_EMAIL this will be the email adress used for the bot to send emails
 - EMAILER_PASSWORD this will be the email password used for the bot to send emails
+
+# GOOGLE
+- GOOGLE_CLIENT_ID  this is used for google auth0 enter the google app id with the permission to get email and username
+
+
+# AREA RELATED
+# DISCORD
+- DISCORD_CLIENT_ID this is the discord bot's client id
 - DISCORD_TOKEN this is the discord bot's token
 - DISCORD_SECRET this is the discord secret used for auth0
 - DISCORD_REDIRECT_URI this is the redirect uri used by discord auth0
 - DISCORD_REDIRECT_URI_MOBILE this is the redirect uri for the mobile app used by discord auth0
 - MOBILE_APP_NAME this is the name of the mobile app, this is used to return to the mobile app after auth0
+
+# GITHUB
 - GITHUB_CLIENT_ID this is the github client ID used with auth0
 - GITHUB_SECRET this is the github client secret used with auth0
+
+# SPOTIFY
+- SPOTIFY_CLIENT_ID this is the spotify client ID used with auth0
+- SPOTIFY_SECRET this is the spotify client secret used with auth0
+- SPOTIFY_REDIRECT_URI this is the redirect uri used by spotify auth0
+- SPOTIFY_REDIRECT_URI_MOBILE this is the redirect uri for the mobile app used by spotify auth0
 
 ## Usage
 
@@ -109,11 +134,16 @@ npm run lintfix
             "commit",
             "repo"
           ],
-          "prefix": "*"
+          "message": "*"
         }
       }
     }
     ```
+  - **action possibilities**:
+    - /repo: this will list the last 10 user's repo created
+    - /pr: this will list the last 10 user's pr created
+    - /issue: this will list the last 10 user's issue made
+    - /commit: this will list the last 10 user's commit
 - **example**:
   ```json
   {
@@ -129,7 +159,7 @@ npm run lintfix
         "service": "github",
         "arguments": {
             "content": "repo",
-            "prefix": "here is your repos:"
+            "message": "here is your repos:"
         }
     }
   }
@@ -140,7 +170,7 @@ npm run lintfix
       userId will link the action reaction to a specific discord user by default set your discord id
   - for reaction:
       we have the content, this define what will be returned in this case it will be the user's repo
-      the prefix will be a message sent before every other
+      the message will be a message sent before every other
 
 - **USAGE 2**:
   ```json
@@ -170,7 +200,7 @@ npm run lintfix
               ],
               "server": "*",
               "channel":"*",
-              "userID": "*"
+              "userID": "*",
               "message": [
                   "A new PR has been opened!",
                   "A new issue has been opened!",
@@ -181,6 +211,11 @@ npm run lintfix
       }
   }
   ```
+  - **action possibilities**:
+    - new_issue: this will send something when a new issue is opened
+    - new_repo: this will send something when a new repo is created
+    - new_commit: this will send something when a new commit is made
+    - new_pr: this will send something when a new pr is opened
 - **example**:
   ```json
     {
@@ -208,7 +243,136 @@ npm run lintfix
       here we define the argument so the bot will send a private message
       then we define the id of the user that will receive the message
       finally the message that will be sent
-    
+
+- **USAGE 3**:
+```json
+    {
+      "name": "*",
+      "action": {
+          "service": [
+              "discord"
+          ],
+          "arguments": {
+              "on": [
+                  "/likedtrack",
+                  "/spotiplaying"
+              ],
+              "userId": "*"
+          }
+      },
+      "reaction": {
+          "service": [
+              "spotify"
+          ],
+          "arguments": {
+              "content": [
+                  "liked_track",
+                  "currently_playing"
+              ],
+              "message": "*"
+          }
+      }
+  }
+  ```
+  - **action possibilities**:
+    - /likedtrack: this will list the last 10 music of the user's liked track
+    - /spotiplaying: this will send the music the user is currently listening to
+- **example**:
+  ```json
+  {
+      "name": "listMyLikedTrack",
+      "action": {
+          "service": "discord",
+          "arguments": {
+              "on": "/likedtrack",
+              "userId": "431930188255854613"
+          }
+      },
+      "reaction": {
+          "service": "spotify",
+          "arguments": {
+              "content": "liked_track",
+              "message": "your song marked as favourite are :"
+          }
+      }
+  }
+  ```
+  - **explanation**
+  - for action:
+      first for action arguments on will be the command that trigger the action in this case it is /likedtrack
+      userId will link the action reaction to a specific discord user by default set your discord id
+  - for reaction:
+      we have the content, this define what will be returned in this case it will be the user's liked_track
+      the message will be a message sent before every other
+
+- **USAGE 4**:
+```json
+    {
+      "name": "*",
+      "action": {
+          "service": [
+              "spotify"
+          ],
+          "arguments": {
+              "on": [
+                  "liked_track",
+                  "new_liked_track",
+                  "currently_playing"
+              ],
+          }
+      },
+      "reaction": {
+          "service": [
+              "discord"
+          ],
+          "arguments": {
+              "react": [
+                  "message",
+                  "private_message"
+              ],
+              "server": "*",
+              "channel":"*",
+              "userID": "*",
+              "message": [
+                  "Liked track updated !",
+                  "New sound on liked track !",
+                  "I'm currently listening something !",
+              ]
+          }
+      }
+  }
+  ```
+  - **action possibilities**:
+    - liked_track: will list the last 10 music of the user's spotify liked track when it is updated ( a song is added or removed)
+    - new_liked_track: will send the music if a music is added to the liked track
+    - currently_playing: if the user is currently listening to something send the music
+- **example**:
+  ```json
+  {
+      "name": "send message when listening to something",
+      "action": {
+          "service": "spotify",
+          "arguments": {
+              "on": "currently_playing",
+          }
+      },
+      "reaction": {
+          "service": "discord",
+          "arguments": {
+            "react": "message",
+            "server": "1308348420037279747",
+            "channel": "1325848053206352018",
+            "message": "I'm currently playing :"
+          }
+      }
+  }
+  ```
+  - **explanation**
+  - for action:
+      first for action arguments on will be a modification in spotify data that trigger the reaction in this case it is currently_playing so if the music the user is currently playing change it will trigger the reaction
+  - for reaction:
+      we have the content, this define what will be returned in this case it will define wether it is a private message or not ( not in this case ) then the server and the channel where the message will be send is precised the message argument is a text that will be  sent before every other
+
 ## API Endpoints
 
 ### User Registration and Authentication
@@ -730,27 +894,6 @@ npm run lintfix
     }
     ```
 
-- **POST /mobileauth/refresh/discord**
-  - **Description**: Refresh Discord OAuth token.
-  - **header**:
-    ```json
-    {
-      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
-    }
-    ```
-  - **Response**:
-    ```json
-    {
-      "status": 200,
-      "messageStatus": "success",
-      "message": "Discord token has been saved for the mobile client",
-      "data": null,
-      "error": null,
-      "session": null,
-      "username": null
-    }
-    ```
-
 - **POST /auth/callback/github**
   - **Description**: Handle GitHub OAuth callback.
   - **body**:
@@ -792,6 +935,81 @@ npm run lintfix
       "status": 200,
       "messageStatus": "success",
       "message": "Github token has been refreshed",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /auth/callback/spotify**
+  - **Description**: Handle Spotify OAuth callback.
+  - **body**:
+    ```json
+    {
+      "code": "authorization_code"
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Spotify token has been saved",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /auth/refresh/Spotify**
+  - **Description**: Refresh Spotify OAuth token.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Spotify token has been refreshed",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /mobileauth/callback/Spotify**
+  - **Description**: Handle Spotify OAuth callback.
+  - **body**:
+    ```json
+    {
+      "code": "authorization_code"
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Spotify token has been saved using mobile auth",
       "data": null,
       "error": null,
       "session": null,
@@ -944,6 +1162,56 @@ npm run lintfix
       "messageStatus": "success",
       "message": "your github repository have been fetched with succes",
       "data": "user's repo list",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+### Spotify endpoint
+
+- **GET /get_my_liked_tracks**
+  - **Description**: Return a list of the user's liked track.
+  - **query**:
+   ```json
+    {
+      "limit": 10
+    }
+    ```
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "your liked tracks have been fetched with success",
+      "data": "the list of the user's liked track limited to the size precised in the query",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **GET /get_currently_playing**
+  - **Description**: Return the infos of the song the user is currently playing.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "your currently playing track has been fetched with success",
+      "data": "the data about the song the user is currently listening",
       "error": null,
       "session": null,
       "username": null
@@ -1284,15 +1552,6 @@ All API responses will be returned in the following format:
   - **Message**: "An error occured while trying to get the discord token on mobile"
   - **Reason**: probably because the given code is invalid so the back couldn't turn it in a token try again or check logs.
 
-- **POST /mobileauth/refresh/discord**
-  - **Status**: 400
-  - **Message**: "you first have to login to discord with the mobile client to be able to refresh your token"
-  - **Reason**: you first have to login to discord.
-
-  - **Status**: 500
-  - **Message**: "An error occured while trying to get the discord token re log-in discord with the mobile"
-  - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to discord.
-
 - **POST /auth/callback/github**
   - **Status**: 400
   - **Message**: "code is required"
@@ -1306,6 +1565,33 @@ All API responses will be returned in the following format:
   - **Status**: 500
   - **Message**: "An error occured while trying to get the github token"
   - **Reason**: the back couldn't refresh the token in this case delete the github token.
+
+- **POST /auth/callback/spotify**
+  - **Status**: 400
+  - **Message**: "code is required"
+  - **Reason**: no code provided in the request body.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the spotify token"
+  - **Reason**: probably because the given code is invalid so the back couldn't turn it in a token.
+
+- **POST /auth/refresh/spotify**
+  - **Status**: 400
+  - **Message**: "you first have to login to spotify to be able to refresh your token"
+  - **Reason**: you first have to login to spotify.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the spotify token"
+  - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to spotify.
+
+- **POST /mobileauth/callback/spotify**
+  - **Status**: 400
+  - **Message**: "code is required when trying to generate a token with the mobile client"
+  - **Reason**: no code provided in the request body.
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to get the spotify token on mobile"
+  - **Reason**: probably because the given code is invalid so the back couldn't turn it in a token try again or check logs.
 
 ### API endpoint
 
@@ -1353,6 +1639,16 @@ All API responses will be returned in the following format:
   - **Status**: 401
   - **Message**: "you are not logged in using github"
   - **Reason**: ther user didn't logged in using github 0auth.
+
+- **GET /get_my_liked_tracks**
+  - **Status**: 401
+  - **Message**: "you are not logged in using spotify"
+  - **Reason**: ther user didn't logged in using spotify 0auth.
+
+- **GET /get_currently_playing**
+  - **Status**: 401
+  - **Message**: "you are not logged in using spotify"
+  - **Reason**: ther user didn't logged in using spotify 0auth.
 
 - **GET /get_my_repos**
   - **Status**: 401

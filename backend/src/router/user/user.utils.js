@@ -113,7 +113,6 @@ async function sendEmail({ to, subject, html }) {
             subject, // Subject line
             html, // HTML body
         });
-        console.log("Email sent successfully.");
     } catch (err) {
         console.error("Error while sending email:", err);
         throw err;

@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
         type: Object,
         default: {}
     },
+    spotify_token: { // this will be used to store the github token
+        type: Object,
+        default: {}
+    },
     email: { // this will be used to identify the user
         type: String,
         unique: [true, "an account already exist on this email!"], // this will be used to avoid having multiple accounts with the same email

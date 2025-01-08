@@ -1,14 +1,18 @@
 const ActionReactionModel = require("../../database/models/actionReaction");
 const axios = require("axios");
 
-async function getGithubUserData(token, url) { // type can be pr or issue
-    const prsResponse = await axios.get(
-        url,
-        {
-            headers: { Authorization: `Bearer ${token}` },
-        }
-    );
-    return prsResponse.data;
+async function getGithubUserData(token, url) {
+    try {
+        const prsResponse = await axios.get(
+            url,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+        return prsResponse.data;
+    } catch (err) {
+        return { "ErrorOnGitFetch": err.response?.data ? err.response?.data : err };
+    }
 }
 
 async function ActionGithub(AREA) {
@@ -43,17 +47,31 @@ async function ActionGithub(AREA) {
             break;
         default:
             console.error("Unknown action");
-            Datas = "error";
+            Datas = "unknownAction";
         }
-        if (Datas == "error")
+        if (Datas == "unknownAction")
             return;
+        if (Datas.ErrorOnGitFetch) {
+            if (actionReactions.CachedData != "error")
+                actionReactions.Treated = false;
+            else
+                actionReactions.Treated = true;
+            actionReactions.Errors = Datas.ErrorOnGitFetch;
+            actionReactions.CachedData = "error";
+            await actionReactions.save();
+            return;
+        }
 
         //avoid treating the same data twice and avoid treating data that has already been treated and avoid treating data when it decrease
         if (TriggerEvent == "new_commit" || TriggerEvent == "new_pr" || TriggerEvent == "new_issue") {
-            if (actionReactions.CachedData.total_count === Datas.total_count && actionReactions.CachedData.items[0].id === Datas.items[0].id) {
+            if (actionReactions.CachedData.total_count && actionReactions.CachedData.total_count != 0) {
+                if (actionReactions.CachedData.total_count === Datas.total_count && actionReactions.CachedData.items[0].id === Datas.items[0].id) {
+                    actionReactions.Treated = true;
+                } else if (actionReactions.CachedData.total_count < Datas.total_count) {
+                    actionReactions.Treated = false;
+                }
+            } else {
                 actionReactions.Treated = true;
-            } else if (actionReactions.CachedData.total_count < Datas.total_count) {
-                actionReactions.Treated = false;
             }
 
         } else if (TriggerEvent == "new_repo") {
@@ -106,10 +124,16 @@ async function ReactionGithub(AREA) {
             break;
         default:
             console.error("Unknown action");
-            Datas = "error";
+            Datas = "unknownAction";
         }
-        if (Datas == "error")
+        if (Datas == "unknownAction")
             return;
+        if (Datas.ErrorOnGitFetch) {
+            actionReactions.Errors = Datas.ErrorOnGitFetch;
+            actionReactions.CachedData = "error";
+            await actionReactions.save();
+            return;
+        }
 
         actionReactions.CachedData = Datas;
         actionReactions.CachedData.content = actionReactions.Reaction.arguments.content;
