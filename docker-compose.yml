@@ -22,6 +22,12 @@ services:
     env_file:
       - ./backend/.env.docker
 
+  client_mobile:
+    build:
+      context: ./mobile
+    volumes:
+      - shared-volume:/shared
+
   client_web:
     build:
       context: ./front
@@ -31,7 +37,7 @@ services:
       - shared-volume:/shared
     command: npm run dev
     depends_on:
-      # - mobile-client
+      - client_mobile
       - server
     env_file:
       - ./front/.env.docker
