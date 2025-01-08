@@ -794,6 +794,29 @@ npm run lintfix
     }
     ```
 
+- **PATCH /profile**
+  - **Description**: Change the user profile data.
+  - **body**:
+    ```json
+    {
+      "session": "session_token",
+      "newUsername": "new_username",
+      "newEmail": "new_email"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "profile updated successfully",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": "updated_username"
+    }
+    ```
+
 ### OAuth Endpoints
 
 - **POST /auth/callback/discord**

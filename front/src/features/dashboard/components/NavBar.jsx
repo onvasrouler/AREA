@@ -13,15 +13,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ServiceDialog } from "./ServiceDialog";
 import { useNavigate } from "react-router-dom";
-import { getApiClient } from "@/common/client/APIClient"
 
-export function Navbar({ username, services }) {
+export function Navbar({ username, services, authStatus }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-  const apiClient = getApiClient();
 
   const filteredServices = services.filter((service) =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -58,17 +56,26 @@ export function Navbar({ username, services }) {
 
   const handleLogout = async () => {
     try {
-      const response = await apiClient.post("logout", {
-        session: localStorage.getItem("session"),
-      });
-      if (response.status === 200) {
-        localStorage.removeItem("session");
-        navigate("/login");
+      const session = localStorage.getItem('session');
+      if (session) {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'session': session
+          }
+        });
+        if (response.ok) {
+          localStorage.removeItem('session');
+          navigate('/login');
+        } else {
+          console.error('Failed to logout');
+        }
       } else {
-        console.error("Failed to logout");
+        console.error('No session found');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error:', error);
     }
   };
 
@@ -121,15 +128,15 @@ export function Navbar({ username, services }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <div className="text-center">
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  <DropdownMenuItem className="focus:bg-primary focus:text-primary-foreground cursor-pointer" onClick={() => navigate("/profile")}>
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/settings")}>
+                  <DropdownMenuItem className="focus:bg-primary focus:text-primary-foreground cursor-pointer" onClick={() => navigate("/settings")}>
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLogout()}>
+                  <DropdownMenuItem className="focus:bg-primary focus:text-primary-foreground cursor-pointer" onClick={() => handleLogout()}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
@@ -144,8 +151,10 @@ export function Navbar({ username, services }) {
           isOpen={!!selectedService}
           onClose={handleCloseDialog}
           service={selectedService}
+          authStatus={authStatus}
         />
       )}
     </nav>
   );
 }
+

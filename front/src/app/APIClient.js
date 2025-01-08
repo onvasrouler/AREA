@@ -5,7 +5,7 @@ const callApi = async (endpoint, method = "GET", body = null) => {
 
   const headers = {
     "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
+    ...(token && { Session: `${token}` }),
   };
 
   const options = {

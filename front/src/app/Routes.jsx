@@ -6,6 +6,7 @@ import { ProfilePage } from "../features/profile/ProfilePage";
 import { SettingsPage } from "../features/settings/SettingsPage";
 import { CallbackDiscord } from "../features/auth/CallbackDiscord";
 import { CallbackGithub } from "../features/auth/CallbackGithub";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const AppRoutes = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -15,6 +16,7 @@ const AppRoutes = () => {
   }
 
   return (
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
       <Routes>
         <Route path="/" element={<LoginPage />} />
@@ -34,6 +36,7 @@ const AppRoutes = () => {
         )}
       </Routes>
     </Router>
+    </GoogleOAuthProvider>
   );
 };
 

@@ -31,10 +31,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { getApiClient } from "@/common/client/APIClient";
 import { useToast } from "@/hooks/use-toast";
+import { PasswordResetComponent } from "./PasswordResetComponent"
+import { CustomGoogleLogin } from "@/components/ui/CustomGoogleLogin";
+import axios from 'axios';
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -43,10 +45,6 @@ const loginSchema = z.object({
 
 const signUpSchema = loginSchema.extend({
   username: z.string().min(3, "Username must be at least 3 characters"),
-})
-
-const forgotPasswordSchema = z.object({
-  email: z.string().email("Invalid email address"),
 })
 
 export function LoginPage() {
@@ -72,13 +70,6 @@ export function LoginPage() {
       email: "",
       password: "",
       ...(isLogin ? {} : { username: "" }),
-    },
-  })
-
-  const forgotPasswordForm = useForm({
-    resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: {
-      email: "",
     },
   })
 
@@ -157,32 +148,6 @@ export function LoginPage() {
     }
   };
 
-  const handleForgotPassword = async (values) => {
-    try {
-      const response = await apiClient.post("forgotpassword", {
-        email: values.email,
-      });
-      if (response.status === 200) {
-        toast({
-          title: "Password Reset Email Sent",
-          description: "Please check your email for instructions to reset your password.",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Password Reset Failed",
-          description: "Failed to send password reset email. Please try again.",
-        });
-      }
-    } catch {
-      toast({
-        variant: "destructive",
-        title: "Password Reset Error",
-        description: "An error occurred while processing your request. Please try again later.",
-      });
-    }
-  };
-
   const handleConfirmRegistration = async (data) => {
     try {
       const response = await apiClient.post("register/verify", {
@@ -226,31 +191,37 @@ export function LoginPage() {
     }
   };
 
-  const handleOAuthLogin = async () => {
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
-      const response = await apiClient.post("auth/google", {});
-      if (response.status === 200) {
-        const data = await response.json();
-        localStorage.setItem('session', data.session_token);
+      console.log(credentialResponse);
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}auth/google`, {
+            token: credentialResponse.credential,
+        });
+        const data = response.data;
+        console.log(data.session)
+        localStorage.setItem('session', data.session);
         toast({
-          title: "Google Login Successful",
-          description: "You have been logged in successfully with Google.",
+            title: "Google Login Successful",
+            description: "You have been logged in successfully with Google.",
         });
         window.location.href = "/dashboard";
-      } else {
+    } catch (error) {
+        console.error(error);
         toast({
-          variant: "destructive",
-          title: "Google Login Failed",
-          description: "An error occurred during Google login. Please try again.",
+            variant: "destructive",
+            title: "Google Login Error",
+            description: "An error occurred during Google login. Please try again later.",
         });
-      }
-    } catch {
-      toast({
-        variant: "destructive",
-        title: "Google Login Error",
-        description: "An error occurred during Google login. Please try again later.",
-      });
     }
+  };
+
+  const handleGoogleLoginError = (error) => {
+      console.error(error);
+      toast({
+          variant: "destructive",
+          title: "Google Login Error",
+          description: "Google login failed. Please try again.",
+      });
   };
 
   return (
@@ -332,21 +303,14 @@ export function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full rounded-sm">
                 {isLogin ? "Login" : "Sign Up"}
               </Button>
-              <Button
-                type="button"
-                className="w-full flex items-center justify-center"
-                onClick={() => handleOAuthLogin()}
-              >
-                <img
-                  src="src/assets/google.png"
-                  alt="Google logo"
-                  className="w-5 h-5 mr-2"
-                />
-                {isLogin ? "Login with Google" : "Sign Up with Google"}
-              </Button>
+              <CustomGoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginError}
+                useOneTap
+              />
             </form>
           </Form>
         </CardContent>
@@ -358,45 +322,7 @@ export function LoginPage() {
           >
             {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
           </Button>
-          {isLogin && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="link" className="w-full">
-                  Forgot Password?
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Forgot Password</DialogTitle>
-                  <DialogDescription>
-                    Enter your email address to reset your password.
-                  </DialogDescription>
-                </DialogHeader>
-                <Form {...forgotPasswordForm}>
-                  <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)} className="space-y-4">
-                    <FormField
-                      control={forgotPasswordForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="john@example.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <DialogFooter>
-                      <Button type="submit" className="w-full">
-                        Reset Password
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
-          )}
+          {isLogin && <PasswordResetComponent />}
         </CardFooter>
       </Card>
 
