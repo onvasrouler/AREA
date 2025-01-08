@@ -26,7 +26,6 @@ const AppRoutes = () => {
           <>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/callback-discord" element={<CallbackDiscord />} />
             <Route path="/callback-github" element={<CallbackGithub />} />
             <Route path="*" element={<Navigate to="/dashboard" />} />

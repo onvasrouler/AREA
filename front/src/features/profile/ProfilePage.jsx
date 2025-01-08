@@ -228,22 +228,15 @@ export function ProfilePage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <div className="text-center">
-                <DropdownMenuItem 
-                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer" 
+                <DropdownMenuItem
+                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer"
                   onClick={() => navigate("/dashboard")}
                 >
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer" 
-                  onClick={() => navigate("/settings")}
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer" 
+                <DropdownMenuItem
+                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer"
                   onClick={handleLogout}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -261,9 +254,9 @@ export function ProfilePage() {
             <CardTitle>Edit Profile</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs 
-              defaultValue="account" 
-              className="w-full" 
+            <Tabs
+              defaultValue="account"
+              className="w-full"
               value={activeTab}
               onValueChange={setActiveTab}
             >
