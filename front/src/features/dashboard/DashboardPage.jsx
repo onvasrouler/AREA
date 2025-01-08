@@ -113,7 +113,7 @@ export function DashboardPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen">
-        <Navbar username={username} />
+        <Navbar/>
         <div className="flex-grow flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>

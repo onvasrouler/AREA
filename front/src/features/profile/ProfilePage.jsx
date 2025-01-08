@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FaUser } from 'react-icons/fa';
-import { Settings, LogOut, LayoutDashboard } from 'lucide-react';
+import { LogOut, LayoutDashboard, Settings } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -215,9 +215,15 @@ export function ProfilePage() {
       <div className="flex items-center justify-between h-16 relative">
         <div className="flex items-center">
           <img src={AreaLogo} alt="AREA Logo" className="w-8 h-8 mr-2" />
-          <h1 className="text-lg font-semibold">Profile</h1>
+          <h1 className="text-2xl font-bold">AREA</h1>
         </div>
-        <div className="flex items-center">
+        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center">
+            <Settings className="mr-2 h-6 w-6" />
+            <span className="text-2xl font-bold">
+              Dashboard
+            </span>
+          </div>
+        <div className="flex items-center bg-primary text-white">
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Avatar>
