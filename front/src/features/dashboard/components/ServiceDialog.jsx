@@ -105,13 +105,43 @@ useEffect(() => {
 
   const AccordionItems = (
     <Accordion type="single" collapsible className="w-full pr-2">
-      {areas.map(area => (
+      {areas.map((area) => (
         <AccordionItem key={area.name} value={area.name} className="pr-8 relative">
           <AccordionTrigger>{area.name}</AccordionTrigger>
           <AccordionContent>
-            <pre className="whitespace-pre-wrap text-left">
-              {JSON.stringify(area, null, 2)}
-            </pre>
+            <div className="text-left space-y-2">
+              <div>
+                <strong>ID :</strong> {area.id}
+              </div>
+              <div>
+                <strong>Nom :</strong> {area.name}
+              </div>
+              <div>
+                <strong>Action :</strong>
+                <ul className="ml-4 list-disc">
+                  <li>
+                    <strong>Service :</strong> {area.action.service}
+                  </li>
+                  <li>
+                    <strong>Argument :</strong> {area.action.arguments.on}
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <strong>Réaction :</strong>
+                <ul className="ml-4 list-disc">
+                  <li>
+                    <strong>Service :</strong> {area.reaction.service}
+                  </li>
+                  <li>
+                    <strong>Utilisateur :</strong> {area.reaction.arguments.userId}
+                  </li>
+                  <li>
+                    <strong>Message :</strong> {area.reaction.arguments.message}
+                  </li>
+                </ul>
+              </div>
+            </div>
           </AccordionContent>
           <Button
             variant="ghost"
@@ -123,12 +153,12 @@ useEffect(() => {
             }}
           >
             <Trash2 className="h-4 w-4" />
-            <span className="sr-only">Delete area</span>
+            <span className="sr-only">Supprimer l'élément</span>
           </Button>
         </AccordionItem>
       ))}
     </Accordion>
-  )
+  );
 
   const renderServiceContent = () => {
     if (!isAuthenticated) {
