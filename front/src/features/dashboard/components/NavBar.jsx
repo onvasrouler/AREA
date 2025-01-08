@@ -1,9 +1,7 @@
-import { useState, useEffect, useRef } from "react";
 import { FaUser } from "react-icons/fa";
 import { User, Settings, LogOut } from 'lucide-react';
 import AreaLogo from "../../../assets/AREA.png";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,48 +9,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ServiceDialog } from "./ServiceDialog";
 import { useNavigate } from "react-router-dom";
 
-export function Navbar({ username, services, authStatus }) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedService, setSelectedService] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+export function Navbar({ username }) {
   const navigate = useNavigate();
-
-  const filteredServices = services.filter((service) =>
-    service.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    setIsDropdownOpen(value.trim() !== "");
-  };
-
-  const handleServiceSelect = (service) => {
-    setSelectedService(service);
-    setSearchTerm("");
-    setIsDropdownOpen(false);
-  };
-
-  const handleCloseDialog = () => {
-    setSelectedService(null);
-  };
 
   const handleLogout = async () => {
     try {
@@ -81,45 +41,23 @@ export function Navbar({ username, services, authStatus }) {
 
   return (
     <nav>
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 bg-primary text-white">
         <div className="flex items-center justify-between h-16 relative">
           <div className="flex items-center">
             <img src={AreaLogo} alt="AREA Logo" className="w-8 h-8 mr-2" />
             <span className="text-2xl font-bold">AREA</span>
           </div>
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <span className="text-lg font-medium whitespace-nowrap">
-              Welcome back, {username}
+            <span className="text-2xl font-bold">
+              Dashboard
             </span>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="relative" ref={dropdownRef}>
-              <Input
-                type="search"
-                placeholder="Search services..."
-                className="w-full sm:w-[200px] md:w-[300px]"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-              {isDropdownOpen && filteredServices.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                  {filteredServices.map((service) => (
-                    <div
-                      key={service.id}
-                      className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                      onClick={() => handleServiceSelect(service)}
-                    >
-                      {service.name}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          <div className="flex items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="" size="icon" className="rounded-full">
                   <Avatar>
-                    <AvatarImage src="/placeholder-avatar.jpg" alt={username} />
+                    <AvatarImage src="https://static-00.iconduck.com/assets.00/avatar-icon-2048x2048-ilrgk6vk.png" alt={username} />
                     <AvatarFallback>
                       <FaUser className="h-5 w-5" />
                     </AvatarFallback>
@@ -146,15 +84,6 @@ export function Navbar({ username, services, authStatus }) {
           </div>
         </div>
       </div>
-      {selectedService && (
-        <ServiceDialog
-          isOpen={!!selectedService}
-          onClose={handleCloseDialog}
-          service={selectedService}
-          authStatus={authStatus}
-        />
-      )}
     </nav>
   );
 }
-
