@@ -15,7 +15,7 @@ import { AlertCircle } from 'lucide-react';
 
 import areaData from '@/AREA.json';
 
-export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated }) {
+export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated }) {
   const [linkedService, setLinkedService] = useState('');
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedReaction, setSelectedReaction] = useState('');
@@ -42,6 +42,8 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     switch (serviceName) {
       case 'Discord':
         return isDiscordAuthenticated;
+      case 'GitHub':
+        return isGitHubAuthenticated;
       default:
         return false;
     }
@@ -136,18 +138,31 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     const reactionArguments = {
       react: selectedReaction || ""
     };
-    if (selectedReaction === "message") {
-      if (selectedServerId) {
-        reactionArguments.serverId = selectedServerId;
+
+    if (service.name === "Discord") {
+      actionArguments.userId = discordUserId;
+    }
+
+    if (linkedService === "Discord") {
+      if (selectedReaction === "message") {
+        if (selectedServerId) {
+          reactionArguments.serverId = selectedServerId;
+        }
+        if (selectedChannelId) {
+          reactionArguments.channelId = selectedChannelId;
+        }
+      } else if (selectedReaction === "private_message") {
+        if (discordUserId) {
+          reactionArguments.userId = discordUserId;
+        }
       }
-      if (selectedChannelId) {
-        reactionArguments.channelId = selectedChannelId;
-      }
-    } else if (selectedReaction === "private_message") {
+    } else if (linkedService === "GitHub") {
+      reactionArguments.content = selectedReaction;
       if (discordUserId) {
         reactionArguments.userId = discordUserId;
       }
     }
+
     Object.entries(argumentsData).forEach(([key]) => {
       if (formData[key] !== undefined && formData[key] !== '') {
         reactionArguments[key] = formData[key];
@@ -202,6 +217,7 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     setDiscordUserId('');
     if (linkedService === "Discord") {
       fetchServers();
+    } else if (linkedService === "GitHub") {
       fetchDiscordUserId();
     }
   }, [linkedService, service]);
@@ -288,34 +304,38 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
                 />
               </div>
             )}
-            {value.component === "Select" && key === "serverId" && (
-              <Select onValueChange={(serverId) => {
-                setSelectedServerId(serverId);
-                fetchChannels(serverId);
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder={value.description} />
-                </SelectTrigger>
-                <SelectContent>
-                  {discordServers.map(server => (
-                    <SelectItem key={server.id} value={server.id}>{server.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            {value.component === "Select" && key === "channelId" && selectedServerId && (
-              <Select onValueChange={(channelId) => {
-                setSelectedChannelId(channelId);
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder={value.description} />
-                </SelectTrigger>
-                <SelectContent>
-                  {discordChannels[selectedServerId]?.map(channel => (
-                    <SelectItem key={channel.id} value={channel.id}>{channel.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {value.component === "Select" && linkedService === "Discord" && (
+              <>
+                {key === "serverId" && (
+                  <Select onValueChange={(serverId) => {
+                    setSelectedServerId(serverId);
+                    fetchChannels(serverId);
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={value.description} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {discordServers.map(server => (
+                        <SelectItem key={server.id} value={server.id}>{server.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                {key === "channelId" && selectedServerId && (
+                  <Select onValueChange={(channelId) => {
+                    setSelectedChannelId(channelId);
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={value.description} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {discordChannels[selectedServerId]?.map(channel => (
+                        <SelectItem key={channel.id} value={channel.id}>{channel.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </>
             )}
           </div>
         ))}
@@ -334,4 +354,3 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated })
     </Dialog>
   );
 }
-

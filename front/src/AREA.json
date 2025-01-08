@@ -2,7 +2,24 @@
     "services": [
         {
             "name": "Discord",
-            "actions": [],
+            "actions": [
+                {
+                    "type": "/repo",
+                    "display": "List repositories"
+                },
+                {
+                    "type": "/pr",
+                    "display": "List pull requests"
+                },
+                {
+                    "type": "/issue",
+                    "display": "List issues"
+                },
+                {
+                    "type": "/commit",
+                    "display": "List commits"
+                }
+            ],
             "reactions": [
                 {
                     "type": "message",
@@ -58,7 +75,52 @@
                     "display": "New Repository"
                 }
             ],
-            "reactions": []
+            "reactions": [
+                {
+                  "type": "repo",
+                  "display": "List Repositories",
+                  "arguments": {
+                    "prefix": {
+                      "label": "Prefix",
+                      "description": "Message to display before the repository list",
+                      "component": "TextArea"
+                    }
+                  }
+                },
+                {
+                  "type": "pr",
+                  "display": "List Pull Requests",
+                  "arguments": {
+                    "prefix": {
+                      "label": "Prefix",
+                      "description": "Message to display before the pull request list",
+                      "component": "TextArea"
+                    }
+                  }
+                },
+                {
+                  "type": "issue",
+                  "display": "List Issues",
+                  "arguments": {
+                    "prefix": {
+                      "label": "Prefix",
+                      "description": "Message to display before the issue list",
+                      "component": "TextArea"
+                    }
+                  }
+                },
+                {
+                  "type": "commit",
+                  "display": "List Commits",
+                  "arguments": {
+                    "prefix": {
+                      "label": "Prefix",
+                      "description": "Message to display before the commit list",
+                      "component": "TextArea"
+                    }
+                  }
+                }
+              ]
         },
         {
             "name": "Spotify",
