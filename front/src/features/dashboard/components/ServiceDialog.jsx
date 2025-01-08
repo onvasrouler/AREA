@@ -111,35 +111,13 @@ useEffect(() => {
           <AccordionContent>
             <div className="text-left space-y-2">
               <div>
-                <strong>ID :</strong> {area.id}
+                <strong>Area's name :</strong> {area.name}
               </div>
               <div>
-                <strong>Nom :</strong> {area.name}
+                When the action <strong>{area.action.arguments.on}</strong> happens on <strong>{area.action.service}</strong>,
               </div>
               <div>
-                <strong>Action :</strong>
-                <ul className="ml-4 list-disc">
-                  <li>
-                    <strong>Service :</strong> {area.action.service}
-                  </li>
-                  <li>
-                    <strong>Argument :</strong> {area.action.arguments.on}
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <strong>Réaction :</strong>
-                <ul className="ml-4 list-disc">
-                  <li>
-                    <strong>Service :</strong> {area.reaction.service}
-                  </li>
-                  <li>
-                    <strong>Utilisateur :</strong> {area.reaction.arguments.userId}
-                  </li>
-                  <li>
-                    <strong>Message :</strong> {area.reaction.arguments.message}
-                  </li>
-                </ul>
+                <strong>{area.reaction.service}</strong> react by sending <strong>{area.reaction.arguments.message}</strong>
               </div>
             </div>
           </AccordionContent>
