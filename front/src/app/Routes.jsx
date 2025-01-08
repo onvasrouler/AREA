@@ -7,6 +7,7 @@ import { SettingsPage } from "../features/settings/SettingsPage";
 import { CallbackDiscord } from "../features/auth/CallbackDiscord";
 import { CallbackGithub } from "../features/auth/CallbackGithub";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { CallbackSpotify } from "../features/auth/CallbackSpotify";
 
 const AppRoutes = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -29,6 +30,7 @@ const AppRoutes = () => {
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/callback-discord" element={<CallbackDiscord />} />
             <Route path="/callback-github" element={<CallbackGithub />} />
+            <Route path="/callback-spotify" element={<CallbackSpotify />} />
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </>
         ) : (
