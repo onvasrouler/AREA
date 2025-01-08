@@ -81,7 +81,7 @@
                   "display": "List Repositories",
                   "arguments": {
                     "prefix": {
-                      "label": "Prefix",
+                      "label": "Message",
                       "description": "Message to display before the repository list",
                       "component": "TextArea"
                     }
@@ -92,7 +92,7 @@
                   "display": "List Pull Requests",
                   "arguments": {
                     "prefix": {
-                      "label": "Prefix",
+                      "label": "Message",
                       "description": "Message to display before the pull request list",
                       "component": "TextArea"
                     }
@@ -103,7 +103,7 @@
                   "display": "List Issues",
                   "arguments": {
                     "prefix": {
-                      "label": "Prefix",
+                      "label": "Message",
                       "description": "Message to display before the issue list",
                       "component": "TextArea"
                     }
@@ -114,7 +114,7 @@
                   "display": "List Commits",
                   "arguments": {
                     "prefix": {
-                      "label": "Prefix",
+                      "label": "Message",
                       "description": "Message to display before the commit list",
                       "component": "TextArea"
                     }
@@ -124,8 +124,44 @@
         },
         {
             "name": "Spotify",
-            "actions": [],
-            "reactions": []
+            "actions": [
+                {
+                    "type": "currently_playing",
+                    "display": "Song currently playing"
+                },
+                {
+                    "type": "new_liked_track",
+                    "display": "New liked track"
+                },
+                {
+                    "type": "liked_track",
+                    "display": "List of favorite songs"
+                }
+            ],
+            "reactions": [
+                {
+                    "type": "currently_playing",
+                    "display": "Song currently playing",
+                    "arguments": {
+                        "prefix": {
+                            "label": "Message",
+                            "description": "The song you are listening to is ",
+                            "component": "TextArea"
+                        }
+                    }
+                },
+                {
+                    "type": "liked_track",
+                    "display": "List of liked songs",
+                    "arguments": {
+                        "prefix": {
+                            "label": "Message",
+                            "description": "Your favorite songs are: ",
+                            "component": "TextArea"
+                        }
+                    }
+                }
+            ]
         },
         {
             "name": "OneDrive",
