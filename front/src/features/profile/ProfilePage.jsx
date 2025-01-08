@@ -217,7 +217,7 @@ export function ProfilePage() {
       exit={{ opacity: 0 }}
       className="min-h-screen flex flex-col"
     >
-      <motion.div
+      <motion.div 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
@@ -234,7 +234,7 @@ export function ProfilePage() {
           </div>
           <div className="flex items-center bg-primary text-white">
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button size="icon" className="rounded-full">
                   <FaUser className="h-8 w-8" />
                 </Button>
@@ -262,7 +262,7 @@ export function ProfilePage() {
         </div>
       </motion.div>
 
-      <motion.main
+      <motion.main 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.2 }}
@@ -303,8 +303,8 @@ export function ProfilePage() {
             </motion.div>
 
             <div className="mt-6">
-              <AnimatePresence mode="wait">
-                <TabsContent value="account">
+              <AnimatePresence>
+                <TabsContent key="account" value="account">
                   <motion.form
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -333,7 +333,7 @@ export function ProfilePage() {
                       />
                     </div>
 
-                    <motion.div
+                    <motion.div 
                       className="space-y-4 pt-6"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -379,8 +379,7 @@ export function ProfilePage() {
                     </motion.div>
                   </motion.form>
                 </TabsContent>
-
-                <TabsContent value="security">
+                <TabsContent key="security" value="security">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -390,7 +389,7 @@ export function ProfilePage() {
                   >
                     <div className="flex justify-center">
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Button onClick={handleRequestPasswordChange}>
+                        <Button onClick={handleRequestPasswordChange} className="mt-10">
                           Request password change
                         </Button>
                       </motion.div>
@@ -437,13 +436,19 @@ export function ProfilePage() {
                               placeholder="Confirm your new password"
                             />
                           </div>
+                          <div className='flex justify-center'>
+                            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                              <Button onClick={handleSaveChanges} className="mr-2 ">
+                                Save Changes
+                              </Button>
+                            </motion.div>
+                          </div>
                         </motion.form>
                       )}
                     </AnimatePresence>
                   </motion.div>
                 </TabsContent>
-
-                <TabsContent value="services">
+                <TabsContent key="services" value="services">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -506,4 +511,3 @@ export function ProfilePage() {
     </motion.div>
   );
 }
-
