@@ -146,13 +146,8 @@ export function DashboardPage() {
                         <div
                           key={service.id}
                           onClick={() => handleServiceSelect(service)}
-                          className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-muted"
+                          className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-muted hover:text-white rounded-lg"
                         >
-                          <img
-                            src={service.image}
-                            alt={service.name}
-                            className="h-6 w-6 object-contain"
-                          />
                           <span>{service.name}</span>
                         </div>
                       ))}
