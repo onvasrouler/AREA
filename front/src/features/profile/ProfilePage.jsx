@@ -2,11 +2,9 @@ import { useEffect, useState } from 'react';
 import { FaUser } from 'react-icons/fa';
 import { LogOut, LayoutDashboard, Settings } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   AlertDialog,
@@ -32,6 +30,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import ServicesInfos from "@features/ServicesInfos"
+import { Footer } from "@features/dashboard/components/Footer"
+import { motion, AnimatePresence } from "framer-motion"
 
 export function ProfilePage() {
   const [username, setUsername] = useState('');
@@ -211,210 +211,299 @@ export function ProfilePage() {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between h-16 relative">
-        <div className="flex items-center">
-          <img src={AreaLogo} alt="AREA Logo" className="w-8 h-8 mr-2" />
-          <h1 className="text-2xl font-bold">AREA</h1>
-        </div>
-        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center">
-            <Settings className="mr-2 h-6 w-6" />
-            <span className="text-2xl font-bold">
-              Dashboard
-            </span>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen flex flex-col"
+    >
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="w-full px-4 sm:px-6 lg:px-8 bg-primary text-white"
+      >
+        <div className="flex items-center justify-between h-16 relative">
+          <div className="flex items-center">
+            <img src={AreaLogo} alt="AREA Logo" className="w-8 h-8 mr-2" />
+            <h1 className="text-2xl font-bold">AREA</h1>
           </div>
-        <div className="flex items-center bg-primary text-white">
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Avatar>
-                <AvatarFallback>
-                  <FaUser />
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <div className="text-center">
-                <DropdownMenuItem
-                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer"
-                  onClick={() => navigate("/dashboard")}
-                >
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
-                  Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="focus:bg-primary focus:text-primary-foreground cursor-pointer"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </DropdownMenuItem>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center">
+            <Settings className="mr-2 h-6 w-6" />
+            <span className="text-2xl font-bold">Settings</span>
+          </div>
+          <div className="flex items-center bg-primary text-white">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button size="icon" className="rounded-full">
+                  <FaUser className="h-8 w-8" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <div className="text-center">
+                  <DropdownMenuItem
+                    className="focus:bg-primary focus:text-primary-foreground cursor-pointer"
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="focus:bg-primary focus:text-primary-foreground cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className='flex items-center justify-center mt-8'>
-        <Card className="w-full max-w-4xl shadow-lg rounded-md">
-          <CardHeader>
-            <CardTitle>Edit Profile</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs
-              defaultValue="account"
-              className="w-full"
-              value={activeTab}
-              onValueChange={setActiveTab}
+      <motion.main
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+        className="flex-grow container mx-auto px-4 py-8"
+      >
+        <div className="max-w-4xl mx-auto">
+          <Tabs
+            defaultValue="account"
+            className="w-full"
+            value={activeTab}
+            onValueChange={setActiveTab}
+          >
+            <motion.div
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.2 }}
             >
-              <TabsList className="flex space-x-4 bg-white">
+              <TabsList className="flex space-x-4 bg-white justify-center w-full">
                 <TabsTrigger
                   value="account"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white"
+                  className="data-[state=inactive]:text-primary data-[state=active]:bg-primary data-[state=active]:text-white"
                 >
                   Account
                 </TabsTrigger>
                 <TabsTrigger
                   value="security"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white"
+                  className="data-[state=inactive]:text-primary data-[state=active]:bg-primary data-[state=active]:text-white"
                 >
                   Security
                 </TabsTrigger>
                 <TabsTrigger
                   value="services"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white"
+                  className="data-[state=inactive]:text-primary data-[state=active]:bg-primary data-[state=active]:text-white"
                 >
                   Services
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="account">
-                <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      id="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Enter your username"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
-                    />
-                  </div>
-                </form>
-              </TabsContent>
-              <TabsContent value="security">
-                <div className="flex justify-center mb-6">
-                  <Button onClick={handleRequestPasswordChange}>
-                    Request password change
-                  </Button>
-                </div>
-                {showPasswordFields && (
-                  <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-                    <div className="space-y-2 flex justify-center">
-                      A reset token has been sent to your email. Please enter it below.
-                    </div>
+            </motion.div>
+
+            <div className="mt-6">
+              <AnimatePresence mode="wait">
+                <TabsContent value="account">
+                  <motion.form
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                    onSubmit={(e) => e.preventDefault()}
+                    className="space-y-4"
+                  >
                     <div className="space-y-2">
-                      <Label htmlFor="resetToken">Reset Token</Label>
+                      <Label htmlFor="username">Username</Label>
                       <Input
-                        id="resetToken"
-                        value={resetToken}
-                        onChange={(e) => setResetToken(e.target.value)}
-                        placeholder="Enter the received reset token"
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter your username"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="new-password">New Password</Label>
+                      <Label htmlFor="email">Email</Label>
                       <Input
-                        id="new-password"
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Enter your new password"
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="confirm-new-password">Confirm New Password</Label>
-                      <Input
-                        id="confirm-new-password"
-                        type="password"
-                        value={confirmNewPassword}
-                        onChange={(e) => setConfirmNewPassword(e.target.value)}
-                        placeholder="Confirm your new password"
-                      />
+
+                    <motion.div
+                      className="space-y-4 pt-6"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <div className="flex justify-between">
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Button onClick={handleSaveChanges} className="mr-2">
+                            Save Changes
+                          </Button>
+                        </motion.div>
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Button onClick={handleLogoutAllDevices}>
+                            Logout from all devices
+                          </Button>
+                        </motion.div>
+                      </div>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                            <Button variant="destructive" className="w-full">
+                              Delete Account
+                            </Button>
+                          </motion.div>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete your account
+                              and remove your data from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleProfileDeletion}>
+                              Delete Account
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </motion.div>
+                  </motion.form>
+                </TabsContent>
+
+                <TabsContent value="security">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div className="flex justify-center">
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Button onClick={handleRequestPasswordChange}>
+                          Request password change
+                        </Button>
+                      </motion.div>
                     </div>
-                  </form>
-                )}
-              </TabsContent>
-              <TabsContent value="services">
-                <Table>
-                  <TableCaption>Your connected services</TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Service</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {ServicesInfos.map((service) => (
-                      <TableRow key={service.id}>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center">
-                            {service.name}
+                    <AnimatePresence>
+                      {showPasswordFields && (
+                        <motion.form
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2 }}
+                          onSubmit={(e) => e.preventDefault()}
+                          className="space-y-4"
+                        >
+                          <div className="text-center">
+                            A reset token has been sent to your email. Please enter it below.
                           </div>
-                        </TableCell>
-                        <TableCell>{service.description}</TableCell>
-                        <TableCell>
-                          {loggedInServices[service.name.toLowerCase()] ? (
-                            <span className="text-green-600">Connected</span>
-                          ) : (
-                            <span className="text-red-600">Not Connected</span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-            </Tabs>
+                          <div className="space-y-2">
+                            <Label htmlFor="resetToken">Reset Token</Label>
+                            <Input
+                              id="resetToken"
+                              value={resetToken}
+                              onChange={(e) => setResetToken(e.target.value)}
+                              placeholder="Enter the received reset token"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="new-password">New Password</Label>
+                            <Input
+                              id="new-password"
+                              type="password"
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              placeholder="Enter your new password"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+                            <Input
+                              id="confirm-new-password"
+                              type="password"
+                              value={confirmNewPassword}
+                              onChange={(e) => setConfirmNewPassword(e.target.value)}
+                              placeholder="Confirm your new password"
+                            />
+                          </div>
+                        </motion.form>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </TabsContent>
 
-            <div className="flex justify-between mt-6">
-              <Button onClick={handleSaveChanges} className="mr-2">
-                Save Changes
-              </Button>
-              <Button onClick={handleLogoutAllDevices} variant="outline">
-                Logout from all devices
-              </Button>
+                <TabsContent value="services">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Table>
+                      <TableCaption>Your connected services</TableCaption>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Service</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <AnimatePresence>
+                          {ServicesInfos.map((service, index) => (
+                            <motion.tr
+                              key={service.id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -20 }}
+                              transition={{ duration: 0.2, delay: index * 0.1 }}
+                            >
+                              <TableCell className="font-medium">
+                                <div className="flex items-center">
+                                  {service.name}
+                                </div>
+                              </TableCell>
+                              <TableCell>{service.description}</TableCell>
+                              <TableCell>
+                                <motion.span
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  className={
+                                    loggedInServices[service.name.toLowerCase()]
+                                      ? "text-green-600"
+                                      : "text-red-600"
+                                  }
+                                >
+                                  {loggedInServices[service.name.toLowerCase()]
+                                    ? "Connected"
+                                    : "Not Connected"}
+                                </motion.span>
+                              </TableCell>
+                            </motion.tr>
+                          ))}
+                        </AnimatePresence>
+                      </TableBody>
+                    </Table>
+                  </motion.div>
+                </TabsContent>
+              </AnimatePresence>
             </div>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="mt-4">Delete Account</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your account and remove your data from our servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleProfileDeletion}>Delete Account</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+          </Tabs>
+        </div>
+      </motion.main>
+      <Footer />
+    </motion.div>
   );
 }
 
