@@ -24,7 +24,11 @@ const handleLoginFunctions = {
       window.location.href = AUTH_URL;
   },
   handleSpotifyLogin: () => {
-    // Implement Spotify login logic
+    const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+    const REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
+    const SCOPE = 'user-library-read user-read-currently-playing';
+    const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
+    window.location.href = AUTH_URL;
     console.log("Spotify login")
   },
   handleOneDriveLogin: () => {
