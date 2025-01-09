@@ -70,6 +70,7 @@ exports.discordRefresh = async (req, res) => {
             if (!parsedData.access_token)
                 return api_formatter(req, res, 500, "error", "An error occurred while trying to refresh the discord token", null, parsedData);
             req.user.discord_token = parsedData;
+            req.user.discord_token.expires_at = Date.now() + parsedData.expires_in * 1000;
             await req.user.save();
             const areas = await AreaModel.find({ creator_id: req.user.unique_id });
             for (const area of areas) {

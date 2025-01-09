@@ -25,8 +25,11 @@ exports.profile = async (req, res) => {
             "email": req.user.email,
             "account_type": req.user.accountType,
             "logged_in_discord": logged_in_discord,
+            "discord_expire_at": logged_in_discord ? req.user.discord_token.expires_at : null,
             "logged_in_github": logged_in_github,
-            "logged_in_spotify": logged_in_spotify
+            "github_expire_at": logged_in_github ? req.user.github_token.expires_at : null,
+            "logged_in_spotify": logged_in_spotify,
+            "spotify_expire_at": logged_in_spotify ? req.user.spotify_token.expires_at : null
         };
         return api_formatter(req, res, 200, "success", "You are authenticated", user_infos, null, null); // return the user informations
     } catch (err) {
