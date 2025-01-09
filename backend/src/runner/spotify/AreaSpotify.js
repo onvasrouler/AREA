@@ -34,18 +34,18 @@ async function ActionSpotify(AREA) {
         }
         const TriggerEvent = actionReactions.Action.arguments.on;
         switch (TriggerEvent) {
-        case "currently_playing":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
-            break;
-        case "liked_track":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
-            break;
-        case "new_liked_track":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
-            break;
-        default:
-            console.error("Unknown action");
-            Datas = "UnknownAction";
+            case "currently_playing":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
+                break;
+            case "liked_track":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+                break;
+            case "new_liked_track":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "UnknownAction";
         }
         if (Datas == "UnknownAction")
             return;
@@ -76,7 +76,7 @@ async function ActionSpotify(AREA) {
         } else if (TriggerEvent == "currently_playing") {
             if (actionReactions.CachedData.item && actionReactions.CachedData.item.id === Datas.item.id) {
                 actionReactions.Treated = true;
-            } else if (Datas != "") {
+            } else if (Datas != "" && actionReactions.CachedData != "" && actionReactions.CachedData.item != null) {
                 actionReactions.Treated = false;
             }
         }
@@ -108,15 +108,15 @@ async function ReactionSpotify(AREA) {
 
         let Datas = "";
         switch (actionReactions.Reaction.arguments.content) {
-        case "currently_playing":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
-            break;
-        case "liked_track":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
-            break;
-        default:
-            console.error("Unknown action");
-            Datas = "UnknownAction";
+            case "currently_playing":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
+                break;
+            case "liked_track":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "UnknownAction";
         }
         if (Datas == "UnknownAction")
             return;
