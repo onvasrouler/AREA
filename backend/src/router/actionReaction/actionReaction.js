@@ -54,8 +54,6 @@ exports.postArea = async (req, res) => {
 exports.getArea = async (req, res) => {
     try {
         const actionReactions = await ActionReactionModel.find({ creator_id: req.user.unique_id });
-        if (actionReactions.length === 0)
-            return api_formatter(req, res, 404, "notFound", "Action Reaction not found");
         const parsedData = actionReactions.map(actionReaction => ({
             id: actionReaction.unique_id,
             name: actionReaction.Name,
@@ -111,8 +109,6 @@ exports.getRawDataArea = async (req, res) => {
         if (!id)
             return api_formatter(req, res, 400, "error", "Missing required fields", null);
         const actionReactions = await ActionReactionModel.find({ unique_id: id });
-        if (actionReactions.length === 0)
-            return api_formatter(req, res, 404, "notFound", "Action Reaction not found");
         const parsedData = actionReactions.map(actionReaction => ({
             id: actionReaction.unique_id,
             name: actionReaction.Name,
