@@ -883,7 +883,7 @@ npm run lintfix
     ```
 
 - **POST /auth/refresh/discord**
-  - **Description**: Refresh Discord OAuth token.
+  - **Description**: Refresh Discord OAuth token for the user and his areas.
   - **header**:
     ```json
     {
@@ -896,6 +896,27 @@ npm run lintfix
       "status": 200,
       "messageStatus": "success",
       "message": "Discord token has been saved",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /logout/discord**
+  - **Description**: delete OAuth token for the user and area.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Discord token has been deleted",
       "data": null,
       "error": null,
       "session": null,
@@ -958,7 +979,7 @@ npm run lintfix
     ```
 
 - **POST /auth/refresh/github**
-  - **Description**: Github refresh token.
+  - **Description**: Github refresh token for the user and his areas.
   - **header**:
     ```json
     {
@@ -977,7 +998,28 @@ npm run lintfix
       "username": null
     }
     ```
-
+  
+- **POST /logout/github**
+  - **Description**: delete OAuth token for the user and area.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Github token has been deleted",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+  
 - **POST /auth/callback/spotify**
   - **Description**: Handle Spotify OAuth callback.
   - **body**:
@@ -1006,7 +1048,7 @@ npm run lintfix
     ```
 
 - **POST /auth/refresh/Spotify**
-  - **Description**: Refresh Spotify OAuth token.
+  - **Description**: Refresh Spotify OAuth token for the user and his areas.
   - **header**:
     ```json
     {
@@ -1019,6 +1061,27 @@ npm run lintfix
       "status": 200,
       "messageStatus": "success",
       "message": "Spotify token has been refreshed",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /logout/spotify**
+  - **Description**: delete OAuth token for the user and area.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Spotify token has been deleted",
       "data": null,
       "error": null,
       "session": null,
@@ -1673,6 +1736,11 @@ All API responses will be returned in the following format:
   - **Message**: "An error occured while trying to get the discord token"
   - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to discord.
 
+- **POST /logout/discord**
+  - **Status**: 500
+  - **Message**: "An error occured while trying to delete the discord token"
+  - **Reason**: an unexpected error happend on the back check log and try again
+
 - **POST /mobileauth/callback/discord**
   - **Status**: 400
   - **Message**: "code is required when trying to generate a token with the mobile client"
@@ -1691,10 +1759,19 @@ All API responses will be returned in the following format:
   - **Message**: "An error occured while trying to get the github token"
   - **Reason**: the provided code wasn't correct so the back couldn't turn it in a token.
 
-- **POST /auth/callback/github**
+- **POST /auth/refresh/github**
+  - **Status**: 400
+  - **Message**: "you first have to login to github to be able to refresh your token"
+  - **Reason**: the user didn't logged in with github auth0 before trying to refresh his token.
+
   - **Status**: 500
   - **Message**: "An error occured while trying to get the github token"
   - **Reason**: the back couldn't refresh the token in this case delete the github token.
+
+- **POST /logout/github**
+  - **Status**: 500
+  - **Message**: "An error occured while trying to delete the github token"
+  - **Reason**: an unexpected error happend on the back check log and try again
 
 - **POST /auth/callback/spotify**
   - **Status**: 400
@@ -1713,6 +1790,11 @@ All API responses will be returned in the following format:
   - **Status**: 500
   - **Message**: "An error occured while trying to get the spotify token"
   - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to spotify.
+
+- **POST /logout/spotify**
+  - **Status**: 500
+  - **Message**: "An error occured while trying to delete the spotify token"
+  - **Reason**: an unexpected error happend on the back check log and try again
 
 - **POST /mobileauth/callback/spotify**
   - **Status**: 400
