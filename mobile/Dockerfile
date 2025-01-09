@@ -10,5 +10,5 @@ COPY . .
 # Install the dependencies
 RUN flutter pub get
 
-# Run the app when the container launches
-CMD ["flutter", "build", "apk", "--release", "--output=/shared/app-release.apk"]
+# Build the APK and copy it to the shared volume
+CMD flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk /shared/client.apk
