@@ -1,6 +1,5 @@
 const UserModel = require("../../database/models/users");
 const SessionModel = require("../../database/models/session");
-const GoogleUsersModel = require("../../database/models/googleUsers.js");
 const TokenModel = require("../../database/models/token");
 const api_formatter = require("../../middleware/api-formatter.js");
 const { OAuth2Client } = require("google-auth-library");
@@ -13,7 +12,6 @@ const { return_signed_cookies,
     reset_user_session,
     delete_every_user_session,
     delete_user_account,
-    delete_google_account,
     sendEmail } = require("./user.utils");
 
 var hour = 3600000;
@@ -52,6 +50,7 @@ exports.fastregister = async (req, res) => {
             return api_formatter(req, res, 400, "username_already_exist", "an account with the provided username already exist", null, null, null); // return an error message
 
         await new UserModel({ // create a new user
+            unique_id: crypto.randomUUID(),
             email: register_data.email,
             username: register_data.username,
             password: register_data.password,
@@ -228,6 +227,8 @@ exports.login = async (req, res) => {
         }).then(async function (userToLogin) {
             if (!userToLogin)
                 return api_formatter(req, res, 401, "user_not_found", "no user found with the provided email or username");
+            if (userToLogin.accountType == "google")
+                return api_formatter(req, res, 401, "google_account", "this account is a google account");
             if (!userToLogin.emailVerified)
                 return api_formatter(req, res, 401, "email_not_verified", "the email is not verified for this account");
             if (await !userToLogin.comparePassword(login_data.password))
@@ -278,19 +279,23 @@ exports.googleAuth = async (req, res) => {
         });
 
         const payload = ticket.getPayload(); // get the payload
-        const { sub: googleId, email, name, picture } = payload; // get the google id, email, name and picture
+        let { sub: googleId, email, name, picture } = payload; // get the google id, email, name and picture
 
         // Check if the user exists in the database
-        let googleUser = await GoogleUsersModel.findOne({ google_id: googleId }); // find the user in the database
+        let googleUser = await UserModel.findOne({ google_id: googleId }); // find the user in the database
 
         if (!googleUser) { // if the user is not found create a new user
-            googleUser = new GoogleUsersModel({
+            if (await UserModel.usernameExists(name)) // check if the email already exist
+                name = name + crypto.randomBytes(2).toString("hex"); // add a random string to the username
+            googleUser = new UserModel({
                 google_id: googleId,
                 email: email,
                 username: name,
                 profilePicture: picture,
                 creationIp: ip,
                 unique_id: crypto.randomUUID(),
+                emailVerified: true,
+                accountType: "google"
             });
             await googleUser.save().then(async function (userRegistered) { // if the user is created successfully
                 tmpUserRegister = userRegistered;
@@ -330,7 +335,7 @@ exports.googleAuth = async (req, res) => {
         }
     } catch (err) { // if an error occured while trying to register
         console.error(err);
-        await delete_google_account(tmpUserRegister);
+        await delete_user_account(tmpUserRegister);
         return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err);
     }
 };
@@ -368,10 +373,7 @@ exports.deletefastprofile = async (req, res) => {
             if (!req.user.comparePassword(req.body.password))
                 return api_formatter(req, res, 401, "incorrect_password", "the provided password is incorrect for this account", null, null, null);
             await SessionModel.deleteMany({ user_signed_id: req.user.unique_id });
-            if (req.user.session_type == "google")
-                await GoogleUsersModel.deleteOne({ _id: req.user._id });
-            else
-                await UserModel.deleteOne({ _id: req.user._id });
+            await UserModel.deleteOne({ _id: req.user._id });
             return api_formatter(req, res, 200, "success", "account deleted successfully", null, null, null);
         } catch (err) {
             console.error(err);
@@ -387,6 +389,11 @@ exports.deleteaccount = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return an error message
+
+        if (req.user.accountType == "google") {
+            await delete_user_account(req.user); // delete the user account
+            return api_formatter(req, res, 200, "success", "account deleted successfully", null, null, null); // return a success message
+        }
 
         const givenPassword = req.body.password;
         if (!givenPassword) // if the password is not provided
@@ -434,15 +441,11 @@ exports.confirmdeleteaccount = async (req, res) => {
             return api_formatter(req, res, 404, "notfound", "the provided token doesn't exist or is expired", null, null, null); // return an error message
 
         let user = await UserModel.findOne({ unique_id: deleteAccountToken.userId }); // find the user in the database
-        let googleUser = await GoogleUsersModel.findOne({ unique_id: deleteAccountToken.userId }); // find the user in the database
 
-        if (!user && !googleUser) // if the user is not found
+        if (!user) // if the user is not found
             return api_formatter(req, res, 404, "notfound", "no user found with the provided token", null, null, null); // return an error message
 
-        if (user)
-            await delete_google_account(user); // delete the user account
-        if (googleUser)
-            await delete_google_account(googleUser); // delete the google account
+        await delete_user_account(user); // delete the user account
         await TokenModel.deleteMany({ userId: user.unique_id }); // delete all the tokens of the user
         return api_formatter(req, res, 200, "success", "account deleted successfully", null, null, null); // return a success message
     } catch (err) { // if an error occured while trying to delete the account
@@ -458,11 +461,11 @@ exports.profilepicture = async (req, res) => {
         } else {
             if (!req.files || Object.keys(req.files).length === 0) // if no file is uploaded
                 return api_formatter(req, res, 400, "nofile", "No files were uploaded.", null, null, null, req.user.username); // return an error message
-            if (req.session_type == "google") // if the session type is google
+            if (req.user.accountType == "google") // if the session type is google
                 return api_formatter(req, res, 401, "unauthorised", "You can't set a profile picture with a google account", null, null, null, req.user.username); // return an error message
 
             const profilePicture = req.files.profilepicture; // get the profile picture
-            const oldPath = req.user.profilePicturePath; // get the old path
+            const oldPath = req.user.profilePicture; // get the old path
             const fileExtension = path.extname(profilePicture.name); // get the file extension
             const uniqueFileName = `${req.user.unique_id}_${crypto.randomUUID()}${fileExtension}`; // create a unique file name
 
@@ -484,7 +487,7 @@ exports.profilepicture = async (req, res) => {
                         }
                     });
 
-                req.user.profilePicturePath = uploadPath; // set the profile picture path
+                req.user.profilePicture = uploadPath; // set the profile picture path
                 req.user.save().then(() => { // save the user
                     return api_formatter(req, res, 200, "success", "File uploaded successfully", { fileName: uniqueFileName }, null, null, req.user.username); // return a success message
                 }).catch((err) => { // if an error occured while saving the user
@@ -504,11 +507,11 @@ exports.getprofilepicture = async (req, res) => {
         if (!req.user || req.user == null) { // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null, null); // return an error message
         } else {
-            if (req.user.session_type == "google") // if the session type is google
-                return res.sendFile(req.user.profilePicture); // send the profile picture
-            if (!req.user.profilePicturePath || req.user.profilePicturePath == null || req.user.profilePicturePath == "") // if the profile picture path is not found
+            if (req.user.accountType == "google") // if the session type is google
+                return res.send(req.user.profilePicture); // send the profile picture
+            if (!req.user.profilePicture || req.user.profilePicture == null || req.user.profilePicture == "") // if the profile picture path is not found
                 return api_formatter(req, res, 404, "notfound", "no profile picture found", null, null, null, req.user.username); // return an error message
-            return res.sendFile(req.user.profilePicturePath); // send the profile picture
+            return res.sendFile(req.user.profilePicture); // send the profile picture
         }
     } catch (err) { // if an error occured while getting the file
         console.error(err);
@@ -521,16 +524,16 @@ exports.deleteprofilepicture = async (req, res) => {
         if (!req.user || req.user == null) { // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null, null); // return an error message
         } else {
-            if (req.user.session_type == "google") // if the session type is google
+            if (req.user.accountType == "google") // if the session type is google
                 return api_formatter(req, res, 401, "unauthorised", "You can't delete a profile picture with a google account", null, null, null, req.user.username); // return an error message
-            if (!req.user.profilePicturePath || req.user.profilePicturePath == null || req.user.profilePicturePath == "") // if the profile picture path is not found
+            if (!req.user.profilePicture || req.user.profilePicture == null || req.user.profilePicture == "") // if the profile picture path is not found
                 return api_formatter(req, res, 404, "notfound", "no profile picture found", null, null, null, req.user.username); // return an error message
-            fs.unlink(req.user.profilePicturePath, (err) => { // delete the file
+            fs.unlink(req.user.profilePicture, (err) => { // delete the file
                 if (err) {
                     console.error(err);
                     return api_formatter(req, res, 500, "error", "Error while deleting file", null, err, null, req.user.username); // return an error message
                 }
-                req.user.profilePicturePath = ""; // set the profile picture path to null
+                req.user.profilePicture = ""; // set the profile picture path to null
                 req.user.save().then(() => { // save the user
                     return api_formatter(req, res, 200, "success", "File deleted successfully", null, null, null, req.user.username); // return a success message
                 }).catch((err) => { // if an error occured while saving the user
@@ -598,6 +601,8 @@ exports.forgotpassword = async (req, res) => {
         const user = await UserModel.findOne({ email: email }); // find the user in the database
         if (!user) // if the user is not found
             return api_formatter(req, res, 404, "notfound", "no user found with the provided email", null, null, null); // return an error message
+        if (user.accountType == "google") // if the account type is google
+            return api_formatter(req, res, 401, "unauthorised", "You can't reset the password of a google account", null, null, null); // return an error message
 
         const resetToken = await createToken(user.unique_id, "passwordReset", 15);
 
