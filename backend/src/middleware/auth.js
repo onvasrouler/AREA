@@ -1,5 +1,4 @@
 const UserModel = require("../database/models/users.js");
-const GoogleUsersModel = require("../database/models/googleUsers.js");
 const SessionModel = require("../database/models/session.js");
 const jwt = require("jsonwebtoken");
 const sendApiData = require("./api-formatter.js");
@@ -31,34 +30,18 @@ async function checkAuthenticated(req, res, next) {
         }).then(async function (FoundSession) {
             if (!FoundSession) // if the session is not found
                 return invalid_session(req, res);
-            if (FoundSession.session_type == "default") { // if the session is a default session we will find the user in the model users
-                await UserModel.findOne({
-                    link_session_id: FoundSession.signed_id // this will find the user that has the session id in the link_session_id field
-                }).then(async function (CorrespondingUser) {
-                    if (await verif_session_data(FoundSession, CorrespondingUser)) // verify the session data to avoid security issues
-                        return invalid_session(req, res);
-                    req.user = CorrespondingUser; // this will set the user
-                    req.session = FoundSession; // this will set the session
-                    return next(); // we call the next middleware
-                }).catch(function (err) {
-                    console.error(err); // if an error occured
-                    return invalid_session(req, res); // we return an invalid session
-                });
-            } else if (FoundSession.session_type == "google") { // if the session is a google session we will find the user in the model googleUsers
-                await GoogleUsersModel.findOne({
-                    link_session_id: FoundSession.signed_id // this will find the user that has the session id in the link_session_id field
-                }).then(async function (CorrespondingUser) {
-                    if (await verif_session_data(FoundSession, CorrespondingUser)) // verify the session data to avoid security issues
-                        return invalid_session(req, res);
-                    req.user = CorrespondingUser; // this will set the user
-                    req.session = FoundSession; // this will set the session
-                    return next(); // we call the next middleware
-                }).catch(function (err) {
-                    console.error(err); // if an error occured
-                    return invalid_session(req, res); // we return an invalid session
-                });
-            } else
-                return invalid_session(req, res); // if the session type is invalid
+            await UserModel.findOne({
+                link_session_id: FoundSession.signed_id // this will find the user that has the session id in the link_session_id field
+            }).then(async function (CorrespondingUser) {
+                if (await verif_session_data(FoundSession, CorrespondingUser)) // verify the session data to avoid security issues
+                    return invalid_session(req, res);
+                req.user = CorrespondingUser; // this will set the user
+                req.session = FoundSession; // this will set the session
+                return next(); // we call the next middleware
+            }).catch(function (err) {
+                console.error(err); // if an error occured
+                return invalid_session(req, res); // we return an invalid session
+            });
         }).catch(function (err) {
             console.error(err);
             return invalid_session(req, res); // if an while trying to find the session

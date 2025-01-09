@@ -6,7 +6,25 @@ const userSchema = new mongoose.Schema({
     unique_id: { // this is the user id that will be used to identify the user we don't use _id to avoid security issues
         type: String,
         unique: [true, "The Unique ID is already taken for this userSchema"],
-        trim: true
+        trim: true,
+        required: [true, "Unique ID is required"]
+    },
+    google_id: {
+        type: String,
+        trim: true,
+        validate: {
+            validator: function (v) {
+                if (this.accountType === "google") {
+                    return v && v.length > 0;
+                }
+                return true;
+            },
+            message: "Google ID is required for Google accounts."
+        },
+        unique: function () {
+            return this.accountType === "google";
+        },
+        default: ""
     },
     link_session_id: { // this will be used list every session that the user created
         type: Array,
@@ -52,13 +70,12 @@ const userSchema = new mongoose.Schema({
         maxlength: [20, "username can't be more than 20 characters"],
         required: [true, "username is required"],
     },
-    profilePicturePath: { // this will be used to store the user's profile picture path
+    profilePicture: { // this will be used to store the user's profile picture path
         type: String,
         default: ""
     },
     password: { // this will be used to store the user's password
         type: String,
-        required: "Your password is required",
         validate: {
             validator: function (v) {
                 return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/.test(v);
@@ -93,6 +110,7 @@ const userSchema = new mongoose.Schema({
     },
     accountType: { // this will be used to know the account type
         type: String,
+        enum: ["default", "google"],
         default: "default"
     }
 });
@@ -102,6 +120,8 @@ userSchema.pre("save", function (next) {
         const user = this;
         user.LastModificationIp = user.creationIp;
         user.LastModificationDate = Date.now();
+
+        if (user.accountType === "google") return next(); // if the account type is google, we don't need to hash the password
 
         if (!user.isModified("password")) return next(); // if the password is not modified, we don't need to hash it
 

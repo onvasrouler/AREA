@@ -76,7 +76,7 @@ async function ActionSpotify(AREA) {
         } else if (TriggerEvent == "currently_playing") {
             if (actionReactions.CachedData.item && actionReactions.CachedData.item.id === Datas.item.id) {
                 actionReactions.Treated = true;
-            } else if (Datas != "") {
+            } else if (Datas != "" && actionReactions.CachedData != "" && actionReactions.CachedData.item != null) {
                 actionReactions.Treated = false;
             }
         }
