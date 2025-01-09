@@ -11,9 +11,9 @@ import { Search, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from "framer-motion"
 import { Footer } from "@features/dashboard/components/Footer"
 import { Separator } from "@/components/ui/separator"
+import { AreasList } from "@features/dashboard/components/AreasList"
 
 export function DashboardPage() {
-  const [username, setUsername] = useState("User")
   const [selectedService, setSelectedService] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -29,30 +29,13 @@ export function DashboardPage() {
   })
   const apiClient = getApiClient()
   const services = ServicesInfos
+  const [areas, setAreas] = useState([]);
 
   const filteredServices = services.filter((service) =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const session = localStorage.getItem("session")
-      if (session) {
-        try {
-          const response = await apiClient.get("sessions", {
-            session: session
-          })
-
-          if (response.ok) {
-            const data = await response.json()
-            setUsername(data.username)
-          }
-        } catch (error) {
-          console.error('Error:', error)
-        }
-      }
-    }
-
     const checkServicesAuth = async () => {
       const session = localStorage.getItem("session")
       if (session) {
@@ -83,13 +66,32 @@ export function DashboardPage() {
       }
     }
 
+    const fetchAreas = async () => {
+      try {
+        const session = localStorage.getItem("session");
+        const response = await apiClient.get("area", {
+          session: session
+        })
+        const data = await response.json()
+        console.log("Areas:", data.data);
+        if (data?.data) {
+          setAreas(data.data);
+        } else {
+          setAreas([]);
+        }
+      } catch (error) {
+        console.error("Error fetching areas:", error);
+      }
+    }
+
     document.addEventListener("mousedown", handleClickOutside)
-    Promise.all([fetchUserData(), checkServicesAuth()])
+    Promise.all([checkServicesAuth(), fetchAreas()])
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [apiClient])
+
+  }, [])
 
   const handleCardClick = (service) => {
     setSelectedService(service)
@@ -212,8 +214,8 @@ export function DashboardPage() {
             </motion.div>
           </AnimatePresence>
           <Separator className="mt-8 border-t-2" />
-          <div className="font-bold mb-8 mt-8 text-center">
-              <span className="text-2xl font-bold text-primary">Actions - Reactions</span>
+          <div className="font-bold mb-8 mt-8">
+              <AreasList areas={areas} />
           </div>
         </div>
       </main>
