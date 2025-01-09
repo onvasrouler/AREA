@@ -373,6 +373,42 @@ npm run lintfix
   - for reaction:
       we have the content, this define what will be returned in this case it will define wether it is a private message or not ( not in this case ) then the server and the channel where the message will be send is precised the message argument is a text that will be  sent before every other
 
+- **USAGE 5**:
+```json
+    {
+      "name": "*",
+      "reaction": {
+        "service": "gmail",
+        "arguments": {
+            "email": "*",
+            "object": "*",
+            "message": "*"
+        }
+    }
+  }
+  ```
+- **example**:
+```json
+    {
+      "name": "*",
+      "reaction": {
+        "service": "gmail",
+        "arguments": {
+            "email": "aimeric.rouyer@gmail.com",
+            "object": "currently playing",
+            "message": "you're currently playing: "
+        }
+      }
+    }
+  ```
+  - **explanation**:
+  - for action:
+      here i'm not specifying the action because it can be everything that already exist so that would be the same thing as already written
+  - for reaction:
+      email will be the receiver's email
+      object will be the mail's object
+      message will be a text that is shown before the data
+
 ## API Endpoints
 
 ### User Registration and Authentication
@@ -1334,6 +1370,100 @@ npm run lintfix
     }
     ```
 
+- **PATCH /area**
+  - **Description**: change some info on an action reaction using the area id.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **body**:
+    ```json
+    {
+      "id": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+      "name": "newName",
+      "action": "newAction",
+      "reaction": "newReaction"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Action Reaction updated",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **GET /rawdataarea**
+  - **Description**: get all the data an action reaction using the area id.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **body**:
+    ```json
+    {
+      "id": [
+        "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+        "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+        "..."
+      ],
+      "active": "true // false",
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "NB Action Reaction activated // deactivated",
+      "data": "all the data related to the area including CachedData and Error",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /activeAreas**
+  - **Description**: activate or deactivate ( this means the area will not work but isn't deleted ) an action reaction using the area id.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **body**:
+    ```json
+    {
+      "id": [
+        "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+        "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+        "..."
+      ],
+      "active": "true // false",
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "NB Action Reaction activated // deactivated",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
 ## Data Format
 
 All API responses will be returned in the following format:
@@ -1695,3 +1825,44 @@ All API responses will be returned in the following format:
   - **Status**: 500
   - **Message**: "An error occured while trying to get the user's area"
   - **Reason**: an unexpected error happend on the back check log and try again
+
+- **PATCH /area**
+  - **Status**: 400
+  - **Message**: "Missing required fields"
+  - **Reason**: the user didn't provide an area id in the request body
+
+  - **Status**: 404
+  - **Message**: "Action Reaction not found"
+  - **Reason**: no area found with the provided id
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to update the area"
+  - **Reason**: an unexpected error happend on the back check log and try again
+
+
+- **GET /rawdataarea**
+  - **Status**: 400
+  - **Message**: "Missing required fields"
+  - **Reason**: the user didn't provide an area id in the request body
+
+  - **Status**: 404
+  - **Message**: "Action Reaction not found"
+  - **Reason**: no area found with the provided id
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying get the area's data"
+  - **Reason**: an unexpected error happend on the back check log and try again
+
+- **POST /activeAreas**
+  - **Status**: 400
+  - **Message**: "Missing required fields"
+  - **Reason**: the user didn't provide an area id in the request body
+
+  - **Status**: 404
+  - **Message**: "Action Reaction not found"
+  - **Reason**: no area found with the provided id
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to update the area"
+  - **Reason**: an unexpected error happend on the back check log and try again
+
