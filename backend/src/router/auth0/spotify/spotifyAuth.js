@@ -137,3 +137,21 @@ exports.spotifyCallbackMobile = async (req, res) => {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the spotify token on mobile", null, err);
     }
 };
+
+exports.logoutSpotify = async (req, res) => {
+    try {
+        req.user.spotify_token = {};
+        await req.user.save();
+        const areas = await AreaModel.find({ creator_id: req.user.unique_id });
+        for (const area of areas) {
+            if (area.service == "spotify") {
+                area.tokens.spotify = "";
+                await area.save();
+            }
+        }
+        return api_formatter(req, res, 200, "success", "Spotify token has been deleted");
+    } catch (err) {
+        console.error(err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to delete the spotify token", null, err);
+    }
+};
