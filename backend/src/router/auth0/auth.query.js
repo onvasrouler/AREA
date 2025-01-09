@@ -1,6 +1,7 @@
 const discordInteraction = require("./discord/discordAuth.js");
 const githubInteraction = require("./github/githubAuth.js");
 const spotifyInteraction = require("./spotify/spotifyAuth.js");
+const twitchInteraction = require("./twitch/twitchAuth.js");
 const checkAuthenticated = require("../../middleware/auth.js");
 
 module.exports = function (app) {
@@ -17,4 +18,10 @@ module.exports = function (app) {
     app.post("/auth/refresh/spotify", checkAuthenticated, spotifyInteraction.spotifyRefresh);
 
     app.post("/mobileauth/callback/spotify", checkAuthenticated, spotifyInteraction.spotifyCallbackMobile);
+
+    app.post("/auth/callback/twitch", checkAuthenticated, twitchInteraction.twitchCallback);
+    app.post("/auth/refresh/twitch", checkAuthenticated, twitchInteraction.twitchRefresh);
+
+    app.post("/mobileauth/callback/twitch", checkAuthenticated, twitchInteraction.twitchCallbackMobile);
+
 };

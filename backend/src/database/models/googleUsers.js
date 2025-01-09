@@ -20,6 +20,22 @@ const googleUsersSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    discord_token: { // this will be used to store the discord token
+        type: Object,
+        default: {}
+    },
+    github_token: { // this will be used to store the github token
+        type: Object,
+        default: {}
+    },
+    spotify_token: { // this will be used to store the github token
+        type: Object,
+        default: {}
+    },
+    twitch_token: { // this will be used to store the twitch token
+        type: Object,
+        default: {}
+    },
     email: {
         type: String,
         unique: [true, "An account with this email already exists."],
