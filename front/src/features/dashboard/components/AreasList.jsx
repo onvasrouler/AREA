@@ -30,9 +30,9 @@ export function AreasList({ areas }) {
         <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between p-4 hover:text-white"
           >
-            <span className="text-2xl font-bold text-primary w-full text-center">Actions - Reactions</span>
+            <span className="text-2xl font-bold text-primary w-full text-center hover:text-white">Actions - Reactions</span>
             {isOpen ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
