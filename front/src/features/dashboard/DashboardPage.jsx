@@ -10,6 +10,7 @@ import ServicesInfos from "@features/ServicesInfos"
 import { Search, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from "framer-motion"
 import { Footer } from "@features/dashboard/components/Footer"
+import { Separator } from "@/components/ui/separator"
 
 export function DashboardPage() {
   const [username, setUsername] = useState("User")
@@ -123,7 +124,7 @@ export function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Navbar username={username} />
+      <Navbar/>
       <main className="flex-grow flex flex-col items-center p-4 sm:p-8">
         <div className="w-full max-w-3xl mb-8">
           <Card className="border-none shadow-none">
@@ -160,6 +161,12 @@ export function DashboardPage() {
         </div>
 
         <div className="w-full max-w-7xl">
+          <Separator className="mb-8 border-t-2" />
+            <div className="font-bold mb-8 text-center">
+              <span className="text-2xl font-bold text-primary">
+                SERVICES
+              </span>
+            </div>
           <AnimatePresence>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -204,6 +211,10 @@ export function DashboardPage() {
               ))}
             </motion.div>
           </AnimatePresence>
+          <Separator className="mt-8 border-t-2" />
+          <div className="font-bold mb-8 mt-8 text-center">
+              <span className="text-2xl font-bold text-primary">Actions - Reactions</span>
+          </div>
         </div>
       </main>
 
