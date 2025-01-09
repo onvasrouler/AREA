@@ -60,7 +60,9 @@ exports.getArea = async (req, res) => {
             id: actionReaction.unique_id,
             name: actionReaction.Name,
             action: actionReaction.Action,
-            reaction: actionReaction.Reaction
+            reaction: actionReaction.Reaction,
+            active: actionReaction.active,
+            created_at: actionReaction.created_at
         }));
         return api_formatter(req, res, 200, "success", "Action Reaction found", parsedData);
     }
@@ -85,3 +87,65 @@ exports.deleteArea = async (req, res) => {
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token", null, err);
     }
 };
+
+exports.patchArea = async (req, res) => {
+    try {
+        const { id, name, action, reaction } = req.body;
+        if (!id || !name || !action || !reaction)
+            return api_formatter(req, res, 400, "error", "Missing required fields", null);
+        if (!await ActionReactionModel.exists({ unique_id: id }))
+            return api_formatter(req, res, 404, "notFound", "Action Reaction not found");
+        await ActionReactionModel.updateOne({ unique_id: id }, { Name: name, Action: action, Reaction: reaction });
+        return api_formatter(req, res, 200, "success", "Action Reaction updated");
+    }
+    catch (err) {
+        console.error(err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to update the area", null, err);
+    }
+}
+
+
+exports.getRawDataArea = async (req, res) => {
+    try {
+        const { id } = req.body;
+        if (!id)
+            return api_formatter(req, res, 400, "error", "Missing required fields", null);
+        const actionReactions = await ActionReactionModel.find({ unique_id: id });
+        if (actionReactions.length === 0)
+            return api_formatter(req, res, 404, "notFound", "Action Reaction not found");
+        const parsedData = actionReactions.map(actionReaction => ({
+            id: actionReaction.unique_id,
+            name: actionReaction.Name,
+            action: actionReaction.Action,
+            reaction: actionReaction.Reaction,
+            active: actionReaction.active,
+            created_at: actionReaction.created_at,
+            LastModificationDate: actionReaction.LastModificationDate,
+            CachedData: actionReaction.CachedData ? actionReaction.CachedData : null,
+            Error: actionReaction.Error ? actionReaction.Error : null
+
+        }));
+        return api_formatter(req, res, 200, "success", "Action Reaction found", parsedData);
+    }
+    catch (err) {
+        console.error(err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to get the area's data", null, err);
+    }
+}
+
+exports.postActiveArea = async (req, res) => {
+    try {
+        const { id, active } = req.body;
+        if (!id)
+            return api_formatter(req, res, 400, "error", "Missing required fields", null);
+        const actionReaction = await ActionReactionModel.find({ unique_id: id });
+        if (actionReaction.length === 0)
+            return api_formatter(req, res, 404, "notFound", "Action Reaction not found");
+        await ActionReactionModel.updateMany({ unique_id: id }, { active });
+        return api_formatter(req, res, 200, "success", `${actionReaction.length} Action Reaction ${active === true ? "activated" : "deactivated"}`);
+    }
+    catch (err) {
+        console.error(err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to update the active area", null, err);
+    }
+}
