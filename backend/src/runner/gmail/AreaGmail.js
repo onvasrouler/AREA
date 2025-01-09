@@ -1,6 +1,5 @@
 const nodemailer = require("nodemailer");
 const ActionReactionModel = require("../../database/models/actionReaction");
-const axios = require("axios");
 
 // This is the transporter for sending emails
 const mailSender = nodemailer.createTransport({

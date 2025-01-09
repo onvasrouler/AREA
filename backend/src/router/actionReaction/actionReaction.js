@@ -102,7 +102,7 @@ exports.patchArea = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to update the area", null, err);
     }
-}
+};
 
 
 exports.getRawDataArea = async (req, res) => {
@@ -131,7 +131,7 @@ exports.getRawDataArea = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the area's data", null, err);
     }
-}
+};
 
 exports.postActiveArea = async (req, res) => {
     try {
@@ -148,4 +148,4 @@ exports.postActiveArea = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to update the active area", null, err);
     }
-}
+};

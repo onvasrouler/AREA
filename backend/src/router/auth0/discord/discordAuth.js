@@ -152,4 +152,4 @@ exports.logoutDiscord = async (req, res) => {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to delete the discord token", null, err);
     }
-}
+};
