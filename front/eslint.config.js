@@ -32,6 +32,7 @@ export default [
       "react-refresh/only-export-components": "off",
       "react/prop-types": "off",
       "react-hooks/exhaustive-deps": "off",
+      "react/no-unescaped-entities": "off",
     },
   },
 ];

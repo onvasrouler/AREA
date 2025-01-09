@@ -7,6 +7,7 @@ import { SettingsPage } from "../features/settings/SettingsPage";
 import { CallbackDiscord } from "../features/auth/CallbackDiscord";
 import { CallbackGithub } from "../features/auth/CallbackGithub";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { ClientApkPage } from "../features/client-apk/clientApk";
 
 const AppRoutes = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -21,6 +22,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/client.apk" element={<ClientApkPage />} />
 
         {isAuthenticated ? (
           <>
