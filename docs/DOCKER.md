@@ -1,12 +1,14 @@
+
 # Docker Documentation for the Project
 
 ## Overview
-This project uses **Docker** to containerize the application and simplify deployment and development. The project is structured with **Docker Compose** to manage multiple services: the server, client_web, and MongoDB.
+This project uses **Docker** to containerize the application and simplify deployment and development. The project is structured with **Docker Compose** to manage multiple services: the server, client_web, client_mobile, and MongoDB.
 
 The structure includes the following components:
 1. **mongo**: MongoDB database container.
 2. **server**: Backend service container.
-3. **client_web**: Frontend service container.
+3. **client_web**: Frontend web service container.
+4. **client_mobile**: Mobile client build container for Flutter.
 
 ---
 
@@ -38,6 +40,12 @@ services:
     env_file:
       - ./backend/.env.docker
 
+  client_mobile:
+    build:
+      context: ./mobile
+    volumes:
+      - shared-volume:/shared
+
   client_web:
     build:
       context: ./front
@@ -47,6 +55,7 @@ services:
       - shared-volume:/shared
     command: npm run dev
     depends_on:
+      - client_mobile
       - server
     env_file:
       - ./front/.env.docker
@@ -78,12 +87,18 @@ volumes:
 - **Ports**: Maps the container's port `8081` to host port `8081`.
 - **Volumes**: Mounts `shared-volume` to `/shared` for shared data between services.
 - **Command**: Runs the frontend service using `npm run dev`.
-- **Depends_on**: Ensures the `server` service starts before the frontend.
+- **Depends_on**: Ensures the `server` and `client_mobile` services start before the frontend.
 - **Environment File**: Loads environment variables from `./front/.env.docker`.
+
+#### **4. `client_mobile` Service**
+- **Build**:
+  - Context: `./mobile` directory where the mobile Dockerfile is located.
+- **Volumes**: Mounts `shared-volume` to `/shared` for output communication.
+- **Command**: Builds the Flutter application APK and copies it to the shared volume.
 
 #### **Volumes**
 - `mongo-data`: Stores MongoDB data persistently.
-- `shared-volume`: Provides a shared volume for communication between `client_web` and `mobile-client`.
+- `shared-volume`: Provides a shared volume for communication between services.
 
 ---
 
@@ -114,15 +129,6 @@ EXPOSE 8080
 CMD ["npm", "start"]
 ```
 
-### Key Points
-1. **Base Image**: Uses the latest Node.js image.
-2. **Work Directory**: Sets the working directory to `/app`.
-3. **Dependencies**:
-   - Copies `package.json` to install required packages.
-4. **Source Code**: Copies all backend source code into the container.
-5. **Port Exposure**: Exposes port `8080` for external communication.
-6. **Startup Command**: Executes `npm start`.
-
 ---
 
 ## Frontend Dockerfile
@@ -152,14 +158,28 @@ EXPOSE 8081
 CMD ["npm", "start"]
 ```
 
-### Key Points
-1. **Base Image**: Uses the latest Node.js image.
-2. **Work Directory**: Sets the working directory to `/app`.
-3. **Dependencies**:
-   - Copies `package.json` to install required packages.
-4. **Source Code**: Copies all frontend source code into the container.
-5. **Port Exposure**: Exposes port `8081` for external communication.
-6. **Startup Command**: Executes `npm start`.
+---
+
+## Mobile Dockerfile
+
+**Path**: `mobile/Dockerfile`
+
+```dockerfile
+# Use the latest Flutter image as a parent image
+FROM ghcr.io/cirruslabs/flutter:3.24.5
+
+# Set the working directory
+WORKDIR /app
+
+# Copy all the source code into the container's working directory
+COPY . .
+
+# Install the dependencies
+RUN flutter pub get
+
+# Build the APK and copy it to the shared volume
+CMD flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk /shared/client.apk
+```
 
 ---
 
@@ -186,13 +206,14 @@ docker-compose down
 1. **MongoDB**: Accessible at `localhost:27017`.
 2. **Backend Server**: Accessible at `http://localhost:8080`.
 3. **Frontend Client**: Accessible at `http://localhost:8081`.
+4. **Mobile APK**: The built APK will be available in the shared volume.
 
 ---
 
 ## Notes
 - Ensure environment variables for `backend` and `front` are correctly configured in `.env.docker` files.
-- Shared volume `shared-volume` is ready for communication between frontend and other clients (e.g., `client_mobile`).
-- The `client_mobile` service will be added later as indicated in the `docker-compose.yml` file.
+- Shared volume `shared-volume` is used for communication between `client_web` and `client_mobile`.
+- The `client_mobile` service builds a release APK that is available in the shared volume.
 
 ---
 

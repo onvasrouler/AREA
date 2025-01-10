@@ -107,32 +107,72 @@ useEffect(() => {
     console.log("Area to be deleted:", area);
   }
 
+  function formatJsonValues(data) {
+    const formatters = {
+      service: (value) => capitalizeFirstLetter(value),
+      on: (value) => value.replace(/_/g, " "),
+      react: (value) => capitalizeFirstLetter(value.replace(/_/g, " ")),
+    };
+  
+    function capitalizeFirstLetter(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+  
+    function formatObject(obj) {
+      if (Array.isArray(obj)) {
+        return obj.map(formatObject);
+      } else if (obj && typeof obj === "object") {
+        return Object.fromEntries(
+          Object.entries(obj).map(([key, value]) => [
+            key,
+            formatters[key] ? formatters[key](value) : formatObject(value),
+          ])
+        );
+      }
+      return obj;
+    }
+  
+    return formatObject(data);
+  }
+
   const AccordionItems = (
     <Accordion type="single" collapsible className="w-full pr-2">
-      {areas.map(area => (
-        <AccordionItem key={area.name} value={area.name} className="pr-8 relative">
-          <AccordionTrigger>{area.name}</AccordionTrigger>
-          <AccordionContent>
-            <pre className="whitespace-pre-wrap text-left">
-              {JSON.stringify(area, null, 2)}
-            </pre>
-          </AccordionContent>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-0 top-2 -mr-6"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAreaDeletion(area);
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-            <span className="sr-only">Delete area</span>
-          </Button>
-        </AccordionItem>
-      ))}
+      {areas.map((rawArea) => {
+        const area = formatJsonValues(rawArea);
+  
+        return (
+          <AccordionItem key={area.name} value={area.name} className="pr-8 relative">
+            <AccordionTrigger>{area.name}</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-left space-y-2">
+                <div>
+                  <strong>Area's name :</strong> {area.name}
+                </div>
+                <div>
+                  When the action <strong>{area.action.arguments.on}</strong> happens on <strong>{area.action.service}</strong>,
+                </div>
+                <div>
+                  <strong>{area.reaction.service}</strong> reacts by sending <strong>{area.reaction.arguments.react}</strong>: <strong>{area.reaction.arguments.message}</strong>
+                </div>
+              </div>
+            </AccordionContent>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-0 top-2 -mr-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAreaDeletion(rawArea);
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="sr-only">Delete</span>
+            </Button>
+          </AccordionItem>
+        );
+      })}
     </Accordion>
-  )
+  );
 
   const renderServiceContent = () => {
     if (!isAuthenticated) {

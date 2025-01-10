@@ -6,6 +6,8 @@ module.exports = function (app) {
     app.post("/area", checkAuthenticated, actionReaction.postArea);
     app.get("/area", checkAuthenticated, actionReaction.getArea);
     app.delete("/area", checkAuthenticated, actionReaction.deleteArea);
+    app.patch("/area", checkAuthenticated, actionReaction.patchArea);
 
-    // a completer tout
+    app.get("/rawdataarea", checkAuthenticated, actionReaction.getRawDataArea);
+    app.post("/activeAreas", checkAuthenticated, actionReaction.postActiveArea);
 };

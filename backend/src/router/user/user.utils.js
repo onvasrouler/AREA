@@ -3,7 +3,6 @@ const api_formatter = require("../../middleware/api-formatter.js");
 const UserModel = require("../../database/models/users");
 const SessionModel = require("../../database/models/session");
 const nodemailer = require("nodemailer");
-const GoogleUsersModel = require("../../database/models/googleUsers");
 
 // This function will return the signed cookies
 async function return_signed_cookies(req, res, Session, User) {
@@ -75,16 +74,6 @@ async function delete_every_user_session(User) {
     }
 }
 
-// This function will delete a Google account
-async function delete_google_account(User) {
-    delete_every_user_session(User);
-    return await GoogleUsersModel.deleteOne({
-        _id: User ? User._id : null
-    }).catch(function (err) {
-        console.error(err);
-    });
-}
-
 // This function will delete the user account
 async function delete_user_account(User) {
     delete_every_user_session(User);
@@ -125,6 +114,5 @@ module.exports = {
     reset_user_session,
     delete_every_user_session,
     delete_user_account,
-    delete_google_account,
     sendEmail, // Export the email sending function
 };
