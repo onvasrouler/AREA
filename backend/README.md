@@ -409,6 +409,104 @@ npm run lintfix
       object will be the mail's object
       message will be a text that is shown before the data
 
+- **USAGE 6**:
+```json
+    {
+      "name": "*",
+      "action": {
+        "service": "twitch",
+        "arguments": {
+            "on": [
+              "new_follow",
+              "following_online"
+            ]
+        }
+    }
+  }
+  ```
+  - **explanation**:
+    new_follow this will trigger the reaction when the user follow a new streamer 
+    following_online this will trigger the reaction when one of the streamer the user follow goes online
+  - **example**:
+    ```json
+    {
+      "name": "*",
+      "action": {
+        "service": "twitch",
+        "arguments": {
+            "on": "new_follow"
+        }
+    },
+     "reaction": {
+        "service": "discord",
+        "arguments": {
+            "react": "message",
+            "server": "1308348420037279747",
+            "channel": "1325848053206352018",
+            "message": "i'm following a new streamer  :"
+        }
+    }
+  }
+  ```
+  - **explanation**:
+    the action is when the user follow a new person on twitch
+    the reaction is to send a discord message
+
+
+- **USAGE 7**:
+    ```json
+    {
+      "name": "*",
+      "reaction": {
+        "service": "discord",
+        "arguments": {
+            "on": [
+              "/twitchonline",
+              "/following"
+            ],
+            "userId": "*",
+        }
+    },
+    "reaction": {
+        "service": "twitch",
+        "arguments": {
+            "content": [
+              "following",
+              "following_online"
+            ],
+            "message": "*"
+        }
+    }
+  }
+  ```
+  - **explanation**:
+      /twitchonline will return the list of the streamer the user follow that are online with info about their stream
+      /following will return the list of the streamer the user follow
+  - **example**:
+  ```json
+  {
+    "name": "on /following on discord send the list of the streamer the user follow",
+    "action": {
+        "service": "discord",
+        "arguments": {
+            "on": "/following",
+            "userId": "431930188255854613"
+        }
+    },
+    "reaction": {
+        "service": "twitch",
+        "arguments": {
+            "content": "following",
+            "message": "here is the list of streamer you follow :"
+        }
+    }
+  }
+  ```
+  - **explanation**:
+    the action is when the user use the command /following on discord
+    the reaction is to list the streamer the user follow
+
+
 ## API Endpoints
 
 ### User Registration and Authentication
