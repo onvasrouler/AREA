@@ -46,8 +46,8 @@ export function DashboardPage() {
           const responseData = await response.json()
 
           setAuthStatus({
-            isDiscordAuthenticated: responseData.data?.logged_in_discord === true,
-            isGitHubAuthenticated: responseData.data?.logged_in_github === true,
+            isDiscordAuthenticated: responseData.data?.logged_in_discord === true && responseData.data?.logged_in_discord !== "session_expired",
+            isGitHubAuthenticated: responseData.data?.logged_in_github === true && responseData.data?.logged_in_github !== "session_expired",
             isSpotifyAuthenticated: false,
             isOneDriveAuthenticated: false,
             isGmailAuthenticated: false,

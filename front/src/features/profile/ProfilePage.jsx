@@ -58,8 +58,6 @@ export function ProfilePage() {
           console.log(data);
           setUsername(data.data.username);
           setEmail(data.data.email);
-
-          const currentTime = Date.now();
           const expirations = {
             discord: data.data.logged_in_discord && data.data.discord_expire_at
               ? new Date(data.data.discord_expire_at).toLocaleString()
@@ -71,13 +69,18 @@ export function ProfilePage() {
               ? new Date(data.data.spotify_expire_at).toLocaleString()
               : "N/A",
           };
-
-          setLoggedInServices({
-            discord: data.data.logged_in_discord,
-            github: data.data.logged_in_github,
-            spotify: data.data.logged_in_spotify,
-          });
-
+          const loggedIn = {
+            discord: data.data.logged_in_discord && data.data.discord_expire_at
+              ? new Date(data.data.discord_expire_at) > new Date()
+              : false,
+            github: data.data.logged_in_github && data.data.github_expire_at
+              ? new Date(data.data.github_expire_at) > new Date()
+              : false,
+            spotify: data.data.logged_in_spotify && data.data.spotify_expire_at
+              ? new Date(data.data.spotify_expire_at) > new Date()
+              : false,
+          };
+          setLoggedInServices(loggedIn);
           setServiceExpirations(expirations);
         }
       } catch (error) {
@@ -236,7 +239,7 @@ export function ProfilePage() {
       exit={{ opacity: 0 }}
       className="min-h-screen flex flex-col"
     >
-      <motion.div 
+      <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
@@ -515,7 +518,10 @@ export function ProfilePage() {
                                 >
                                   {loggedInServices[service.name.toLowerCase()]
                                     ? "Connected"
-                                    : "Not Connected"}
+                                    : serviceExpirations[service.name.toLowerCase()] !== "N/A" &&
+                                      new Date(serviceExpirations[service.name.toLowerCase()]) <= new Date()
+                                      ? "Token Expired"
+                                      : "Not Connected"}
                                 </motion.span>
                               </TableCell>
                               <TableCell>
