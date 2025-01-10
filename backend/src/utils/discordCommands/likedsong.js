@@ -48,7 +48,7 @@ module.exports = {
         });
 
         let finalMessage = "";
-        await interaction.reply(`${AREA.Reaction.arguments.prefix}`);
+        await interaction.reply(`${AREA.Reaction.arguments.message}`);
 
         for (const message of Messages) {
             if ((finalMessage + message).length > 1500) {
