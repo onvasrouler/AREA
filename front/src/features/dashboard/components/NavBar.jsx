@@ -55,7 +55,7 @@ export function Navbar() {
           <div className="flex items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="icon" className="rounded-full">
+                <Button size="icon"  aria-label="User profile button" className="rounded-full">
                   <FaUser className="h-8 w-8" />
                 </Button>
               </DropdownMenuTrigger>

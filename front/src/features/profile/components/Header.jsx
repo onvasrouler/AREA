@@ -25,7 +25,7 @@ export function Header({ handleLogout, navigate }) {
         <div className="flex items-center bg-primary text-white">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="icon" className="rounded-full">
+              <Button size="icon" aria-label="User profile menu" className="rounded-full">
                 <FaUser className="h-8 w-8" />
               </Button>
             </DropdownMenuTrigger>

@@ -114,7 +114,7 @@ export function AccountTab({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button variant="destructive" className="w-full">
+              <Button aria-label="Delete Account" className="w-full bg-red-700">
                 Delete Account
               </Button>
             </motion.div>
