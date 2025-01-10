@@ -70,6 +70,7 @@ exports.discordRefresh = async (req, res) => {
             if (!parsedData.access_token)
                 return api_formatter(req, res, 500, "error", "An error occurred while trying to refresh the discord token", null, parsedData);
             req.user.discord_token = parsedData;
+            req.user.discord_token.expires_at = Date.now() + parsedData.expires_in * 1000;
             await req.user.save();
             const areas = await AreaModel.find({ creator_id: req.user.unique_id });
             for (const area of areas) {
@@ -133,5 +134,23 @@ exports.discordCallbackMobile = async (req, res) => {
     catch (err) {
         console.error(err);
         return api_formatter(req, res, 500, "error", "An error occured while trying to get the discord token on mobile", null, err);
+    }
+};
+
+exports.logoutDiscord = async (req, res) => {
+    try {
+        req.user.discord_token = {};
+        await req.user.save();
+        const areas = await AreaModel.find({ creator_id: req.user.unique_id });
+        for (const area of areas) {
+            if (area.service == "discord") {
+                area.tokens.discord = "";
+                await area.save();
+            }
+        }
+        return api_formatter(req, res, 200, "success", "Discord token has been deleted");
+    } catch (err) {
+        console.error(err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to delete the discord token", null, err);
     }
 };

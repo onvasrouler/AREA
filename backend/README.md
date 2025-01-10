@@ -373,6 +373,42 @@ npm run lintfix
   - for reaction:
       we have the content, this define what will be returned in this case it will define wether it is a private message or not ( not in this case ) then the server and the channel where the message will be send is precised the message argument is a text that will be  sent before every other
 
+- **USAGE 5**:
+```json
+    {
+      "name": "*",
+      "reaction": {
+        "service": "gmail",
+        "arguments": {
+            "email": "*",
+            "object": "*",
+            "message": "*"
+        }
+    }
+  }
+  ```
+- **example**:
+```json
+    {
+      "name": "*",
+      "reaction": {
+        "service": "gmail",
+        "arguments": {
+            "email": "aimeric.rouyer@gmail.com",
+            "object": "currently playing",
+            "message": "you're currently playing: "
+        }
+      }
+    }
+  ```
+  - **explanation**:
+  - for action:
+      here i'm not specifying the action because it can be everything that already exist so that would be the same thing as already written
+  - for reaction:
+      email will be the receiver's email
+      object will be the mail's object
+      message will be a text that is shown before the data
+
 ## API Endpoints
 
 ### User Registration and Authentication
@@ -847,7 +883,7 @@ npm run lintfix
     ```
 
 - **POST /auth/refresh/discord**
-  - **Description**: Refresh Discord OAuth token.
+  - **Description**: Refresh Discord OAuth token for the user and his areas.
   - **header**:
     ```json
     {
@@ -860,6 +896,27 @@ npm run lintfix
       "status": 200,
       "messageStatus": "success",
       "message": "Discord token has been saved",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /logout/discord**
+  - **Description**: delete OAuth token for the user and area.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Discord token has been deleted",
       "data": null,
       "error": null,
       "session": null,
@@ -922,7 +979,7 @@ npm run lintfix
     ```
 
 - **POST /auth/refresh/github**
-  - **Description**: Github refresh token.
+  - **Description**: Github refresh token for the user and his areas.
   - **header**:
     ```json
     {
@@ -941,7 +998,28 @@ npm run lintfix
       "username": null
     }
     ```
-
+  
+- **POST /logout/github**
+  - **Description**: delete OAuth token for the user and area.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Github token has been deleted",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+  
 - **POST /auth/callback/spotify**
   - **Description**: Handle Spotify OAuth callback.
   - **body**:
@@ -970,7 +1048,7 @@ npm run lintfix
     ```
 
 - **POST /auth/refresh/Spotify**
-  - **Description**: Refresh Spotify OAuth token.
+  - **Description**: Refresh Spotify OAuth token for the user and his areas.
   - **header**:
     ```json
     {
@@ -983,6 +1061,27 @@ npm run lintfix
       "status": 200,
       "messageStatus": "success",
       "message": "Spotify token has been refreshed",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /logout/spotify**
+  - **Description**: delete OAuth token for the user and area.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Spotify token has been deleted",
       "data": null,
       "error": null,
       "session": null,
@@ -1334,6 +1433,100 @@ npm run lintfix
     }
     ```
 
+- **PATCH /area**
+  - **Description**: change some info on an action reaction using the area id.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **body**:
+    ```json
+    {
+      "id": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+      "name": "newName",
+      "action": "newAction",
+      "reaction": "newReaction"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "Action Reaction updated",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **GET /rawdataarea**
+  - **Description**: get all the data an action reaction using the area id.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **body**:
+    ```json
+    {
+      "id": [
+        "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+        "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+        "..."
+      ],
+      "active": "true // false",
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "NB Action Reaction activated // deactivated",
+      "data": "all the data related to the area including CachedData and Error",
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
+- **POST /activeAreas**
+  - **Description**: activate or deactivate ( this means the area will not work but isn't deleted ) an action reaction using the area id.
+  - **header**:
+    ```json
+    {
+      "session": "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx"
+    }
+    ```
+  - **body**:
+    ```json
+    {
+      "id": [
+        "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+        "xxxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx",
+        "..."
+      ],
+      "active": "true // false",
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "status": 200,
+      "messageStatus": "success",
+      "message": "NB Action Reaction activated // deactivated",
+      "data": null,
+      "error": null,
+      "session": null,
+      "username": null
+    }
+    ```
+
 ## Data Format
 
 All API responses will be returned in the following format:
@@ -1543,6 +1736,11 @@ All API responses will be returned in the following format:
   - **Message**: "An error occured while trying to get the discord token"
   - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to discord.
 
+- **POST /logout/discord**
+  - **Status**: 500
+  - **Message**: "An error occured while trying to delete the discord token"
+  - **Reason**: an unexpected error happend on the back check log and try again
+
 - **POST /mobileauth/callback/discord**
   - **Status**: 400
   - **Message**: "code is required when trying to generate a token with the mobile client"
@@ -1561,10 +1759,19 @@ All API responses will be returned in the following format:
   - **Message**: "An error occured while trying to get the github token"
   - **Reason**: the provided code wasn't correct so the back couldn't turn it in a token.
 
-- **POST /auth/callback/github**
+- **POST /auth/refresh/github**
+  - **Status**: 400
+  - **Message**: "you first have to login to github to be able to refresh your token"
+  - **Reason**: the user didn't logged in with github auth0 before trying to refresh his token.
+
   - **Status**: 500
   - **Message**: "An error occured while trying to get the github token"
   - **Reason**: the back couldn't refresh the token in this case delete the github token.
+
+- **POST /logout/github**
+  - **Status**: 500
+  - **Message**: "An error occured while trying to delete the github token"
+  - **Reason**: an unexpected error happend on the back check log and try again
 
 - **POST /auth/callback/spotify**
   - **Status**: 400
@@ -1583,6 +1790,11 @@ All API responses will be returned in the following format:
   - **Status**: 500
   - **Message**: "An error occured while trying to get the spotify token"
   - **Reason**: this occur when the refresh token wasn't correct so you have to reconnect to spotify.
+
+- **POST /logout/spotify**
+  - **Status**: 500
+  - **Message**: "An error occured while trying to delete the spotify token"
+  - **Reason**: an unexpected error happend on the back check log and try again
 
 - **POST /mobileauth/callback/spotify**
   - **Status**: 400
@@ -1695,3 +1907,44 @@ All API responses will be returned in the following format:
   - **Status**: 500
   - **Message**: "An error occured while trying to get the user's area"
   - **Reason**: an unexpected error happend on the back check log and try again
+
+- **PATCH /area**
+  - **Status**: 400
+  - **Message**: "Missing required fields"
+  - **Reason**: the user didn't provide an area id in the request body
+
+  - **Status**: 404
+  - **Message**: "Action Reaction not found"
+  - **Reason**: no area found with the provided id
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to update the area"
+  - **Reason**: an unexpected error happend on the back check log and try again
+
+
+- **GET /rawdataarea**
+  - **Status**: 400
+  - **Message**: "Missing required fields"
+  - **Reason**: the user didn't provide an area id in the request body
+
+  - **Status**: 404
+  - **Message**: "Action Reaction not found"
+  - **Reason**: no area found with the provided id
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying get the area's data"
+  - **Reason**: an unexpected error happend on the back check log and try again
+
+- **POST /activeAreas**
+  - **Status**: 400
+  - **Message**: "Missing required fields"
+  - **Reason**: the user didn't provide an area id in the request body
+
+  - **Status**: 404
+  - **Message**: "Action Reaction not found"
+  - **Reason**: no area found with the provided id
+
+  - **Status**: 500
+  - **Message**: "An error occured while trying to update the area"
+  - **Reason**: an unexpected error happend on the back check log and try again
+

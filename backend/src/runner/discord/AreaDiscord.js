@@ -9,7 +9,6 @@ async function extractData(AREA, prefix) {
     try {
         let message = prefix + "\n" || "";
 
-
         if (AREA.CachedData == "error") {
             message = "an error occured : **" + (AREA.Errors.message || " while fetching the data") + "** on the AREA with name : **" + AREA.Name + "**";
         } else {

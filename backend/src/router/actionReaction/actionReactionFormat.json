@@ -1,0 +1,38 @@
+{
+    "action": {
+        "service": [
+            "github"
+        ],
+        "arguments": {
+            "on": [
+                "new_issue",
+                "new_repo",
+                "new_commit",
+                "new_pr"
+            ]
+        }
+    },
+    "reaction": {
+        "service": [
+            "discord"
+        ],
+        "arguments": {
+            "react": [
+                "message"
+            ],
+            "server": [
+                "*"
+            ],
+            "channel": [
+                "*"
+            ],
+            "message": {
+                "new_pr": "A new PR has been opened!",
+                "new_issue": "A new issue has been opened!",
+                "new_commit": "A new commit has been pushed!",
+                "new_repo": "A new repo has been created!",
+                "*": "*"
+            }
+        }
+    }
+}
