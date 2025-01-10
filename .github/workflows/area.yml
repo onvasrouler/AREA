@@ -176,16 +176,17 @@ jobs:
     needs:
       - deploy-documentation
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Mirror master to main
-        run: |
-          git remote add mirror "${{ env.EPITECH_REPOSITORY }}"
-          git fetch origin master
-          git push --force mirror master:main
-        env:
-          EPITECH_REPOSITORY: ${{ secrets.EPITECH_REPOSITORY }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Mirror master to main
+      if: github.ref == 'refs/heads/master' # Only execute if on the master branch
+      run: |
+        git remote add mirror "${{ env.EPITECH_REPOSITORY }}"
+        git fetch origin master
+        git push --force mirror master:main
+      env:
+        EPITECH_REPOSITORY: ${{ secrets.EPITECH_REPOSITORY }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 # ADD ANSIBLE JOB
