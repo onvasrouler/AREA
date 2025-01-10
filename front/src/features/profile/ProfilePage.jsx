@@ -232,6 +232,62 @@ export function ProfilePage() {
     }
   };
 
+  const handleLogoutFromServices = async (serviceName) => {
+    try {
+      const session = localStorage.getItem('session');
+      if (session) {
+        let apiEndpoint = `logout/${serviceName}`;
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}${apiEndpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'session': session
+          }
+        });
+        if (response.ok) {
+          console.log(`Successfully disconnected from ${serviceName}`);
+          setLoggedInServices((prev) => ({
+            ...prev,
+            [serviceName]: false,
+          }));
+        } else {
+          console.error(`Failed to disconnect from ${serviceName}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error disconnecting from service:', error);
+    }
+  };
+
+  const handleRefreshServicesTokens = async (serviceName) => {
+    try {
+      const session = localStorage.getItem('session');
+      if (session) {
+        let apiEndpoint = `auth/refresh/${serviceName}`;
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}${apiEndpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'session': session,
+          },
+        });
+        console.log(response);
+        if (response.ok) {
+          console.log(`Token for ${serviceName} refreshed successfully`);
+          const refreshedToken = await response.json();
+          setServiceExpirations((prev) => ({
+            ...prev,
+            [serviceName]: new Date(refreshedToken.expire_at).toLocaleString(),
+          }));
+        } else {
+          console.error(`Failed to refresh token for ${serviceName}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing service token:', error);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -526,16 +582,18 @@ export function ProfilePage() {
                               </TableCell>
                               <TableCell>
                                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                                  <Button variant="icon">
+                                  <Button variant="icon" onClick={() => handleRefreshServicesTokens(service.name.toLowerCase())}>
                                     <RefreshCcw />
                                   </Button>
                                 </motion.div>
                               </TableCell>
                               <TableCell>
-                                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                                  <Button variant="destructive">Disconnect</Button>
-                                </motion.div>
-                              </TableCell>
+                              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                                <Button variant="destructive" onClick={() => handleLogoutFromServices(service.name.toLowerCase())}>
+                                  Disconnect
+                                </Button>
+                              </motion.div>
+                            </TableCell>
                             </motion.tr>
                           ))}
                         </AnimatePresence>
