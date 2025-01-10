@@ -9,29 +9,29 @@ exports.postArea = async (req, res) => {
             return api_formatter(req, res, 400, "MissingInfos", "Missing area name", null);
         if (!action || !reaction)
             return api_formatter(req, res, 400, "MissingInfos", "Missing required fields", null);
-        const services = ["github", "discord", "spotift"];
         const messages = {
             "github": "You need to connect your github account to use github's",
             "discord": "You need to connect your discord account to use discord's",
-            "spotify": "You need to connect your spotify account to use spotify's"
+            "spotify": "You need to connect your spotify account to use spotify's",
+            "twitch": "You need to connect your twitch account to use twitch's"
         };
-
-        for (const service of services) {
-            if (action.service == service && req.user[`${service}_token`] == null)
-                return api_formatter(req, res, 400, "error", `${messages[service]} action`, null);
-            if (reaction.service == service && req.user[`${service}_token`] == null)
-                return api_formatter(req, res, 400, "error", `${messages[service]} reaction`, null);
-        }
 
         const getToken = (service) => req.user[`${service}_token`] ? req.user[`${service}_token`].access_token : "";
 
         const actionToken = getToken(action.service);
         const reactionToken = getToken(reaction.service);
 
+        if (!actionToken && action.service !== "discord")
+            return api_formatter(req, res, 400, "error", `${messages[action.service]} action`, null);
+        if (!reactionToken && reaction.service !== "gmail" && reaction.service !== "discord")
+            return api_formatter(req, res, 400, "error", `${messages[action.service]} reaction`, null);
+
         const tokens = `{
             "${action.service}": "${actionToken}",
             "${reaction.service}": "${reactionToken}"
+            ${(action.service === "twitch" || reaction.service === "twitch") ? `, "twitch_user_data": ${JSON.stringify(req.user.twitch_token.user_data)}` : ""}
         }`;
+
         const newActionReaction = new ActionReactionModel({
             unique_id: crypto.randomBytes(16).toString("hex"),
             Name: name,
