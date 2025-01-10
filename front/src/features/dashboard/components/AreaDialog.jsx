@@ -108,6 +108,7 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
   };
 
   const fetchDiscordUserId = async () => {
+    console.log("fetching discord user id");
     const session = localStorage.getItem("session");
     if (!session) {
       console.error("No session found. Please log in.");
@@ -121,6 +122,7 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
           session: session,
         },
       });
+      console.log(response);
       if (!response.ok) throw new Error("Invalid response");
       const responseData = await response.json();
       if (responseData?.data) {
@@ -146,14 +148,17 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     if (linkedService === "Discord") {
       if (selectedReaction === "message") {
         if (selectedServerId) {
-          reactionArguments.serverId = selectedServerId;
+          reactionArguments.server = selectedServerId;
         }
         if (selectedChannelId) {
-          reactionArguments.channelId = selectedChannelId;
+          reactionArguments.channel = selectedChannelId;
         }
       } else if (selectedReaction === "private_message") {
+        console.log("chose private message");
         if (discordUserId) {
           reactionArguments.userId = discordUserId;
+        } else {
+          console.error("No discord user ID found.");
         }
       }
     } else if (linkedService === "GitHub") {
@@ -215,12 +220,9 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     setSelectedServerId('');
     setSelectedChannelId('');
     setDiscordUserId('');
-    if (linkedService === "Discord") {
-      fetchServers();
-    } else if (linkedService === "GitHub") {
-      fetchDiscordUserId();
-    }
-  }, [linkedService, service]);
+    fetchServers();
+    fetchDiscordUserId();
+  }, []);
 
   useEffect(() => {
     if (selectedReaction && linkedService) {
