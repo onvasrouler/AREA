@@ -14,7 +14,7 @@ export function Footer() {
         <div className="flex items-center justify-center space-x-6 text-sm">
           <div className="flex items-center">
             <Copyright className="h-4 w-4 mr-1" />
-            <span>2025 OnVasRouler</span>
+            <span>2025 OnVaSRouler</span>
           </div>
           <motion.a
             href="https://www.youtube.com/watch?v=lYBUbBu4W08"
