@@ -6,18 +6,68 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import { Trash2 } from 'lucide-react'
 
-export function AreasList({ areas }) {
+export function AreasList({ areas: initialAreas }) {
+  const [areas, setAreas] = React.useState(initialAreas || [])
+  const [statuses, setStatuses] = React.useState({})
   const [isOpen, setIsOpen] = React.useState(false)
-  const [statuses, setStatuses] = React.useState(
-    Object.fromEntries(areas.map((area, index) => [index, true]))
-  )
 
-  const handleStatusChange = (index) => {
-    setStatuses(prev => ({
-      ...prev,
-      [index]: !prev[index]
-    }))
+  React.useEffect(() => {
+    setAreas(initialAreas || [])
+    setStatuses(
+      Object.fromEntries((initialAreas || []).map((area, index) => [index, area.active]))
+    )
+  }, [initialAreas])
+
+  const handleStatusChange = async (index) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}activeAreas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          session: localStorage.getItem("session"),
+        },
+        body: JSON.stringify({
+          id: areas[index].id,
+          active: !statuses[index],
+        }),
+      })
+      if (response.ok) {
+        setStatuses((prev) => ({
+          ...prev,
+          [index]: !prev[index],
+        }))
+      } else {
+        console.error("Error:", response.statusText)
+      }
+    } catch (error) {
+      console.error("Error:", error)
+    }
+  }
+
+  const handleAreaDeletion = async (area) => {
+    try {
+      const session = localStorage.getItem("session")
+      const body = JSON.stringify({ id: area.id })
+      const headers = {
+        "Content-Type": "application/json",
+        "session": session,
+      }
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
+        method: "DELETE",
+        headers,
+        body,
+      })
+      if (!response.ok) {
+        throw new Error("Error deleting area")
+      } else {
+        // Update the local state to remove the deleted area
+        setAreas((prevAreas) => prevAreas.filter((item) => item.id !== area.id))
+      }
+    } catch (error) {
+      console.error("Error deleting area:", error)
+    }
   }
 
   return (
@@ -49,6 +99,7 @@ export function AreasList({ areas }) {
                   <TableHead className="text-center">Name</TableHead>
                   <TableHead className="text-center">Service</TableHead>
                   <TableHead className="text-center">Linked Service</TableHead>
+                  <TableHead className="w-[50px] text-center">Delete</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -56,13 +107,26 @@ export function AreasList({ areas }) {
                   <TableRow key={index}>
                     <TableCell>
                       <Switch
-                        checked={statuses[index]}
+                        checked={statuses[index] || false}
                         onCheckedChange={() => handleStatusChange(index)}
                       />
                     </TableCell>
                     <TableCell className="font-medium text-center">{area.name}</TableCell>
                     <TableCell className="font-medium text-center">{area.action.service}</TableCell>
                     <TableCell className="font-medium text-center">{area.reaction.service}</TableCell>
+                    <TableCell className="flex justify-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleAreaDeletion(area)
+                        }}
+                      >
+                        <Trash2 className="text-red-600 hover:text-white" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -73,4 +137,3 @@ export function AreasList({ areas }) {
     </div>
   )
 }
-
