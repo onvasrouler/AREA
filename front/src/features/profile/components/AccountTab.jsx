@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,45 @@ export function AccountTab({
   handleLogoutAllDevices,
   handleProfileDeletion
 }) {
+  const [deletePassword, setDeletePassword] = useState("");
+  const [showTokenDialog, setShowTokenDialog] = useState(false);
+  const [confirmationToken, setConfirmationToken] = useState("");
+
+  const handleDelete = async () => {
+    try {
+      await handleProfileDeletion(deletePassword);
+      setDeletePassword("");
+      setShowTokenDialog(true);
+    } catch (error) {
+      console.error('Error initiating profile deletion:', error);
+    }
+  };
+
+  const handleConfirmDeletion = async () => {
+    try {
+      const session = localStorage.getItem('session');
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}profile/confirm`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'session': session
+        },
+        body: JSON.stringify({
+          token: confirmationToken
+        })
+      });
+
+      if (response.ok) {
+        localStorage.removeItem('session');
+        window.location.href = '/login';
+      } else {
+        console.error('Failed to confirm profile deletion');
+      }
+    } catch (error) {
+      console.error('Error confirming profile deletion:', error);
+    }
+  };
+
   return (
     <motion.form
       initial={{ opacity: 0, y: 20 }}
@@ -82,15 +122,60 @@ export function AccountTab({
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your account
-                and remove your data from our servers.
+              <AlertDialogDescription className="space-y-4">
+                <p>
+                  This action cannot be undone. This will permanently delete your account
+                  and remove your data from our servers.
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="deletePassword">Please enter your password to confirm</Label>
+                  <Input
+                    id="deletePassword"
+                    type="password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    placeholder="Enter your password"
+                  />
+                </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleProfileDeletion}>
+              <AlertDialogCancel onClick={() => setDeletePassword("")}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete}>
                 Delete Account
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={showTokenDialog} onOpenChange={setShowTokenDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Account Deletion</AlertDialogTitle>
+              <AlertDialogDescription className="space-y-4">
+                <p>
+                  Please enter the confirmation token sent to your email address.
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmationToken">Confirmation Token</Label>
+                  <Input
+                    id="confirmationToken"
+                    value={confirmationToken}
+                    onChange={(e) => setConfirmationToken(e.target.value)}
+                    placeholder="Enter confirmation token"
+                  />
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => {
+                setShowTokenDialog(false);
+                setConfirmationToken("");
+              }}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleConfirmDeletion}>
+                Confirm Account Deletion
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -99,3 +184,4 @@ export function AccountTab({
     </motion.form>
   );
 }
+

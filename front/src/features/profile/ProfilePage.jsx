@@ -176,8 +176,28 @@ export function ProfilePage() {
     }
   };
 
-  const handleProfileDeletion = () => {
-    console.log('Profile deletion requested');
+  const handleProfileDeletion = (password) => {
+    try {
+      const session = localStorage.getItem('session');
+      if (session) {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}profile`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'session': session
+          },
+          body: JSON.stringify({ password })
+        }).then((response) => {
+          if (response.ok) {
+            console.log('Profile deletion initiated');
+          } else {
+            console.error('Failed to delete profile');
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const handleLogoutAllDevices = async () => {
