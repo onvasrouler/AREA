@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FaUser } from 'react-icons/fa';
-import { LogOut, LayoutDashboard, Settings } from 'lucide-react';
+import { LogOut, LayoutDashboard, Settings, RefreshCcw } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -44,22 +44,41 @@ export function ProfilePage() {
   const [loggedInServices, setLoggedInServices] = useState([]);
   const apiClient = getApiClient();
   const navigate = useNavigate();
+  const [serviceExpirations, setServiceExpirations] = useState({});
 
   const fetchUserData = async () => {
     const session = localStorage.getItem('session');
     if (session) {
       try {
-        const response = await apiClient.get("profile_info", {
-          session: session
+        const response = await apiClient.get('profile_info', {
+          session: session,
         });
         if (response.ok) {
           const data = await response.json();
-          setUsername(data.username);
+          console.log(data);
+          setUsername(data.data.username);
           setEmail(data.data.email);
+
+          const currentTime = Date.now();
+          const expirations = {
+            discord: data.data.logged_in_discord && data.data.discord_expire_at
+              ? new Date(data.data.discord_expire_at).toLocaleString()
+              : "N/A",
+            github: data.data.logged_in_github && data.data.github_expire_at
+              ? new Date(data.data.github_expire_at).toLocaleString()
+              : "N/A",
+            spotify: data.data.logged_in_spotify && data.data.spotify_expire_at
+              ? new Date(data.data.spotify_expire_at).toLocaleString()
+              : "N/A",
+          };
+
           setLoggedInServices({
             discord: data.data.logged_in_discord,
             github: data.data.logged_in_github,
+            spotify: data.data.logged_in_spotify,
           });
+
+          setServiceExpirations(expirations);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -461,7 +480,10 @@ export function ProfilePage() {
                         <TableRow>
                           <TableHead>Service</TableHead>
                           <TableHead>Description</TableHead>
+                          <TableHead>Token expiration date</TableHead>
                           <TableHead>Status</TableHead>
+                          <TableHead>Refresh </TableHead>
+                          <TableHead>Disconnect</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -480,6 +502,7 @@ export function ProfilePage() {
                                 </div>
                               </TableCell>
                               <TableCell>{service.description}</TableCell>
+                              <TableCell>{serviceExpirations[service.name.toLowerCase()] || 'N/A'}</TableCell>
                               <TableCell>
                                 <motion.span
                                   initial={{ opacity: 0 }}
@@ -494,6 +517,18 @@ export function ProfilePage() {
                                     ? "Connected"
                                     : "Not Connected"}
                                 </motion.span>
+                              </TableCell>
+                              <TableCell>
+                                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                                  <Button variant="icon">
+                                    <RefreshCcw />
+                                  </Button>
+                                </motion.div>
+                              </TableCell>
+                              <TableCell>
+                                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                                  <Button variant="destructive">Disconnect</Button>
+                                </motion.div>
                               </TableCell>
                             </motion.tr>
                           ))}
