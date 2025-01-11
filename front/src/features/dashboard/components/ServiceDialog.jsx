@@ -242,6 +242,7 @@ useEffect(() => {
         service={service}
         isDiscordAuthenticated={authStatus.isDiscordAuthenticated}
         isGitHubAuthenticated={authStatus.isGitHubAuthenticated}
+        isSpotifyAuthenticated={authStatus.isSpotifyAuthenticated}
       />
     </>
   )

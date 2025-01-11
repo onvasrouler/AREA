@@ -16,8 +16,12 @@
                     "display": "List issues"
                 },
                 {
-                    "type": "/commit",
-                    "display": "List commits"
+                    "type": "/spotiplaying",
+                    "display": "Display current song"
+                },
+                {
+                    "type": "/likedtrack",
+                    "display": "List liked tracks"
                 }
             ],
             "reactions": [

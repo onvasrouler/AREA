@@ -15,7 +15,7 @@ import { AlertCircle } from 'lucide-react';
 
 import areaData from '@/AREA.json';
 
-export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated }) {
+export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated, isSpotifyAuthenticated }) {
   const [linkedService, setLinkedService] = useState('');
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedReaction, setSelectedReaction] = useState('');
@@ -44,6 +44,8 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
         return isDiscordAuthenticated;
       case 'GitHub':
         return isGitHubAuthenticated;
+      case 'Spotify':
+        return isSpotifyAuthenticated;
       default:
         return false;
     }
