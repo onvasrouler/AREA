@@ -83,7 +83,7 @@ export function PasswordResetComponent() {
           description: data.message || "Unable to process password reset request.",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "System Error",
@@ -129,7 +129,7 @@ export function PasswordResetComponent() {
           description: data.message || "Invalid or expired reset token.",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "System Error",
