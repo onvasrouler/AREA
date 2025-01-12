@@ -40,6 +40,10 @@ export function DashboardPage() {
     setAreas(prevAreas => [...prevAreas, newArea]);
   };
 
+  const handleAreaDeleted = (deletedAreaId) => {
+    setAreas(prevAreas => prevAreas.filter(area => area.id !== deletedAreaId));
+  };
+
   useEffect(() => {
     const checkServicesAuth = async () => {
       const session = localStorage.getItem("session")
@@ -221,7 +225,7 @@ export function DashboardPage() {
           </AnimatePresence>
           <Separator className="mt-8 border-t-2" />
           <div className="font-bold mb-8 mt-8">
-              <AreasList areas={areas} />
+              <AreasList areas={areas} onAreaDeleted={handleAreaDeleted} />
           </div>
         </div>
       </main>
@@ -234,6 +238,7 @@ export function DashboardPage() {
             service={selectedService}
             authStatus={authStatus}
             onAreaCreated={handleAreaCreated}
+            onAreaDeleted={handleAreaDeleted}
           />
         )}
       </AnimatePresence>

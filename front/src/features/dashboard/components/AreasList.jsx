@@ -10,7 +10,7 @@ import { Trash2 } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
 import { Input } from "@/components/ui/input"
 
-export function AreasList({ areas: initialAreas }) {
+export function AreasList({ areas: initialAreas, onAreaDeleted }) {
   const [areas, setAreas] = React.useState(initialAreas || [])
   const [statuses, setStatuses] = React.useState({})
   const [isOpen, setIsOpen] = React.useState(false)
@@ -68,41 +68,44 @@ export function AreasList({ areas: initialAreas }) {
 
   const handleAreaDeletion = async (area) => {
     try {
-      const session = localStorage.getItem("session")
-      const body = JSON.stringify({ id: area.id })
+      const session = localStorage.getItem("session");
+      const body = JSON.stringify({ id: area.id });
       const headers = {
         "Content-Type": "application/json",
         "session": session,
-      }
+      };
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
         method: "DELETE",
         headers,
         body,
-      })
+      });
       if (!response.ok) {
         toast({
           title: "Error",
           description: "An error occurred while deleting the area",
           variant: "destructive",
-        })
-        throw new Error("Error deleting area")
+        });
+        throw new Error("Error deleting area");
       } else {
         toast({
           title: "Area deleted",
           description: "The area has been successfully deleted",
           variant: "default",
-        })
-        setAreas((prevAreas) => prevAreas.filter((item) => item.id !== area.id))
+        });
+        setAreas((prevAreas) => prevAreas.filter((item) => item.id !== area.id));
+        if (onAreaDeleted) {
+          onAreaDeleted(area.id);
+        }
       }
     } catch (error) {
-      console.error("Error deleting area:", error)
+      console.error("Error deleting area:", error);
       toast({
         title: "Error",
         description: "An unexpected error occurred while deleting the area",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleEditStart = (area) => {
     setEditingId(area.id)
@@ -197,7 +200,7 @@ export function AreasList({ areas: initialAreas }) {
                   <TableRow key={index}>
                     <TableCell>
                       <Switch
-                        checked={statuses[index] || false}
+                        checked={statuses[index] || true}
                         onCheckedChange={() => handleStatusChange(index)}
                       />
                     </TableCell>
