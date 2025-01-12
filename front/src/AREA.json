@@ -5,19 +5,39 @@
             "actions": [
                 {
                     "type": "/repo",
-                    "display": "List repositories"
+                    "display": "List repositories",
+                    "validLinkedServices": ["GitHub"],
+                    "validReactions": ["repo"]
                 },
                 {
                     "type": "/pr",
-                    "display": "List pull requests"
+                    "display": "List pull requests",
+                    "validLinkedServices": ["GitHub"],
+                    "validReactions": ["pr"]
                 },
                 {
-                    "type": "/issue",
-                    "display": "List issues"
+                    "type": "/issues",
+                    "display": "List issues",
+                    "validLinkedServices": ["GitHub"],
+                    "validReactions": ["issues"]
                 },
                 {
-                    "type": "/commit",
-                    "display": "List commits"
+                    "type": "/commits",
+                    "display": "List commits",
+                    "validLinkedServices": ["GitHub"],
+                    "validReactions": ["commit"]
+                },
+                {
+                    "type": "/spotiplaying",
+                    "display": "Display current song",
+                    "validLinkedServices": ["Spotify"],
+                    "validReactions": ["currently_playing"]
+                },
+                {
+                    "type": "/likedtrack",
+                    "display": "List liked tracks",
+                    "validLinkedServices": ["Spotify"],
+                    "validReactions": ["liked_track"]
                 }
             ],
             "reactions": [
@@ -60,72 +80,122 @@
             "actions": [
                 {
                     "type": "new_issue",
-                    "display": "New Issue"
+                    "display": "New Issue",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message"]
                 },
                 {
                     "type": "new_pr",
-                    "display": "New Pull Request"
+                    "display": "New Pull Request",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message"]
                 },
                 {
                     "type": "new_commit",
-                    "display": "New Commit"
+                    "display": "New Commit",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message"]
                 },
                 {
                     "type": "new_repo",
-                    "display": "New Repository"
+                    "display": "New Repository",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message"]
                 }
             ],
             "reactions": [
                 {
-                  "type": "repo",
-                  "display": "List Repositories",
-                  "arguments": {
-                    "prefix": {
-                      "label": "Message",
-                      "description": "Message to display before the repository list",
-                      "component": "TextArea"
+                    "type": "repo",
+                    "display": "List Repositories",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "Message to display before the repository list",
+                            "component": "TextArea"
+                        }
                     }
-                  }
                 },
                 {
-                  "type": "pr",
-                  "display": "List Pull Requests",
-                  "arguments": {
-                    "prefix": {
-                      "label": "Message",
-                      "description": "Message to display before the pull request list",
-                      "component": "TextArea"
+                    "type": "pr",
+                    "display": "List Pull Requests",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "Message to display before the pull request list",
+                            "component": "TextArea"
+                        }
                     }
-                  }
                 },
                 {
-                  "type": "issue",
-                  "display": "List Issues",
-                  "arguments": {
-                    "prefix": {
-                      "label": "Message",
-                      "description": "Message to display before the issue list",
-                      "component": "TextArea"
+                    "type": "issues",
+                    "display": "List Issues",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "Message to display before the issue list",
+                            "component": "TextArea"
+                        }
                     }
-                  }
                 },
                 {
-                  "type": "commit",
-                  "display": "List Commits",
-                  "arguments": {
-                    "prefix": {
-                      "label": "Message",
-                      "description": "Message to display before the commit list",
-                      "component": "TextArea"
+                    "type": "commit",
+                    "display": "List Commits",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "Message to display before the commit list",
+                            "component": "TextArea"
+                        }
                     }
-                  }
                 }
-              ]
+            ]
         },
         {
             "name": "Spotify",
-            "actions": [],
-            "reactions": []
+            "actions": [
+                {
+                    "type": "currently_playing",
+                    "display": "Song currently playing",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message"]
+                },
+                {
+                    "type": "new_liked_track",
+                    "display": "New liked track",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message"]
+                },
+                {
+                    "type": "liked_track",
+                    "display": "List of favorite songs",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message"]
+                }
+            ],
+            "reactions": [
+                {
+                    "type": "currently_playing",
+                    "display": "Song currently playing",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "The song you are listening to is ",
+                            "component": "TextArea"
+                        }
+                    }
+                },
+                {
+                    "type": "liked_track",
+                    "display": "List of liked songs",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "Your favorite songs are: ",
+                            "component": "TextArea"
+                        }
+                    }
+                }
+            ]
         },
         {
             "name": "OneDrive",

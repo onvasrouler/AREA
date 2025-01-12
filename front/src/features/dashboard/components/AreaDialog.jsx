@@ -12,10 +12,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast"
 
 import areaData from '@/AREA.json';
 
-export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated }) {
+export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated, isSpotifyAuthenticated }) {
   const [linkedService, setLinkedService] = useState('');
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedReaction, setSelectedReaction] = useState('');
@@ -28,11 +29,24 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
   const [formData, setFormData] = useState({});
   const [authError, setAuthError] = useState('');
   const [areaName, setAreaName] = useState('');
-
   const currentService = areaData.services.find(s => s.name === service.name);
-  const services = areaData.services.filter(s => s.name !== service.name).map(s => s.name);
-  const actions = currentService?.actions || [];
-  const reactions = linkedService ? areaData.services.find(s => s.name === linkedService)?.reactions || [] : [];
+  const { toast } = useToast()
+
+  const services = areaData.services
+    .filter(s => s.name !== service.name)
+    .map(s => s.name);
+
+  const actions = currentService?.actions.filter(action => {
+    return !linkedService || action.validLinkedServices?.includes(linkedService);
+  }) || [];
+
+  const reactions = linkedService
+    ? areaData.services
+        .find(s => s.name === linkedService)?.reactions.filter(reaction => {
+          const action = actions.find(a => a.type === selectedAction);
+          return action?.validReactions?.includes(reaction.type);
+        }) || []
+    : [];
 
   const handleInputChange = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
@@ -44,6 +58,8 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
         return isDiscordAuthenticated;
       case 'GitHub':
         return isGitHubAuthenticated;
+      case 'Spotify':
+        return isSpotifyAuthenticated;
       default:
         return false;
     }
@@ -56,6 +72,8 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     } else {
       setAuthError('');
     }
+    setSelectedAction('');
+    setSelectedReaction('');
   };
 
   const fetchServers = async () => {
@@ -108,6 +126,7 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
   };
 
   const fetchDiscordUserId = async () => {
+    console.log("fetching discord user id");
     const session = localStorage.getItem("session");
     if (!session) {
       console.error("No session found. Please log in.");
@@ -121,6 +140,7 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
           session: session,
         },
       });
+      console.log(response);
       if (!response.ok) throw new Error("Invalid response");
       const responseData = await response.json();
       if (responseData?.data) {
@@ -135,9 +155,20 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     const actionArguments = {
       on: selectedAction || ""
     };
-    const reactionArguments = {
-      react: selectedReaction || ""
-    };
+
+    let reactionArguments = {};
+
+    console.log("linkedService", linkedService);
+
+    if (linkedService === "GitHub" || linkedService === "Spotify" || linkedService === "Twitch") {
+      reactionArguments = {
+        content: selectedReaction || ""
+      };
+    } else {
+      reactionArguments = {
+        react: selectedReaction || ""
+      }
+    }
 
     if (service.name === "Discord") {
       actionArguments.userId = discordUserId;
@@ -146,14 +177,17 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     if (linkedService === "Discord") {
       if (selectedReaction === "message") {
         if (selectedServerId) {
-          reactionArguments.serverId = selectedServerId;
+          reactionArguments.server = selectedServerId;
         }
         if (selectedChannelId) {
-          reactionArguments.channelId = selectedChannelId;
+          reactionArguments.channel = selectedChannelId;
         }
       } else if (selectedReaction === "private_message") {
+        console.log("chose private message");
         if (discordUserId) {
           reactionArguments.userId = discordUserId;
+        } else {
+          console.error("No discord user ID found.");
         }
       }
     } else if (linkedService === "GitHub") {
@@ -186,6 +220,11 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     const session = localStorage.getItem("session");
     if (!session) {
       console.error("No session found. Please log in.");
+      toast({
+        title: "Error",
+        description: "No session found. Please log in.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -201,10 +240,19 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
         body: JSON.stringify(requestBody),
       });
       if (!response.ok) throw new Error("Failed to save AREA");
-      alert("AREA created successfully!");
+      console.log("Toast should appear now");
+      toast({
+        title: "Success",
+        description: "AREA created successfully!",
+      });
       onClose();
     } catch (error) {
       console.error("Error creating AREA:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create AREA. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -215,12 +263,9 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     setSelectedServerId('');
     setSelectedChannelId('');
     setDiscordUserId('');
-    if (linkedService === "Discord") {
-      fetchServers();
-    } else if (linkedService === "GitHub") {
-      fetchDiscordUserId();
-    }
-  }, [linkedService, service]);
+    fetchServers();
+    fetchDiscordUserId();
+  }, []);
 
   useEffect(() => {
     if (selectedReaction && linkedService) {
@@ -230,7 +275,6 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
       setArgumentsData(reaction?.arguments || {});
     }
   }, [selectedReaction, linkedService]);
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

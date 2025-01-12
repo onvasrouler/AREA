@@ -69,23 +69,25 @@ export function PasswordResetComponent() {
 
       if (response.ok) {
         toast({
-          title: "Password Reset Email Sent",
-          description: "Please check your email for instructions to reset your password.",
+          title: "Reset Link Sent",
+          description: "Check your email for instructions to reset your password.",
+          variant: "default",
         });
         setShowForgotPasswordDialog(false);
         setShowResetTokenDialog(true);
       } else {
+        const data = await response.json();
         toast({
           variant: "destructive",
-          title: "Password Reset Failed",
-          description: "Failed to send password reset email. Please try again.",
+          title: "Request Failed",
+          description: data.message || "Unable to process password reset request.",
         });
       }
     } catch {
       toast({
         variant: "destructive",
-        title: "Password Reset Error",
-        description: "An error occurred while processing your request. Please try again later.",
+        title: "System Error",
+        description: "Unable to connect to the server. Please try again later.",
       });
     }
   };
@@ -94,8 +96,8 @@ export function PasswordResetComponent() {
     if (values.newPassword !== values.confirmPassword) {
       toast({
         variant: "destructive",
-        title: "Password Reset Failed",
-        description: "Passwords do not match. Please try again.",
+        title: "Password Mismatch",
+        description: "The passwords you entered don't match. Please try again.",
       });
       return;
     }
@@ -114,22 +116,24 @@ export function PasswordResetComponent() {
 
       if (response.ok) {
         toast({
-          title: "Password Reset Successful",
-          description: "Your password has been successfully reset. You can now log in with your new password.",
+          title: "Password Updated",
+          description: "Your password has been successfully reset. You can now log in.",
+          variant: "default",
         });
         setShowResetTokenDialog(false);
       } else {
+        const data = await response.json();
         toast({
           variant: "destructive",
-          title: "Password Reset Failed",
-          description: "Failed to reset your password. Please try again or contact support.",
+          title: "Reset Failed",
+          description: data.message || "Invalid or expired reset token.",
         });
       }
     } catch {
       toast({
         variant: "destructive",
-        title: "Password Reset Error",
-        description: "An error occurred while resetting your password. Please try again later.",
+        title: "System Error",
+        description: "Unable to connect to the server. Please try again later.",
       });
     }
   };

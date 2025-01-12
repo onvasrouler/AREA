@@ -48,7 +48,7 @@ export function DashboardPage() {
           setAuthStatus({
             isDiscordAuthenticated: responseData.data?.logged_in_discord === true && responseData.data?.logged_in_discord !== "session_expired",
             isGitHubAuthenticated: responseData.data?.logged_in_github === true && responseData.data?.logged_in_github !== "session_expired",
-            isSpotifyAuthenticated: false,
+            isSpotifyAuthenticated: responseData.data?.logged_in_spotify === true && responseData.data?.logged_in_spotify !== "session_expired",
             isOneDriveAuthenticated: false,
             isGmailAuthenticated: false,
             isInstagramAuthenticated: false
