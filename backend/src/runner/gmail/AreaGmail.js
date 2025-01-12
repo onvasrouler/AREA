@@ -49,18 +49,23 @@ async function extractData(AREA, prefix) {
                 }
             } else if (AREA.Action.service == "github") {
                 if (AREA.Action.arguments.on == "new_repo") {
-                    AREA.CachedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                     message += "<h1><b>" + AREA.CachedData[0].name + "</b></h1><h2><b> created by " + AREA.CachedData[0].owner.login + "</b></h2><a href='" + AREA.CachedData[0].html_url + "' style='font-size: 15px' target='_blank'>" + AREA.CachedData[0].html_url + "</a>";
                 } else if (AREA.Action.arguments.on == "new_issue") {
-                    AREA.CachedData.items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                     message += "<h1><b>" + AREA.CachedData.items[0].title + "</b></h1><h2><b> created by " + AREA.CachedData.items[0].user.login + "</b></h2><a href='" + AREA.CachedData.items[0].html_url + "' style='font-size: 15px' target='_blank'>" + AREA.CachedData.items[0].html_url + "</a>";
                 } else if (AREA.Action.arguments.on == "new_pr") {
-                    AREA.CachedData.items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                     message += "<h1><b>" + AREA.CachedData.items[0].title + "</b></h1><h2><b> created by " + AREA.CachedData.items[0].user.login + "</b></h2><a href='" + AREA.CachedData.items[0].html_url + "' style='font-size: 15px' target='_blank'>" + AREA.CachedData.items[0].html_url + "</a>";
                 } else if (AREA.Action.arguments.on == "new_commit") {
-                    AREA.CachedData.items.sort((a, b) => new Date(b.commit.author.date) - new Date(a.commit.author.date));
                     message += "<h1><b>" + AREA.CachedData.items[0].commit.message + "</b></h1><h2><b> by " + AREA.CachedData.items[0].author.login + "</b></h2><h3> on repo <b>" + AREA.CachedData.items[0].repository.name + "</b></h3><a href='" + AREA.CachedData.items[0].html_url + "' style='font-size: 15px' target='_blank'>" + AREA.CachedData.items[0].html_url + "</a>";
                 }
+            } else if (AREA.Action.service == "twitch") {
+                if (AREA.Action.arguments.on == "new_follow") {
+                    message += "<h1><b>" + AREA.tokens.twitch_user_data.login + "</b></h1><h2><b> now follow " + AREA.CachedData.data[0].broadcaster_login + "</b></h2> <img src='" + AREA.CachedData.data[0].broadcaster_info.profile_image_url + "' style='width: 100px; height: 100px;'>";
+                } else if (AREA.Action.arguments.on == "following_online") {
+                    message += "<h1><b>" + AREA.CachedData[0].user_name + "</b></h1><h2><b> is now online : " + AREA.CachedData[0].title + "</b></h2><h3> and is playing : <b>" + AREA.CachedData[0].game_name + "</b></h3>" + (AREA.CachedData[0].is_mature ? "<h4>⚠️  the content has been marked as restricted, the content is reserved for the adults </h4>" : "") + "<a href='https://twitch.tv/" + AREA.CachedData[0].user_name + "' style='font-size: 15px' target='_blank'>link</a>";
+                }
+            } else {
+                console.error("Service not found : " + AREA.Action.service + " for action " + AREA.Action);
+                message = "ERROR: Service not found : " + AREA.Action.service + " for action " + AREA.Action;
             }
         }
         return message;

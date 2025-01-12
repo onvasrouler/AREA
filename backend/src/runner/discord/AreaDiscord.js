@@ -28,18 +28,23 @@ async function extractData(AREA, prefix) {
                 }
             } else if (AREA.Action.service == "github") {
                 if (AREA.Action.arguments.on == "new_repo") {
-                    AREA.CachedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                     message += "**" + AREA.CachedData[0].name + "** created by ** " + AREA.CachedData[0].owner.login + "** -> [link](" + AREA.CachedData[0].html_url + ")";;
                 } else if (AREA.Action.arguments.on == "new_issue") {
-                    AREA.CachedData.items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                     message += "**" + AREA.CachedData.items[0].title + "** created by ** " + AREA.CachedData.items[0].user.login + "** -> [link](" + AREA.CachedData.items[0].html_url + ")";;
                 } else if (AREA.Action.arguments.on == "new_pr") {
-                    AREA.CachedData.items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                     message += "**" + AREA.CachedData.items[0].title + "** created by ** " + AREA.CachedData.items[0].user.login + "** -> [link](" + AREA.CachedData.items[0].html_url + ")";;
                 } else if (AREA.Action.arguments.on == "new_commit") {
-                    AREA.CachedData.items.sort((a, b) => new Date(b.commit.author.date) - new Date(a.commit.author.date));
                     message += "**" + AREA.CachedData.items[0].commit.message + "** by ** " + AREA.CachedData.items[0].author.login + "** on repo **" + AREA.CachedData.items[0].repository.name + "** -> [link](" + AREA.CachedData.items[0].html_url + ")";;
                 }
+            } else if (AREA.Action.service == "twitch") {
+                if (AREA.Action.arguments.on == "new_follow") {
+                    message += "**" + AREA.tokens.twitch_user_data.login + "** now follow **" + AREA.CachedData.data[0].broadcaster_login + "**\n[profile picture](" + AREA.CachedData.data[0].broadcaster_info.profile_image_url + ")";
+                } else if (AREA.Action.arguments.on == "following_online") {
+                    message += "**" + AREA.CachedData[0].user_name + "** is now online : **" + AREA.CachedData[0].title + "**\nand is playing : **" + AREA.CachedData[0].game_name + "**" + (AREA.CachedData[0].is_mature ? "\n⚠️  the content has been marked as restricted, the content is reserved for the adults " : "") + "\n # [link](https://twitch.tv/" + AREA.CachedData[0].user_name + ")";
+                }
+            } else {
+                console.error("Service not found : " + AREA.Action.service + " for action " + AREA.Action);
+                message = "ERROR: Service not found : " + AREA.Action.service + " for action " + AREA.Action;
             }
         }
         return message;

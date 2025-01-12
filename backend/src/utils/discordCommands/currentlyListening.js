@@ -23,7 +23,7 @@ module.exports = {
         const Datas = AREA.CachedData.item;
         let message;
         if (AREA.CachedData.currently_playing_type === "track")
-            message = `${(AREA.Reaction.arguments.prefix || "you are listening to : ")}\n**${Datas.name}** by **${Datas.artists[0].name}** -> [link](${Datas.external_urls.spotify})`;
+            message = `${(AREA.Reaction.arguments.message || "you are listening to : ")}\n**${Datas.name}** by **${Datas.artists[0].name}** -> [link](${Datas.external_urls.spotify})`;
         await interaction.reply(message);
     }
 };

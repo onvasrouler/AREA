@@ -2,6 +2,8 @@ const jwt = require("jsonwebtoken");
 const api_formatter = require("../../middleware/api-formatter.js");
 const UserModel = require("../../database/models/users");
 const SessionModel = require("../../database/models/session");
+const AreaModel = require("../../database/models/actionReaction.js");
+const CachedDataModel = require("../database/models/cachedData.js");
 const nodemailer = require("nodemailer");
 
 // This function will return the signed cookies
@@ -77,11 +79,24 @@ async function delete_every_user_session(User) {
 // This function will delete the user account
 async function delete_user_account(User) {
     delete_every_user_session(User);
-    return await UserModel.deleteOne({
-        _id: User ? User._id : null
-    }).catch(function (err) {
-        console.error(err);
-    });
+    if (User) {
+        await AreaModel.deleteMany({
+            creator_id: User ? User.unique_id : null
+        }).catch(function (err) {
+            console.error(err);
+        });
+        await CachedDataModel.deleteOne({
+            user_signed_id: User ? User.unique_id : null
+        }).catch(function (err) {
+            console.error(err);
+        });
+        return await UserModel.deleteOne({
+            _id: User ? User._id : null
+        }).catch(function (err) {
+            console.error(err);
+        });
+    }
+    return null;
 }
 
 // This is the transporter for sending emails

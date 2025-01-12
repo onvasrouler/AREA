@@ -62,22 +62,27 @@ async function ActionSpotify(AREA) {
 
         //avoid treating the same data twice and avoid treating data that has already been treated and avoid treating data when it decrease
         if (TriggerEvent == "new_liked_track") {
-            if (actionReactions.CachedData.total === Datas.total && actionReactions.CachedData.items[0].track.id === Datas.items[0].track.id) {
-                actionReactions.Treated = true;
-            } else if (actionReactions.CachedData.total < Datas.total && actionReactions.CachedData != "") {
-                actionReactions.Treated = false;
+            if (Datas.total != 0) {
+                if (actionReactions.CachedData.total === Datas.total && actionReactions.CachedData.items[0].track.id === Datas.items[0].track.id) {
+                    actionReactions.Treated = true;
+                } else if (actionReactions.CachedData.total < Datas.total && actionReactions.CachedData != "") {
+                    actionReactions.Treated = false;
+                }
             }
-
         } else if (TriggerEvent == "liked_track") {
-            if (actionReactions.CachedData.total === Datas.total && actionReactions.CachedData.items[0].track.id === Datas.items[0].track.id) {
-                actionReactions.Treated = true;
-            } else if (actionReactions.CachedData.total && actionReactions.CachedData.total != 0 && actionReactions.CachedData != "")
-                actionReactions.Treated = false;
+            if (Datas.total != 0) {
+                if (actionReactions.CachedData.total === Datas.total && actionReactions.CachedData.items[0].track.id === Datas.items[0].track.id) {
+                    actionReactions.Treated = true;
+                } else if (actionReactions.CachedData.total && actionReactions.CachedData.total != 0 && actionReactions.CachedData != "")
+                    actionReactions.Treated = false;
+            }
         } else if (TriggerEvent == "currently_playing") {
-            if (actionReactions.CachedData.item && actionReactions.CachedData.item.id === Datas.item.id) {
-                actionReactions.Treated = true;
-            } else if (Datas != "" && actionReactions.CachedData != "" && actionReactions.CachedData.item != null) {
-                actionReactions.Treated = false;
+            if (Datas != "") {
+                if (actionReactions.CachedData.item && actionReactions.CachedData.item.id === Datas.item.id) {
+                    actionReactions.Treated = true;
+                } else if (Datas != "" && actionReactions.CachedData != "" && actionReactions.CachedData.item != null) {
+                    actionReactions.Treated = false;
+                }
             }
         }
         actionReactions.CachedData = Datas;

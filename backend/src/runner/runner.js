@@ -3,6 +3,7 @@ const { ActionDiscord, ReactionDiscord } = require("./discord/AreaDiscord");
 const { ActionGithub, ReactionGithub } = require("./github/AreaGithub.js");
 const { ActionSpotify, ReactionSpotify } = require("./spotify/AreaSpotify.js");
 const { ActionGmail, ReactionGmail } = require("./gmail/AreaGmail.js");
+const { ActionTwitch, ReactionTwitch } = require("./twitch/AreaTwitch.js");
 
 class runner {
     constructor() {
@@ -43,9 +44,11 @@ class runner {
             return ActionSpotify(AREA);
         else if (Action.service === "gmail")
             return ActionGmail(AREA);
+        else if (Action.service === "twitch")
+            return ActionTwitch(AREA);
         else {
-            console.log("Service not found : " + Action.service + " for action " + Action);
-            return "ERROR: Service not found : " + Action.service + " for action " + Action;
+            console.log("Service not found : " + Action.service + " for action " + JSON.stringify(Action));
+            return "ERROR: Service not found : " + Action.service + " for action " + JSON.stringify(Action);
         }
     }
 
@@ -60,9 +63,11 @@ class runner {
             return ReactionSpotify(AREA);
         else if (Reaction.service === "gmail")
             return ReactionGmail(AREA);
+        else if (Reaction.service === "twitch")
+            return ReactionTwitch(AREA);
         else {
-            console.log("Service not found : " + Reaction.service + " for reaction " + Reaction);
-            return "ERROR: Service not found : " + Reaction.service + " for reaction " + Reaction;
+            console.log("Service not found : " + Reaction.service + " for reaction " + JSON.stringify(Reaction));
+            return "ERROR: Service not found : " + Reaction.service + " for reaction " + JSON.stringify(Reaction);
         }
     }
 
