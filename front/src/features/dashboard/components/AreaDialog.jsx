@@ -130,7 +130,6 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
   };
 
   const fetchDiscordUserId = async () => {
-    console.log("fetching discord user id");
     const session = localStorage.getItem("session");
     if (!session) {
       console.error("No session found. Please log in.");
@@ -162,9 +161,14 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
 
     let reactionArguments = {};
 
-    console.log("linkedService", linkedService);
 
-    if (linkedService === "GitHub" || linkedService === "Spotify" || linkedService === "Twitch") {
+    if (linkedService === "Gmail") {
+      reactionArguments = {
+        email: formData.email || "",
+        object: formData.object || "",
+        message: formData.message || ""
+      };
+    } else if (linkedService === "GitHub" || linkedService === "Spotify" || linkedService === "Twitch") {
       reactionArguments = {
         content: selectedReaction || ""
       };
@@ -187,7 +191,6 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
           reactionArguments.channel = selectedChannelId;
         }
       } else if (selectedReaction === "private_message") {
-        console.log("chose private message");
         if (discordUserId) {
           reactionArguments.userId = discordUserId;
         } else {
@@ -244,7 +247,6 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
         body: JSON.stringify(requestBody),
       });
       if (!response.ok) throw new Error("Failed to save AREA");
-      console.log("Toast should appear now");
       toast({
         title: "Success",
         description: "AREA created successfully!",
