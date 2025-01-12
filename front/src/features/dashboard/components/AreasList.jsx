@@ -1,18 +1,21 @@
 "use client"
 
 import * as React from "react"
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Check, X } from 'lucide-react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Trash2 } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
+import { Input } from "@/components/ui/input"
 
 export function AreasList({ areas: initialAreas }) {
   const [areas, setAreas] = React.useState(initialAreas || [])
   const [statuses, setStatuses] = React.useState({})
   const [isOpen, setIsOpen] = React.useState(false)
+  const [editingId, setEditingId] = React.useState(null)
+  const [editingName, setEditingName] = React.useState("")
   const { toast } = useToast()
 
   React.useEffect(() => {
@@ -47,9 +50,19 @@ export function AreasList({ areas: initialAreas }) {
         })
       } else {
         console.error("Error:", response.statusText)
+        toast({
+          title: "Error",
+          description: "Failed to update area status",
+          variant: "destructive",
+        })
       }
     } catch (error) {
       console.error("Error:", error)
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      })
     }
   }
 
@@ -83,6 +96,67 @@ export function AreasList({ areas: initialAreas }) {
       }
     } catch (error) {
       console.error("Error deleting area:", error)
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while deleting the area",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleEditStart = (area) => {
+    setEditingId(area.id)
+    setEditingName(area.name)
+  }
+
+  const handleEditCancel = () => {
+    setEditingId(null)
+    setEditingName("")
+  }
+
+  const handleEditSave = async (area) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          session: localStorage.getItem("session"),
+        },
+        body: JSON.stringify({
+          id: area.id,
+          name: editingName,
+          action: area.action,
+          reaction: area.reaction,
+        }),
+      })
+      if (response.ok) {
+        setAreas((prevAreas) =>
+          prevAreas.map((a) =>
+            a.id === area.id ? { ...a, name: editingName } : a
+          )
+        )
+        setEditingId(null)
+        setEditingName("")
+        toast({
+          title: "Area name updated",
+          description: "The area name has been successfully updated",
+          variant: "default",
+        })
+      } else {
+        console.error("Error:", response.statusText)
+        toast({
+          title: "Error",
+          description: "Failed to update area name",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while updating the area name",
+        variant: "destructive",
+      })
     }
   }
 
@@ -127,7 +201,38 @@ export function AreasList({ areas: initialAreas }) {
                         onCheckedChange={() => handleStatusChange(index)}
                       />
                     </TableCell>
-                    <TableCell className="font-medium text-center">{area.name}</TableCell>
+                    <TableCell className="font-medium text-center">
+                      {editingId === area.id ? (
+                        <div className="flex items-center space-x-2">
+                          <Input
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            className="w-full"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditSave(area)}
+                          >
+                            <Check className="h-4 w-4 text-green-500" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleEditCancel}
+                          >
+                            <X className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span
+                          onClick={() => handleEditStart(area)}
+                          className="cursor-pointer hover:underline"
+                        >
+                          {area.name}
+                        </span>
+                      )}
+                    </TableCell>
                     <TableCell className="font-medium text-center">{area.action.service}</TableCell>
                     <TableCell className="font-medium text-center">{area.reaction.service}</TableCell>
                     <TableCell className="flex justify-center">
@@ -153,3 +258,4 @@ export function AreasList({ areas: initialAreas }) {
     </div>
   )
 }
+
