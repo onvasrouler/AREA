@@ -268,6 +268,7 @@ useEffect(() => {
         isGitHubAuthenticated={authStatus.isGitHubAuthenticated}
         isSpotifyAuthenticated={authStatus.isSpotifyAuthenticated}
         isTwitchAuthenticated={authStatus.isTwitchAuthenticated}
+        isGmailAuthenticated={authStatus.isGmailAuthenticated}
       />
     </>
   )

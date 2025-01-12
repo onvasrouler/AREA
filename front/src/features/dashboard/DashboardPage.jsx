@@ -51,7 +51,7 @@ export function DashboardPage() {
             isGitHubAuthenticated: responseData.data?.logged_in_github === true && responseData.data?.logged_in_github !== "session_expired",
             isSpotifyAuthenticated: responseData.data?.logged_in_spotify === true && responseData.data?.logged_in_spotify !== "session_expired",
             isOneDriveAuthenticated: false,
-            isGmailAuthenticated: false,
+            isGmailAuthenticated: true,
             isInstagramAuthenticated: false,
             isTwitchAuthenticated: responseData.data?.logged_in_twitch === true && responseData.data?.logged_in_twitch !== "session_expired"
           })

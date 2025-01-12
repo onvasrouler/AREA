@@ -50,6 +50,7 @@ export function ProfilePage() {
             twitch: data.data.logged_in_twitch && data.data.twitch_expire_at
               ? new Date(data.data.twitch_expire_at).toLocaleString()
               : "N/A",
+            gmail: "N/A",
           };
           const loggedIn = {
             discord: data.data.logged_in_discord && data.data.discord_expire_at
@@ -64,6 +65,7 @@ export function ProfilePage() {
             twitch: data.data.logged_in_twitch && data.data.twitch_expire_at
               ? new Date(data.data.twitch_expire_at) > new Date()
               : false,
+            gmail: true,
           };
           setLoggedInServices(loggedIn);
           setServiceExpirations(expirations);
