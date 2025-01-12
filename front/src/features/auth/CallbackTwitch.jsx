@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-export const CallbackSpotify = () => {
+export const CallbackTwitch = () => {
     const [status, setStatus] = useState('loading');
     const [error, setError] = useState(null);
     const navigate = useNavigate();
