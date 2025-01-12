@@ -30,9 +30,21 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
   const [areaName, setAreaName] = useState('');
 
   const currentService = areaData.services.find(s => s.name === service.name);
-  const services = areaData.services.filter(s => s.name !== service.name).map(s => s.name);
-  const actions = currentService?.actions || [];
-  const reactions = linkedService ? areaData.services.find(s => s.name === linkedService)?.reactions || [] : [];
+  const services = areaData.services
+    .filter(s => s.name !== service.name)
+    .map(s => s.name);
+
+  const actions = currentService?.actions.filter(action => {
+    return !linkedService || action.validLinkedServices?.includes(linkedService);
+  }) || [];
+
+  const reactions = linkedService
+    ? areaData.services
+        .find(s => s.name === linkedService)?.reactions.filter(reaction => {
+          const action = actions.find(a => a.type === selectedAction);
+          return action?.validReactions?.includes(reaction.type);
+        }) || []
+    : [];
 
   const handleInputChange = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
@@ -58,6 +70,8 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     } else {
       setAuthError('');
     }
+    setSelectedAction('');
+    setSelectedReaction('');
   };
 
   const fetchServers = async () => {
@@ -139,9 +153,20 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     const actionArguments = {
       on: selectedAction || ""
     };
-    const reactionArguments = {
-      react: selectedReaction || ""
-    };
+
+    let reactionArguments = {};
+
+    console.log("linkedService", linkedService);
+
+    if (linkedService === "GitHub" || linkedService === "Spotify" || linkedService === "Twitch") {
+      reactionArguments = {
+        content: selectedReaction || ""
+      };
+    } else {
+      reactionArguments = {
+        react: selectedReaction || ""
+      }
+    }
 
     if (service.name === "Discord") {
       actionArguments.userId = discordUserId;
@@ -234,7 +259,6 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
       setArgumentsData(reaction?.arguments || {});
     }
   }, [selectedReaction, linkedService]);
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
