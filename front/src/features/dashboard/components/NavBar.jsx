@@ -9,9 +9,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 export function Navbar() {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleLogout = async () => {
     try {
@@ -25,9 +27,19 @@ export function Navbar() {
           }
         });
         if (response.ok) {
+          toast({
+            title: "Logout successful",
+            description: "You have been successfully logged out",
+            variant: "default",
+          });
           localStorage.removeItem('session');
           navigate('/login');
         } else {
+          toast({
+            title: "Logout failed",
+            description: "An error occurred while trying to logout",
+            variant: "destructive",
+          });
           console.error('Failed to logout');
         }
       } else {
