@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast"
 
 import areaData from '@/AREA.json';
 
-export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated, isSpotifyAuthenticated, isTwitchAuthenticated, isGmailAuthenticated }) {
+export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated, isSpotifyAuthenticated, isTwitchAuthenticated, isGmailAuthenticated, onAreaCreated }) {
   const [linkedService, setLinkedService] = useState('');
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedReaction, setSelectedReaction] = useState('');
@@ -251,6 +251,9 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
         title: "Success",
         description: "AREA created successfully!",
       });
+      if (onAreaCreated) {
+        onAreaCreated(requestBody);
+      }
       onClose();
     } catch (error) {
       console.error("Error creating AREA:", error);

@@ -53,7 +53,7 @@ const handleLoginFunctions = {
   }
 }
 
-export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
+export function ServiceDialog({ isOpen, onClose, service, authStatus, onAreaCreated }) {
   const isAuthenticated = authStatus && authStatus[`is${service.name}Authenticated`]
   const handleLogin = handleLoginFunctions[`handle${service.name}Login`]
   const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false)
@@ -269,6 +269,14 @@ useEffect(() => {
         isSpotifyAuthenticated={authStatus.isSpotifyAuthenticated}
         isTwitchAuthenticated={authStatus.isTwitchAuthenticated}
         isGmailAuthenticated={authStatus.isGmailAuthenticated}
+        onAreaCreated={(newArea) => {
+          // Update local state
+          setAreas(prevAreas => [...prevAreas, newArea]);
+          // Pass to parent
+          if (onAreaCreated) {
+            onAreaCreated(newArea);
+          }
+        }}
       />
     </>
   )

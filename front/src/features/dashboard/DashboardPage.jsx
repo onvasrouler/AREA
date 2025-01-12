@@ -36,6 +36,10 @@ export function DashboardPage() {
     service.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const handleAreaCreated = (newArea) => {
+    setAreas(prevAreas => [...prevAreas, newArea]);
+  };
+
   useEffect(() => {
     const checkServicesAuth = async () => {
       const session = localStorage.getItem("session")
@@ -229,6 +233,7 @@ export function DashboardPage() {
             onClose={handleCloseDialog}
             service={selectedService}
             authStatus={authStatus}
+            onAreaCreated={handleAreaCreated}
           />
         )}
       </AnimatePresence>
