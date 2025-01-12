@@ -12,6 +12,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast"
 
 import areaData from '@/AREA.json';
 
@@ -28,8 +29,9 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
   const [formData, setFormData] = useState({});
   const [authError, setAuthError] = useState('');
   const [areaName, setAreaName] = useState('');
-
   const currentService = areaData.services.find(s => s.name === service.name);
+  const { toast } = useToast()
+
   const services = areaData.services
     .filter(s => s.name !== service.name)
     .map(s => s.name);
@@ -218,6 +220,11 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
     const session = localStorage.getItem("session");
     if (!session) {
       console.error("No session found. Please log in.");
+      toast({
+        title: "Error",
+        description: "No session found. Please log in.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -233,10 +240,19 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
         body: JSON.stringify(requestBody),
       });
       if (!response.ok) throw new Error("Failed to save AREA");
-      alert("AREA created successfully!");
+      console.log("Toast should appear now");
+      toast({
+        title: "Success",
+        description: "AREA created successfully!",
+      });
       onClose();
     } catch (error) {
       console.error("Error creating AREA:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create AREA. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
