@@ -31,6 +31,113 @@ const createToken = async (userId, type, expiresInMinutes) => {
     return token;
 };
 
+/**
+ * @swagger
+ * /fastregister:
+ *   post:
+ *     summary: Register a new user quickly
+ *     description: Register a new user with email, username, and password quickly ( means without sending an email for the verification ), this is useful for testing purposes.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *               username:
+ *                 type: string
+ *                 description: The user's username.
+ *                 example: username123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: successfully registered 
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations / email_already_exist / username_already_exist
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: some of the information were not provided / an account with the provided email already exist / an account with the provided username already exist
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't register when logged in 
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: Error while registering / Error while creating session / Error while trying to register
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.fastregister = async (req, res) => {
     if (req.user && req.user != null) // if the user is already logged in
         return api_formatter(req, res, 401, "unauthorised", "You can't register when logged in"); // return an error message
@@ -86,11 +193,117 @@ exports.fastregister = async (req, res) => {
     } catch (err) { // if an error occured while trying to register
         console.error(err);
         await delete_user_account(tmpUserRegister);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to register", null, err, null);
     }
 };
 
-// Register a new user
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Register a new user with email, username, and password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *               username:
+ *                 type: string
+ *                 description: The user's username.
+ *                 example: username123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: email sent successfully, check your spam folder 
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations / email_already_exist / username_already_exist
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: some of the information were not provided / an account with the provided email already exist / an account with the provided username already exist
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't register when logged in 
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while sending email / An error occured Error while registering / An error occured while trying to register
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.register = async (req, res) => {
     if (req.user && req.user != null)
         return api_formatter(req, res, 401, "unauthorised", "You can't register when logged in");
@@ -130,20 +343,100 @@ exports.register = async (req, res) => {
                 }).catch(async (err) => {
                     console.error(err);
                     await UserModel.deleteOne({ unique_id: savedUser.unique_id }); // delete the user
-                    return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
+                    return api_formatter(req, res, 500, "error", "An error occured while sending email", null, err, null); // return an error message
                 });
 
         }).catch((err) => {
             console.error(err);
-            return api_formatter(req, res, 500, "error", "Error while registering", null, err, null);
+            return api_formatter(req, res, 500, "error", "An error occured while registering", null, err, null);
         });
     } catch (err) {
         console.error(err);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to register", null, err, null);
     }
 };
 
-// Verify the user's email after registration
+/**
+ * @swagger
+ * /register/verify:
+ *   post:
+ *     summary: verify the registration of a new user
+ *     description: verify the new user with a token sent to the email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The user's email.
+ *                 example: 123456789abcdefgh
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: successfully registered 
+ *       404:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 404 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notfound
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: the provided token doesn't exist or is expired / no user found with the provided token
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while creating session / An error occured while activating the account / An error occured while verifying email
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.verifyregister = async (req, res) => {
     try {
         var tmpUserRegister = null; // this will be used to store the user that was registered
@@ -187,21 +480,140 @@ exports.verifyregister = async (req, res) => {
                 return return_signed_cookies(req, res, sessionRegistered, userRegistered); // return the signed cookies
             }).catch(async (err) => { // if an error occured while creating the session
                 console.error(err);
-                return api_formatter(req, res, 500, "error", "Error while creating session", null, err, null);
+                return api_formatter(req, res, 500, "error", "An error occured while creating session", null, err, null);
             });
         }).catch(async (err) => { // if an error occured while saving the user
             console.error(err);
             await delete_user_account(tmpUserRegister); // delete the user account
-            return api_formatter(req, res, 500, "error", "Error while activating the account", null, err, null);
+            return api_formatter(req, res, 500, "error", "An error occured while activating the account", null, err, null);
         });
 
     } catch (err) { // if an error occured while verifying the email
         console.error(err);
         await delete_user_account(tmpUserRegister);
-        return api_formatter(req, res, 500, "error", "Error while verifying email", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while verifying email", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login a user
+ *     description: log in a user with email or username, and password
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               emailOrUsername:
+ *                 type: string
+ *                 description: The user's email.
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: successfully registered 
+ *                data:
+ *                 type: object
+ *                 description: The data.
+ *                 example: null 
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: null
+ *                session:
+ *                 type: string
+ *                 description: The session token the user will use in his request to be autentificated.
+ *                 example: 123456789abcdefgh
+ *                username:
+ *                 type: string
+ *                 description: The username of the user.
+ *                 example: username123
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: some of the information were not provided
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised / user_not_found / google_account / email_not_verified / incorrect_password
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't register when logged in / no user found with the provided email or username / this account is a google account / the email is not verified for this account / the provided password is incorrect for this account
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while creating session / An error occured while trying to login
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.login = async (req, res) => {
     if (req.user && req.user != null) // if the user is already logged in
         return api_formatter(req, res, 401, "unauthorised", "You can't log in when logged in");
@@ -252,25 +664,142 @@ exports.login = async (req, res) => {
                 return return_signed_cookies(req, res, newSession, userToLogin, "login successful"); // return the signed cookies
             }).catch(async (err) => { // if an error occured while creating the session
                 console.error(err);
-                return api_formatter(req, res, 500, "error", "Error while creating session", null, err, null);
+                return api_formatter(req, res, 500, "error", "An error occured while creating session", null, err, null);
             });
         }).catch(async (err) => { // if an error occured while finding the user
             console.error(err);
-            return api_formatter(req, res, 500, "error", "Error while trying to login", null, err, null);
+            return api_formatter(req, res, 500, "error", "An error occured while trying to login", null, err, null);
         });
     } catch (err) { // if an error occured while trying to login
         console.error(err);
         await reset_user_session(tmpSessuion);
-        return api_formatter(req, res, 500, "error", "Error while trying to login", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to login", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /googleAuth:
+ *   post:
+ *     summary: Authenticate a user using Google OAuth
+ *     description: Authenticate a user using a Google OAuth token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The Google OAuth token.
+ *                 example: ya29.a0AfH6SMC...
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: successfully registered 
+ *                data:
+ *                 type: object
+ *                 description: The data.
+ *                 example: null 
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: null
+ *                session:
+ *                 type: string
+ *                 description: The session token the user will use in his request to be autentificated.
+ *                 example: 123456789abcdefgh
+ *                username:
+ *                 type: string
+ *                 description: The username of the user.
+ *                 example: username123
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no token was provided
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't register when logged in
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to register
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.googleAuth = async (req, res) => {
     if (req.user && req.user != null) // if the user is already logged in
         return api_formatter(req, res, 401, "unauthorised", "You can't register when logged in");
 
     var tmpUserRegister = null;  // this will be used to store the user that was registered
     const { token } = req.body; // get the token from the body
+    if (!token) // if the token is not provided
+        return api_formatter(req, res, 400, "missing_informations", "no token was provided"); // return an error message
     const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress; // get the IP
     try {
         const ticket = await GoogleClient.verifyIdToken({ // verify the token
@@ -336,10 +865,73 @@ exports.googleAuth = async (req, res) => {
     } catch (err) { // if an error occured while trying to register
         console.error(err);
         await delete_user_account(tmpUserRegister);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to register", null, err);
     }
 };
 
+/**
+ * @swagger
+ * /logout:
+ *   post:
+ *     summary: Logout a user
+ *     description: Logout a user by deleting the session.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The Google OAuth token.
+ *                 example: ya29.a0AfH6SMC...
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: logout successful
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to logout
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.logout = async (req, res) => {
     try {
         if (req.user && req.user != null && req.user != undefined) // if the user is logged in
@@ -347,21 +939,165 @@ exports.logout = async (req, res) => {
         return api_formatter(req, res, 200, "success", "logout successful", null, null, null); // return a success message
     } catch (err) {
         console.error(err); // if an error occured
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to logout", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to logout", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /logouteverywhere:
+ *   post:
+ *     summary: Logout a user
+ *     description: Logout a user by deleting the session.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The Google OAuth token.
+ *                 example: ya29.a0AfH6SMC...
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you logged out everywhere successfully
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to logout everywhere
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.logouteverywhere = async (req, res) => {
     try {
         if (req.user && req.user != null && req.user != undefined) // if the user is logged in
             delete_every_user_session(req.user); // delete all the user sessions
-        return api_formatter(req, res, 200, "success", "you logged out everywhere successful", null, null, null); // return a success message
+        return api_formatter(req, res, 200, "success", "you logged out everywhere successfully", null, null, null); // return a success message
     } catch (err) {
         console.error(err); // if an error occured
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to logout everywhere", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to logout fastprofile", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /deletefastprofile:
+ *   delete:
+ *     summary: Delete a user's fast profile
+ *     description: Delete a user's fast profile by providing the password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: account deleted successfully
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin / noPassword / incorrect_password
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in / you didn't provide any password / the provided password is incorrect for this account
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to delete the account
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.deletefastprofile = async (req, res) => {
     try {
         if (!req.user || req.user == null)
@@ -377,14 +1113,95 @@ exports.deletefastprofile = async (req, res) => {
             return api_formatter(req, res, 200, "success", "account deleted successfully", null, null, null);
         } catch (err) {
             console.error(err);
-            return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to delete the account", null, err, null);
+            return api_formatter(req, res, 500, "error", "An error occured while trying to delete the account", null, err, null);
         }
     } catch (err) {
         console.error(err);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to delete the account", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to delete the account", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /profile:
+ *   delete:
+ *     summary: Delete a user's account
+ *     description: Delete a user's account by providing the password if the account is not a Google account.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message, if the account is a google account it will delete it immediatly otherwise it will send a verification email.
+ *                 example: account deleted successfully / email sent successfully, check your spam folder
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin / noPassword / incorrect_password
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in / you didn't provide any password / the provided password is incorrect for this account
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to delete the account
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.deleteaccount = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
@@ -417,14 +1234,113 @@ exports.deleteaccount = async (req, res) => {
             return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
         }).catch((err) => {
             console.error(err);
-            return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
+            return api_formatter(req, res, 500, "error", "An error occured while sending email", null, err, null); // return an error message
         });
     } catch (err) { // if an error occured while trying to delete the account
         console.error(err);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to delete the account", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to delete the account", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /deleteaccount/confirm:
+ *   post:
+ *     summary: Confirm deletion of a user's account
+ *     description: Confirm the deletion of a user's account by providing a valid token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The token for confirming account deletion.
+ *                 example: someRandomToken123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: account deleted successfully
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no token was provided
+ *       404:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 404 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notfound
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: the provided token doesn't exist or is expired
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to delete the account
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.confirmdeleteaccount = async (req, res) => {
     try {
         const { token } = req.body; // get the token from the body
@@ -450,7 +1366,7 @@ exports.confirmdeleteaccount = async (req, res) => {
         return api_formatter(req, res, 200, "success", "account deleted successfully", null, null, null); // return a success message
     } catch (err) { // if an error occured while trying to delete the account
         console.error(err);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to delete the account", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to delete the account", null, err, null);
     }
 };
 
