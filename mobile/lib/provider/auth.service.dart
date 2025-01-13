@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:area/constant/constant.dart';
 import 'dart:convert';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:area/provider/user.service.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 
@@ -42,12 +43,38 @@ class AuthService {
   }
 
   Future<bool> register(String email, String username, String password) async {
-    final url = Uri.parse('$baseurl/fastregister');
+    final url = Uri.parse('$baseurl/register');
 
     final Map<String, dynamic> requestBody = {
       "email": email,
       "username": username,
       "password": password,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
+  Future<bool> confirmEmail(String code) async {
+    final url = Uri.parse('$baseurl/register/verify');
+
+    final Map<String, dynamic> requestBody = {
+      "token": code,
     };
 
     try {
@@ -74,6 +101,7 @@ class AuthService {
       return false;
     }
   }
+
   Future<bool> logout() async {
     final url = Uri.parse('$baseurl/logout');
 
@@ -96,11 +124,163 @@ class AuthService {
       return false;
     }
   }
+
+  Future<bool> logoutEverywhere() async {
+    final url = Uri.parse('$baseurl/logouteverywhere');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        session = "";
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
+  Future<bool> deleteProfile(String password) async {
+    final url = Uri.parse('$baseurl/profile');
+
+    final Map<String, dynamic> requestBody = {
+      "password": password,
+    };
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        session = "";
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+  
+  Future<bool> forgotPassword(String email) async {
+    final url = Uri.parse('$baseurl/forgotpassword');
+
+    final Map<String, dynamic> requestBody = {
+      "email": email,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
+  Future<bool> resetPassword(String code, String password) async {
+    final url = Uri.parse('$baseurl/resetpassword');
+
+    final Map<String, dynamic> requestBody = {
+      "resetToken": code,
+      "newPassword": password,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(requestBody),
+      );
+      
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
 }
 
 class GoogleLoginService {
+  final userService = UserService();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   Future<bool> loginWithGoogle(BuildContext context) async {
-    return false;
+    String? token;
+
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        return false;
+      }
+
+      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      token = googleAuth.accessToken;
+
+    } catch (error) {
+      return false;
+    }
+
+    final url = Uri.parse('$baseurl/auth/google');
+
+    final Map<String, dynamic> requestBody = {
+      "token": token,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+
+        final data = jsonDecode(response.body);
+        session = data['session'];
+
+        await userService.getUserInfo();
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
   }
 }
 
@@ -174,6 +354,99 @@ class GitHubAuthService {
       }
         
       final url = Uri.parse('$baseurl/auth/callback/github');
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+        body: jsonEncode({
+          "code": code,
+        })
+      );
+
+      if (response.statusCode == 200) {
+          return true;
+      } else {
+          return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+}
+
+
+class SpotifyAuthService {
+
+  final String clientId = "";
+  final String redirectUri = "myapp://spotify";
+  final String authUrl = "";
+  
+  Future<bool> authGitHub() async {
+    try {
+      final authEndpoint = Uri.parse(
+        ""
+      );
+
+      final result = await FlutterWebAuth.authenticate(
+        url: authEndpoint.toString(),
+        callbackUrlScheme: Uri.parse(redirectUri).scheme,
+      );
+
+      final code = Uri.parse(result).queryParameters['code'];
+      if (code == null) {
+        return false;
+      }
+        
+      final url = Uri.parse('$baseurl/auth/callback/spotify');
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+        body: jsonEncode({
+          "code": code,
+        })
+      );
+
+      if (response.statusCode == 200) {
+          return true;
+      } else {
+          return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+}
+
+class TwitchAuthService {
+
+  final String clientId = "";
+  final String redirectUri = "myapp://twitch";
+  final String authUrl = "";
+  
+  Future<bool> authGitHub() async {
+    try {
+      final authEndpoint = Uri.parse(
+        ""
+      );
+
+      final result = await FlutterWebAuth.authenticate(
+        url: authEndpoint.toString(),
+        callbackUrlScheme: Uri.parse(redirectUri).scheme,
+      );
+
+      final code = Uri.parse(result).queryParameters['code'];
+      if (code == null) {
+        return false;
+      }
+        
+      final url = Uri.parse('$baseurl/auth/callback/twitch');
 
       final response = await http.post(
         url,

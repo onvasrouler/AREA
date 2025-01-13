@@ -3,51 +3,45 @@ import 'package:go_router/go_router.dart';
 import 'package:area/provider/auth.service.dart';
 import 'package:area/constant/constant.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class ResetPasswordPage extends StatefulWidget {
+  const ResetPasswordPage({super.key});
 
   @override
-  _RegisterState createState() => _RegisterState();
+  _ResetPasswordState createState() => _ResetPasswordState();
 }
 
-class _RegisterState extends State<RegisterPage> {
-  late TextEditingController _email;
+class _ResetPasswordState extends State<ResetPasswordPage> {
+  late TextEditingController _code;
   late TextEditingController _password;
-  late TextEditingController _username;
+  late bool error;
   bool loader = false;
 
   @override
   void initState() {
-    _email = TextEditingController();
+    _code = TextEditingController();
     _password = TextEditingController();
-    _username = TextEditingController();
+    error = false;
     super.initState();
   }
 
   @override
   void dispose() {
-    _email.dispose();
+    _code.dispose();
     _password.dispose();
-    _username.dispose();
     super.dispose();
   }
 
   final authService = AuthService();
 
-  Future<void> _register() async {
-    final response = await authService.register(_email.text, _username.text, _password.text);
 
+  Future<void> _resetPassword() async {
+    final response = await authService.resetPassword(_code.text, _password.text);
     if (response) {
-      GoRouter.of(context).push('/checkEmail');
-    }
-  }
-
-  final GoogleLoginService googleLoginService = GoogleLoginService();
-
-  Future<void> _loginGoogle() async {
-    final response = await googleLoginService.loginWithGoogle(context);
-    if (response) {
-      GoRouter.of(context).push('/menu');
+      GoRouter.of(context).push('/login');
+    } else {
+      setState(() {
+        error = true;
+      });
     }
   }
 
@@ -76,37 +70,28 @@ class _RegisterState extends State<RegisterPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    'Register',
+                    'Reset password',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
                   TextField(
-                    controller: _email,
+                    controller: _code,
                     decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: _username,
-                    decoration: const InputDecoration(
-                      labelText: 'Username',
+                      labelText: 'Verification code',
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: _password,
-                    obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: 'Password',
+                      labelText: 'New password',
                       border: OutlineInputBorder(),
                     ),
-                  ),                  
+                  ),              
                   const SizedBox(height: 15),
                   GestureDetector(
-                    onTap: _register,
+                    onTap: _resetPassword,
                     child: Container(
                       width: 250,
                       height: 50,
@@ -116,44 +101,11 @@ class _RegisterState extends State<RegisterPage> {
                       ),
                       child: const Center(
                         child: Text(
-                          "Register",
+                          "Reset password",
                           style: TextStyle(
                             color: Colors.white,
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: _loginGoogle,
-                    child: Container(
-                      width: 250,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 2,
-                        )
-                      ),
-                      child: Center(
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 10),
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: Image.network(
-                                'https://developers.google.com/identity/images/g-logo.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(width: 30),
-                            const Text("Continue with Google"),
-                          ],
-                        )
                       ),
                     ),
                   ),

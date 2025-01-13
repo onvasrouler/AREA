@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-String baseurl = "";
+String baseurl = "http://172.16.218.188:8080";
 
 String session = "";
 
@@ -13,7 +13,7 @@ int currentServer = 0;
 
 Color containerColor = const Color.fromARGB(255, 255, 255, 255);
 Color backgroundColor = const Color.fromARGB(255, 245, 245, 245);
-Color buttonColor = const Color.fromARGB(255, 22, 163, 74);
+Color buttonColor = const Color.fromARGB(255, 23, 37, 84);
 
 class Service {
   final Color color;
@@ -111,36 +111,10 @@ final List<Service> services = [
   ),
 
   Service(
-    color: const Color.fromARGB(255, 8, 73, 176), 
-    image: 'assets/Onedrive.png',
-    name: 'Onedrive',
-    nameId: 'onedrive',
-    action: [],
-    actionName: [],
-    actionNotification: [],
-    reaction: [],
-    reactionName: [],
-    connected: false
-  ),
-
-  Service(
-    color: const Color.fromARGB(255, 228, 64, 95), 
-    image: 'assets/Instagram.png',
-    name: 'Instagram',
-    nameId: 'instagram',
-    action: [],
-    actionName: [],
-    actionNotification: [],
-    reaction: [],
-    reactionName: [],
-    connected: false
-  ),
-
-  Service(
-    color: const Color.fromARGB(255, 255, 220, 92), 
-    image: 'assets/Gmail.png',
-    name: 'Gmail',
-    nameId: 'gmail',
+    color: const Color.fromARGB(255, 29, 185, 84), 
+    image: 'assets/twitch.png',
+    name: 'Twitch',
+    nameId: 'twitch',
     action: [],
     actionName: [],
     actionNotification: [],

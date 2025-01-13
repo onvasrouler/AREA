@@ -2,6 +2,9 @@ import 'package:area/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/auth/register.dart';
+import 'package:area/auth/forgot_password.dart';
+import 'package:area/auth/reset_password.dart';
+import 'package:area/auth/email_check.dart';
 import 'package:area/pages/menu.dart';
 import 'package:area/pages/subpages/action.dart';
 import 'package:area/pages/subpages/reaction.dart';
@@ -37,6 +40,18 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginPage(),
+        ),
+        GoRoute(
+          path: '/forgotPassword',
+          builder: (context, state) => const ForgotPasswordPage(),
+        ),
+        GoRoute(
+          path: '/resetPassword',
+          builder: (context, state) => const ResetPasswordPage(),
+        ),
+        GoRoute(
+          path: '/checkEmail',
+          builder: (context, state) => const ConfirmEmailPage(),
         ),
         GoRoute(
           path: '/action',
