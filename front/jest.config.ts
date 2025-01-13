@@ -14,6 +14,8 @@ const config: Config = {
   },
   moduleDirectories: ["node_modules", "<rootDir>/node_modules"],
   moduleFileExtensions: ["js", "jsx", "ts", "tsx"],
+  testMatch: ['**/__tests__/**/*.(test|spec).(js|jsx|ts|tsx)'],
+  testPathIgnorePatterns: ['<rootDir>/src/__tests__/__mocks__/'],
   roots: ["<rootDir>/src"],
 };
 

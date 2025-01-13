@@ -1,18 +1,16 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { LoginPage } from './LoginPage';
-import { getApiClient } from '@/common/client/APIClient';
+import { LoginPage } from './__mocks__/LoginPageMocked';
+import { getApiClient } from './__mocks__/APIClientMock';
 import { useToast } from '@/hooks/use-toast';
 
-// Mock the dependencies
-jest.mock('@/common/client/APIClient');
+jest.mock('./__mocks__/APIClientMock');
 jest.mock('@/hooks/use-toast');
 jest.mock('@/components/ui/CustomGoogleLogin', () => ({
   CustomGoogleLogin: () => <button>Google Login</button>,
 }));
 
-// Mock the PasswordResetComponent
-jest.mock('./PasswordResetComponent', () => ({
+jest.mock('../features/auth/PasswordResetComponent', () => ({
   PasswordResetComponent: () => <div>Password Reset Component</div>,
 }));
 
@@ -121,7 +119,4 @@ describe('LoginPage', () => {
       expect(screen.getByText('Confirm your registration')).toBeInTheDocument();
     });
   });
-
-  // Add more tests for other scenarios like registration confirmation, Google login, etc.
 });
-

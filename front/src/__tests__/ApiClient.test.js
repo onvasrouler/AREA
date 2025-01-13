@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { getApiClient } from '../common/client/APIClientMock';
+import { getApiClient } from './__mocks__/APIClientMock';
 
 global.fetch = jest.fn();
 global.localStorage = {
