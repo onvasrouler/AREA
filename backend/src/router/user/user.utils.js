@@ -3,7 +3,7 @@ const api_formatter = require("../../middleware/api-formatter.js");
 const UserModel = require("../../database/models/users");
 const SessionModel = require("../../database/models/session");
 const AreaModel = require("../../database/models/actionReaction.js");
-const CachedDataModel = require("../database/models/cachedData.js");
+const CachedDataModel = require("../../database/models/cachedData.js");
 const nodemailer = require("nodemailer");
 
 // This function will return the signed cookies

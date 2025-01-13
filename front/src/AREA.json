@@ -38,6 +38,18 @@
                     "display": "List liked tracks",
                     "validLinkedServices": ["Spotify"],
                     "validReactions": ["liked_track"]
+                },
+                {
+                    "type": "/twitchonline",
+                    "display": "List online followed streamers",
+                    "validLinkedServices": ["Twitch"],
+                    "validReactions": ["following_online"]
+                },
+                {
+                    "type": "/following",
+                    "display": "List followed streamers",
+                    "validLinkedServices": ["Twitch"],
+                    "validReactions": ["following"]
                 }
             ],
             "reactions": [
@@ -211,6 +223,47 @@
             "name": "Instagram",
             "actions": [],
             "reactions": []
+        },
+        {
+            "name": "Twitch",
+            "actions": [
+                {
+                    "type": "new_follow",
+                    "display": "New streamer followed",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message"]
+                },
+                {
+                    "type": "following_online ",
+                    "display": "Followed streamer online",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message"]
+                }
+            ],
+            "reactions": [
+                {
+                    "type": "following_online",
+                    "display": "List online followed streamers",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "The streamers you are following are online: ",
+                            "component": "TextArea"
+                        }
+                    }
+                },
+                {
+                    "type": "following",
+                    "display": "List followed streamers",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "The streamers you are following are: ",
+                            "component": "TextArea"
+                        }
+                    }
+                }
+            ]
         }
     ]
 }

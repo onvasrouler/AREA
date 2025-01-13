@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast"
 
 import areaData from '@/AREA.json';
 
-export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated, isSpotifyAuthenticated }) {
+export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, isGitHubAuthenticated, isSpotifyAuthenticated, isTwitchAuthenticated }) {
   const [linkedService, setLinkedService] = useState('');
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedReaction, setSelectedReaction] = useState('');
@@ -60,6 +60,8 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
         return isGitHubAuthenticated;
       case 'Spotify':
         return isSpotifyAuthenticated;
+      case 'Twitch':
+        return isTwitchAuthenticated;
       default:
         return false;
     }

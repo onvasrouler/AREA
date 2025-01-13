@@ -47,6 +47,9 @@ export function ProfilePage() {
             spotify: data.data.logged_in_spotify && data.data.spotify_expire_at
               ? new Date(data.data.spotify_expire_at).toLocaleString()
               : "N/A",
+            twitch: data.data.logged_in_twitch && data.data.twitch_expire_at
+              ? new Date(data.data.twitch_expire_at).toLocaleString()
+              : "N/A",
           };
           const loggedIn = {
             discord: data.data.logged_in_discord && data.data.discord_expire_at
@@ -57,6 +60,9 @@ export function ProfilePage() {
               : false,
             spotify: data.data.logged_in_spotify && data.data.spotify_expire_at
               ? new Date(data.data.spotify_expire_at) > new Date()
+              : false,
+            twitch: data.data.logged_in_twitch && data.data.twitch_expire_at
+              ? new Date(data.data.twitch_expire_at) > new Date()
               : false,
           };
           setLoggedInServices(loggedIn);

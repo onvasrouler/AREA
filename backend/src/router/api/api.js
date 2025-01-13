@@ -7,7 +7,7 @@ exports.profile = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return a 401 error
-        const services = ["discord", "github", "spotify"];
+        const services = ["discord", "github", "spotify", "twitch"]; // list of services
         const logged_in_status = {};
 
         services.forEach(service => {
@@ -17,7 +17,7 @@ exports.profile = async (req, res) => {
             logged_in_status[`logged_in_${service}`] = logged_in;
         });
 
-        const { logged_in_discord, logged_in_github, logged_in_spotify } = logged_in_status;
+        const { logged_in_discord, logged_in_github, logged_in_spotify, logged_in_twitch } = logged_in_status;
 
 
         const user_infos = { // this will store the user informations
@@ -29,7 +29,9 @@ exports.profile = async (req, res) => {
             "logged_in_github": logged_in_github,
             "github_expire_at": logged_in_github ? req.user.github_token.expires_at : null,
             "logged_in_spotify": logged_in_spotify,
-            "spotify_expire_at": logged_in_spotify ? req.user.spotify_token.expires_at : null
+            "spotify_expire_at": logged_in_spotify ? req.user.spotify_token.expires_at : null,
+            "logged_in_twitch": logged_in_twitch,
+            "twitch_expire_at": logged_in_twitch ? req.user.twitch_token.expires_at : null
         };
         return api_formatter(req, res, 200, "success", "You are authenticated", user_infos, null, null); // return the user informations
     } catch (err) {

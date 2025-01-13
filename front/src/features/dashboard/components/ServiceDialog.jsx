@@ -43,6 +43,13 @@ const handleLoginFunctions = {
   handleInstagramLogin: () => {
     // Implement Instagram login logic
     console.log("Instagram login")
+  },
+  handleTwitchLogin: () => {
+    const CLIENT_ID = import.meta.env.VITE_TWITCH_CLIENT_ID;
+    const REDIRECT_URI = import.meta.env.VITE_TWITCH_REDIRECT_URI;
+    const SCOPE = "user:read:follows";
+    const AUTH_URL = `https://id.twitch.tv/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}`;
+    window.location.href = AUTH_URL;
   }
 }
 
@@ -260,6 +267,7 @@ useEffect(() => {
         isDiscordAuthenticated={authStatus.isDiscordAuthenticated}
         isGitHubAuthenticated={authStatus.isGitHubAuthenticated}
         isSpotifyAuthenticated={authStatus.isSpotifyAuthenticated}
+        isTwitchAuthenticated={authStatus.isTwitchAuthenticated}
       />
     </>
   )
