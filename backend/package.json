@@ -33,8 +33,17 @@
     "nodejs",
     "javascript",
     "mongodb",
-    "auth",
-    "cookie"
+    "authentication",
+    "auth0",
+    "jwt",
+    "bcrypt",
+    "discord",
+    "google",
+    "email",
+    "nodemailer",
+    "spotify",
+    "twitch",
+    "api"
   ],
   "author": "ciremia",
   "license": "ISC",
@@ -43,6 +52,8 @@
     "concurrently": "^9.0.0",
     "eslint": "^9.9.1",
     "globals": "^15.9.0",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }
