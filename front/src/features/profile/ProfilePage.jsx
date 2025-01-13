@@ -34,7 +34,6 @@ export function ProfilePage() {
         });
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           setUsername(data.data.username);
           setEmail(data.data.email);
           const expirations = {
@@ -50,6 +49,7 @@ export function ProfilePage() {
             twitch: data.data.logged_in_twitch && data.data.twitch_expire_at
               ? new Date(data.data.twitch_expire_at).toLocaleString()
               : "N/A",
+            gmail: "N/A",
           };
           const loggedIn = {
             discord: data.data.logged_in_discord && data.data.discord_expire_at
@@ -64,6 +64,7 @@ export function ProfilePage() {
             twitch: data.data.logged_in_twitch && data.data.twitch_expire_at
               ? new Date(data.data.twitch_expire_at) > new Date()
               : false,
+            gmail: true,
           };
           setLoggedInServices(loggedIn);
           setServiceExpirations(expirations);
@@ -184,7 +185,6 @@ export function ProfilePage() {
           description: "An error occurred while trying to change your password",
           variant: "destructive",
         });
-        console.log(response);
         console.error('Failed to change password');
       }
     } catch (error) {
@@ -350,7 +350,6 @@ export function ProfilePage() {
             'session': session,
           },
         });
-        console.log(response);
         if (response.ok) {
           toast({
             title: "Token refreshed",

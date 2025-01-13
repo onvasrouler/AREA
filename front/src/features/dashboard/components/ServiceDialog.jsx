@@ -53,7 +53,7 @@ const handleLoginFunctions = {
   }
 }
 
-export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
+export function ServiceDialog({ isOpen, onClose, service, authStatus, onAreaCreated, onAreaDeleted }) {
   const isAuthenticated = authStatus && authStatus[`is${service.name}Authenticated`]
   const handleLogin = handleLoginFunctions[`handle${service.name}Login`]
   const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false)
@@ -102,19 +102,19 @@ useEffect(() => {
       const body = JSON.stringify({ id: area.id });
       const headers = {
         "Content-Type": "application/json",
-        "session": session
+        "session": session,
       };
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}area`, {
         method: "DELETE",
         headers,
-        body
-      })
+        body,
+      });
       if (!response.ok) {
         toast({
           title: "Error",
           description: "Error deleting area",
-          variant: "destructive"
-        })
+          variant: "destructive",
+        });
         throw new Error("Error deleting area");
       } else {
         const newAreas = areas.filter(item => item.id !== area.id);
@@ -122,14 +122,17 @@ useEffect(() => {
         toast({
           title: "Area deleted",
           description: "Area has been successfully deleted",
-          variant: "default"
-        })
+          variant: "default",
+        });
+
+        if (onAreaDeleted) {
+          onAreaDeleted(area.id);
+        }
       }
     } catch (error) {
       console.error("Error deleting area:", error);
     }
-    console.log("Area to be deleted:", area);
-  }
+  };
 
   function formatJsonValues(data) {
     const formatters = {
@@ -268,6 +271,15 @@ useEffect(() => {
         isGitHubAuthenticated={authStatus.isGitHubAuthenticated}
         isSpotifyAuthenticated={authStatus.isSpotifyAuthenticated}
         isTwitchAuthenticated={authStatus.isTwitchAuthenticated}
+        isGmailAuthenticated={authStatus.isGmailAuthenticated}
+        onAreaCreated={(newArea) => {
+          // Update local state
+          setAreas(prevAreas => [...prevAreas, newArea]);
+          // Pass to parent
+          if (onAreaCreated) {
+            onAreaCreated(newArea);
+          }
+        }}
       />
     </>
   )

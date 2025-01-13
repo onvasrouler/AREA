@@ -36,6 +36,14 @@ export function DashboardPage() {
     service.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const handleAreaCreated = (newArea) => {
+    setAreas(prevAreas => [...prevAreas, newArea]);
+  };
+
+  const handleAreaDeleted = (deletedAreaId) => {
+    setAreas(prevAreas => prevAreas.filter(area => area.id !== deletedAreaId));
+  };
+
   useEffect(() => {
     const checkServicesAuth = async () => {
       const session = localStorage.getItem("session")
@@ -51,7 +59,7 @@ export function DashboardPage() {
             isGitHubAuthenticated: responseData.data?.logged_in_github === true && responseData.data?.logged_in_github !== "session_expired",
             isSpotifyAuthenticated: responseData.data?.logged_in_spotify === true && responseData.data?.logged_in_spotify !== "session_expired",
             isOneDriveAuthenticated: false,
-            isGmailAuthenticated: false,
+            isGmailAuthenticated: true,
             isInstagramAuthenticated: false,
             isTwitchAuthenticated: responseData.data?.logged_in_twitch === true && responseData.data?.logged_in_twitch !== "session_expired"
           })
@@ -217,7 +225,7 @@ export function DashboardPage() {
           </AnimatePresence>
           <Separator className="mt-8 border-t-2" />
           <div className="font-bold mb-8 mt-8">
-              <AreasList areas={areas} />
+              <AreasList areas={areas} onAreaDeleted={handleAreaDeleted} />
           </div>
         </div>
       </main>
@@ -229,6 +237,8 @@ export function DashboardPage() {
             onClose={handleCloseDialog}
             service={selectedService}
             authStatus={authStatus}
+            onAreaCreated={handleAreaCreated}
+            onAreaDeleted={handleAreaDeleted}
           />
         )}
       </AnimatePresence>
