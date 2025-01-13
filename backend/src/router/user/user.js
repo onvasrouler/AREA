@@ -1967,7 +1967,7 @@ exports.getsessions = async (req, res) => {
  *                message:
  *                 type: string
  *                 description: The message.
- *                 example: ["sessionId1", "sessionId2", ...] deleted successfully
+ *                 example: "['sessionId1', 'sessionId2', ...] deleted successfully"
  *       400:
  *         content:
  *          application/json:
