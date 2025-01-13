@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import sinon from "sinon";
-import { ApiClient, getApiClient } from "../src/common/client/APIClient.js"; // Remplacez par le chemin correct
+import { ApiClient, getApiClient } from "../src/common/client/APIClient.js";
 import { JSDOM } from "jsdom";
 
 describe("ApiClient", () => {
