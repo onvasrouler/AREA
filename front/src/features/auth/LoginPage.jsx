@@ -93,22 +93,23 @@ export function LoginPage() {
       if (data.session) {
         localStorage.setItem("session", data.session);
         toast({
-          title: "Login Successful",
-          description: "You have been logged in successfully.",
+          title: "Welcome back!",
+          description: "You've been successfully logged in.",
+          variant: "default",
         });
         window.location.href = "/dashboard";
       } else {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "Invalid credentials. Please try again.",
+          description: data.message || "Invalid credentials. Please check your email and password.",
         });
       }
-    } catch {
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Login Error",
-        description: "An error occurred during login. Please try again later.",
+        description: error.message || "An unexpected error occurred. Please try again later.",
       });
     }
   };
@@ -121,26 +122,29 @@ export function LoginPage() {
           password: data.password,
           username: data.username,
         });
+
         if (response.status === 200) {
           setRegisteredEmail(data.email);
           setRegistrationData(data);
           setShowConfirmDialog(true);
           toast({
             title: "Registration Successful",
-            description: "Please check your email to confirm your registration.",
+            description: "Please check your email for the verification code.",
+            variant: "default",
           });
         } else {
+          const errorData = await response.json();
           toast({
             variant: "destructive",
             title: "Registration Failed",
-            description: "An error occurred during registration. Please try again.",
+            description: errorData.message || "This email or username might already be registered.",
           });
         }
-      } catch {
+      } catch (error) {
         toast({
           variant: "destructive",
           title: "Registration Error",
-          description: "An error occurred during registration. Please try again later.",
+          description: error.message || "An unexpected error occurred during registration.",
         });
       }
     } else {
@@ -153,75 +157,77 @@ export function LoginPage() {
       const response = await apiClient.post("register/verify", {
         token: data.token,
       });
+
       if (response.status === 200) {
         setShowConfirmDialog(false);
         toast({
-          title: "Registration Confirmed",
-          description: "Your account has been successfully verified.",
+          title: "Account Verified",
+          description: "Your account has been successfully verified. Logging you in...",
+          variant: "default",
         });
+
         const responseLogin = await apiClient.post("login", {
           emailOrUsername: registrationData.email,
           password: registrationData.password,
         });
+
         if (responseLogin.status === 200) {
           const data = await responseLogin.json();
           localStorage.setItem('session', data.session);
-          console.log('Session:', data.session);
           window.location.href = "/dashboard";
         } else {
           toast({
             variant: "destructive",
-            title: "Login Failed",
-            description: "An error occurred during login. Please try logging in manually.",
+            title: "Automatic Login Failed",
+            description: "Your account is verified, but you'll need to log in manually.",
           });
         }
       } else {
+        const errorData = await response.json();
         toast({
           variant: "destructive",
           title: "Verification Failed",
-          description: "Failed to verify your account. Please try again or contact support.",
+          description: errorData.message || "Invalid or expired verification code.",
         });
       }
-    } catch {
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Verification Error",
-        description: "An error occurred during account verification. Please try again later.",
+        description: error.message || "An unexpected error occurred during verification.",
       });
     }
   };
 
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
-      console.log(credentialResponse);
-        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}auth/google`, {
-            token: credentialResponse.credential,
-        });
-        const data = response.data;
-        console.log(data.session)
-        localStorage.setItem('session', data.session);
-        toast({
-            title: "Google Login Successful",
-            description: "You have been logged in successfully with Google.",
-        });
-        window.location.href = "/dashboard";
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}auth/google`, {
+        token: credentialResponse.credential,
+      });
+      const data = response.data;
+      localStorage.setItem('session', data.session);
+      toast({
+        title: "Welcome!",
+        description: "You've been successfully logged in with Google.",
+        variant: "default",
+      });
+      window.location.href = "/dashboard";
     } catch (error) {
-        console.error(error);
-        toast({
-            variant: "destructive",
-            title: "Google Login Error",
-            description: "An error occurred during Google login. Please try again later.",
-        });
+      toast({
+        variant: "destructive",
+        title: "Google Login Failed",
+        description: error.response?.data?.message || "Unable to authenticate with Google.",
+      });
     }
   };
 
   const handleGoogleLoginError = (error) => {
-      console.error(error);
-      toast({
-          variant: "destructive",
-          title: "Google Login Error",
-          description: "Google login failed. Please try again.",
-      });
+    console.error(error);
+    toast({
+      variant: "destructive",
+      title: "Google Login Error",
+      description: "Failed to connect with Google. Please try again or use email login.",
+    });
   };
 
   return (

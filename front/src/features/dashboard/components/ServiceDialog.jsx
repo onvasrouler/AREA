@@ -6,6 +6,7 @@ import { AreaDialog } from "./AreaDialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Trash2 } from 'lucide-react'
+import { useToast } from "@/hooks/use-toast";
 
 const handleLoginFunctions = {
   handleDiscordLogin: () => {
@@ -24,7 +25,11 @@ const handleLoginFunctions = {
       window.location.href = AUTH_URL;
   },
   handleSpotifyLogin: () => {
-    // Implement Spotify login logic
+    const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+    const REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
+    const SCOPE = 'user-library-read user-read-currently-playing';
+    const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
+    window.location.href = AUTH_URL;
     console.log("Spotify login")
   },
   handleOneDriveLogin: () => {
@@ -46,6 +51,7 @@ export function ServiceDialog({ isOpen, onClose, service, authStatus }) {
   const handleLogin = handleLoginFunctions[`handle${service.name}Login`]
   const [isAreaDialogOpen, setIsAreaDialogOpen] = useState(false)
   const [areas, setAreas] = useState([]);
+  const { toast } = useToast();
 
 useEffect(() => {
   if (isOpen && isAuthenticated) {
@@ -66,6 +72,11 @@ useEffect(() => {
           setAreas(filteredAreas);
         } else {
           setAreas([]);
+          toast({
+            title: "No areas",
+            description: "No areas found for this service",
+            variant: "destructive"
+          })
         }
       })
       .catch(err => {
@@ -92,10 +103,20 @@ useEffect(() => {
         body
       })
       if (!response.ok) {
+        toast({
+          title: "Error",
+          description: "Error deleting area",
+          variant: "destructive"
+        })
         throw new Error("Error deleting area");
       } else {
         const newAreas = areas.filter(item => item.id !== area.id);
         setAreas(newAreas);
+        toast({
+          title: "Area deleted",
+          description: "Area has been successfully deleted",
+          variant: "default"
+        })
       }
     } catch (error) {
       console.error("Error deleting area:", error);
@@ -109,11 +130,11 @@ useEffect(() => {
       on: (value) => value.replace(/_/g, " "),
       react: (value) => capitalizeFirstLetter(value.replace(/_/g, " ")),
     };
-  
+
     function capitalizeFirstLetter(str) {
       return str.charAt(0).toUpperCase() + str.slice(1);
     }
-  
+
     function formatObject(obj) {
       if (Array.isArray(obj)) {
         return obj.map(formatObject);
@@ -127,7 +148,7 @@ useEffect(() => {
       }
       return obj;
     }
-  
+
     return formatObject(data);
   }
 
@@ -135,7 +156,7 @@ useEffect(() => {
     <Accordion type="single" collapsible className="w-full pr-2">
       {areas.map((rawArea) => {
         const area = formatJsonValues(rawArea);
-  
+
         return (
           <AccordionItem key={area.name} value={area.name} className="pr-8 relative">
             <AccordionTrigger>{area.name}</AccordionTrigger>
@@ -238,6 +259,7 @@ useEffect(() => {
         service={service}
         isDiscordAuthenticated={authStatus.isDiscordAuthenticated}
         isGitHubAuthenticated={authStatus.isGitHubAuthenticated}
+        isSpotifyAuthenticated={authStatus.isSpotifyAuthenticated}
       />
     </>
   )

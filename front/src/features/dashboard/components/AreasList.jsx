@@ -7,11 +7,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Trash2 } from 'lucide-react'
+import { useToast } from "@/hooks/use-toast"
 
 export function AreasList({ areas: initialAreas }) {
   const [areas, setAreas] = React.useState(initialAreas || [])
   const [statuses, setStatuses] = React.useState({})
   const [isOpen, setIsOpen] = React.useState(false)
+  const { toast } = useToast()
 
   React.useEffect(() => {
     setAreas(initialAreas || [])
@@ -38,6 +40,11 @@ export function AreasList({ areas: initialAreas }) {
           ...prev,
           [index]: !prev[index],
         }))
+        toast({
+          title: "Area status updated",
+          description: "The area status has been successfully updated",
+          variant: "default",
+        })
       } else {
         console.error("Error:", response.statusText)
       }
@@ -60,9 +67,18 @@ export function AreasList({ areas: initialAreas }) {
         body,
       })
       if (!response.ok) {
+        toast({
+          title: "Error",
+          description: "An error occurred while deleting the area",
+          variant: "destructive",
+        })
         throw new Error("Error deleting area")
       } else {
-        // Update the local state to remove the deleted area
+        toast({
+          title: "Area deleted",
+          description: "The area has been successfully deleted",
+          variant: "default",
+        })
         setAreas((prevAreas) => prevAreas.filter((item) => item.id !== area.id))
       }
     } catch (error) {

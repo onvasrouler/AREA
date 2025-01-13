@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
+import { useToast } from "@/hooks/use-toast";
 
 export function AccountTab({
   username,
@@ -27,6 +28,7 @@ export function AccountTab({
   const [deletePassword, setDeletePassword] = useState("");
   const [showTokenDialog, setShowTokenDialog] = useState(false);
   const [confirmationToken, setConfirmationToken] = useState("");
+  const { toast } = useToast();
 
   const handleDelete = async () => {
     try {
@@ -53,9 +55,19 @@ export function AccountTab({
       });
 
       if (response.ok) {
+        toast({
+          title: "Account deleted",
+          description: "Your account has been successfully deleted",
+          variant: "default",
+        });
         localStorage.removeItem('session');
         window.location.href = '/login';
       } else {
+        toast({
+          title: "Account deletion failed",
+          description: "An error occurred while trying to delete your account",
+          variant: "destructive",
+        });
         console.error('Failed to confirm profile deletion');
       }
     } catch (error) {
@@ -92,7 +104,7 @@ export function AccountTab({
         />
       </div>
 
-      <motion.div 
+      <motion.div
         className="space-y-4 pt-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

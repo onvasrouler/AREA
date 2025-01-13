@@ -9,6 +9,7 @@ import { Header } from './components/Header';
 import { AccountTab } from './components/AccountTab';
 import { SecurityTab } from './components/SecurityTab';
 import { ServicesTab } from './components/ServicesTab';
+import { useToast } from "@/hooks/use-toast";
 
 export function ProfilePage() {
   const [username, setUsername] = useState('');
@@ -22,6 +23,7 @@ export function ProfilePage() {
   const apiClient = getApiClient();
   const navigate = useNavigate();
   const [serviceExpirations, setServiceExpirations] = useState({});
+  const { toast } = useToast();
 
   const fetchUserData = async () => {
     const session = localStorage.getItem('session');
@@ -84,9 +86,19 @@ export function ProfilePage() {
           }
         });
         if (response.ok) {
+          toast({
+            title: "Logout successful",
+            description: "You have been successfully logged out",
+            variant: "default",
+          });
           localStorage.removeItem('session');
           navigate('/login');
         } else {
+          toast({
+            title: "Logout failed",
+            description: "An error occurred while trying to logout",
+            variant: "destructive",
+          });
           console.error('Failed to logout');
         }
       }
@@ -111,8 +123,18 @@ export function ProfilePage() {
           })
         });
         if (response.ok) {
+          toast({
+            title: "Profile edited",
+            description: "Your profile has been successfully edited",
+            variant: "default",
+          });
           console.log('Profile edited successfully');
         } else {
+          toast({
+            title: "Profile edit failed",
+            description: "An error occurred while trying to edit your profile",
+            variant: "destructive",
+          });
           console.error('Failed to edit profile');
         }
       }
@@ -140,12 +162,22 @@ export function ProfilePage() {
       });
 
       if (response.ok) {
+        toast({
+          title: "Password changed",
+          description: "Your password has been successfully changed",
+          variant: "default",
+        });
         console.log('Password changed successfully');
         setShowPasswordFields(false);
         setResetToken('');
         setNewPassword('');
         setConfirmNewPassword('');
       } else {
+        toast({
+          title: "Password change failed",
+          description: "An error occurred while trying to change your password",
+          variant: "destructive",
+        });
         console.log(response);
         console.error('Failed to change password');
       }
@@ -166,9 +198,19 @@ export function ProfilePage() {
         }),
       });
       if (response.ok) {
+        toast({
+          title: "Password change request sent",
+          description: "A password change request has been sent to your email",
+          variant: "default",
+        });
         setShowPasswordFields(true);
         console.log('Password change request sent');
       } else {
+        toast({
+          title: "Password change request failed",
+          description: "An error occurred while trying to request a password change",
+          variant: "destructive",
+        });
         console.error('Failed to request password change');
       }
     } catch {
@@ -189,8 +231,20 @@ export function ProfilePage() {
           body: JSON.stringify({ password })
         }).then((response) => {
           if (response.ok) {
+            toast({
+              title: "Profile deleted",
+              description: "Your profile has been successfully deleted",
+              variant: "default",
+            });
+            navigate('/login');
+            localStorage.removeItem('session');
             console.log('Profile deletion initiated');
           } else {
+            toast({
+              title: "Profile deletion failed",
+              description: "An error occurred while trying to delete your profile",
+              variant: "destructive",
+            });
             console.error('Failed to delete profile');
           }
         });
@@ -211,9 +265,21 @@ export function ProfilePage() {
             'session': session
           }
         });
-        localStorage.removeItem('session');
         if (response.ok) {
+          toast({
+            title: "Logout successful",
+            description: "You have been successfully logged out from all devices",
+            variant: "default",
+          });
+          localStorage.removeItem('session');
           navigate('/login');
+        } else {
+          toast({
+            title: "Logout failed",
+            description: "An error occurred while trying to logout from all devices",
+            variant: "destructive",
+          });
+          console.error('Failed to logout from all devices');
         }
       }
     } catch (error) {
@@ -242,12 +308,22 @@ export function ProfilePage() {
           }
         });
         if (response.ok) {
+          toast({
+            title: "Logout successful",
+            description: `Successfully disconnected from ${serviceName}`,
+            variant: "default",
+          });
           console.log(`Successfully disconnected from ${serviceName}`);
           setLoggedInServices((prev) => ({
             ...prev,
             [serviceName]: false,
           }));
         } else {
+          toast({
+            title: "Logout failed",
+            description: `An error occurred while trying to disconnect from ${serviceName}`,
+            variant: "destructive",
+          });
           console.error(`Failed to disconnect from ${serviceName}`);
         }
       }
@@ -270,6 +346,11 @@ export function ProfilePage() {
         });
         console.log(response);
         if (response.ok) {
+          toast({
+            title: "Token refreshed",
+            description: `Token for ${serviceName} refreshed successfully`,
+            variant: "default",
+          });
           console.log(`Token for ${serviceName} refreshed successfully`);
           const refreshedToken = await response.json();
           setServiceExpirations((prev) => ({
@@ -277,6 +358,11 @@ export function ProfilePage() {
             [serviceName]: new Date(refreshedToken.expire_at).toLocaleString(),
           }));
         } else {
+          toast({
+            title: "Token refresh failed",
+            description: `An error occurred while trying to refresh token for ${serviceName}`,
+            variant: "destructive",
+          });
           console.error(`Failed to refresh token for ${serviceName}`);
         }
       }
@@ -294,7 +380,7 @@ export function ProfilePage() {
     >
       <Header handleLogout={handleLogout} navigate={navigate} />
 
-      <motion.main 
+      <motion.main
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.2 }}
