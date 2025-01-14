@@ -37,6 +37,8 @@ const createToken = async (userId, type, expiresInMinutes) => {
  *   post:
  *     summary: Register a new user quickly
  *     description: Register a new user with email, username, and password quickly ( means without sending an email for the verification ), this is useful for testing purposes.
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -203,6 +205,8 @@ exports.fastregister = async (req, res) => {
  *   post:
  *     summary: Register a new user
  *     description: Register a new user with email, username, and password.
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -362,6 +366,8 @@ exports.register = async (req, res) => {
  *   post:
  *     summary: verify the registration of a new user
  *     description: verify the new user with a token sent to the email
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -501,6 +507,8 @@ exports.verifyregister = async (req, res) => {
  *   post:
  *     summary: Login a user
  *     description: log in a user with email or username, and password
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -683,6 +691,8 @@ exports.login = async (req, res) => {
  *   post:
  *     summary: Authenticate a user using Google OAuth
  *     description: Authenticate a user using a Google OAuth token.
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -875,6 +885,8 @@ exports.googleAuth = async (req, res) => {
  *   post:
  *     summary: Logout a user
  *     description: Logout a user by deleting the session.
+ *     tags:
+ *      - user
  *     parameters:
  *       - in: header
  *         name: session
@@ -943,8 +955,10 @@ exports.logout = async (req, res) => {
  * @swagger
  * /logouteverywhere:
  *   post:
- *     summary: Logout a user
- *     description: Logout a user by deleting the session.
+ *     summary: Logout a user everywhere
+ *     description: Logout a user by deleting all the sessions.
+ *     tags:
+ *      - user
  *     parameters:
  *       - in: header
  *         name: session
@@ -1022,6 +1036,8 @@ exports.logouteverywhere = async (req, res) => {
  *         schema:
  *           type: string
  *         description: The session header
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -1133,6 +1149,8 @@ exports.deletefastprofile = async (req, res) => {
  *         schema:
  *           type: string
  *         description: The session header
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -1254,6 +1272,8 @@ exports.deleteaccount = async (req, res) => {
  *   delete:
  *     summary: Confirm deletion of a user's account
  *     description: Confirm the deletion of a user's account by providing a valid token.
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -1409,6 +1429,8 @@ exports.confirmdeleteaccount = async (req, res) => {
  *         schema:
  *           type: string
  *         description: The session header
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -1556,6 +1578,8 @@ exports.profilepicture = async (req, res) => {
  *   get:
  *     summary: Get a user's profile picture
  *     description: Retrieve the profile picture of the user.
+ *     tags:
+ *      - user
  *     parameters:
  *       - in: header
  *         name: session
@@ -1657,6 +1681,8 @@ exports.getprofilepicture = async (req, res) => {
  *   delete:
  *     summary: Delete a user's profile picture
  *     description: Delete the profile picture of the user.
+ *     tags:
+ *      - user
  *     parameters:
  *       - in: header
  *         name: session
@@ -1781,6 +1807,8 @@ exports.deleteprofilepicture = async (req, res) => {
  *   get:
  *     summary: Get a user's active sessions
  *     description: Retrieve all active sessions for the user.
+ *     tags:
+ *      - user
  *     parameters:
  *       - in: header
  *         name: session
@@ -1936,6 +1964,8 @@ exports.getsessions = async (req, res) => {
  *         schema:
  *           type: string
  *         description: The session header
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -2054,6 +2084,8 @@ exports.deletesessions = async (req, res) => {
  *   post:
  *     summary: Request a password reset
  *     description: Request a password reset by providing the user's email.
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -2208,6 +2240,8 @@ exports.forgotpassword = async (req, res) => {
  *   post:
  *     summary: Reset a user's password
  *     description: Reset a user's password by providing a valid reset token and a new password.
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:
@@ -2358,6 +2392,8 @@ exports.resetpassword = async (req, res) => {
  *         schema:
  *           type: string
  *         description: The session header
+ *     tags:
+ *      - user
  *     requestBody:
  *       required: true
  *       content:

@@ -35,13 +35,17 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Your API Title',
-            version: '1.0.0',
-            description: 'A description of your API',
+            title: 'AREA API',
+            version: '4.2.0',
+            description: 'this is the API for the AREA project',
+            contact: {
+                name: 'aimeric',
+                email: 'aimeric.rouyer@gmail.com',
+            },
         },
         servers: [
             {
-                url: 'http://localhost:3333', // Replace with your server URL
+                url: `${process.env.SERVER_PROTOCOL}://${process.env.SERVER_URL}${process.env.PORT ? ":" + process.env.PORT : ""}`,
             },
         ],
     },
