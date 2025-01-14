@@ -70,7 +70,13 @@ jobs:
         run: npm run lint
         working-directory: backend
 
-      # ADD A JOB FOR THE TESTS
+      - name: Start backend server to run tests
+        run: npm start &
+        working-directory: backend
+
+      - name: Run tests
+        run: npm run test
+        working-directory: backend
 
 # Mobile
   mobile:

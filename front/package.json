@@ -9,7 +9,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "mocha"
+    "test": "mocha",
+    "test-react": "mocha --require jsdom-global/register --require @babel/register --extensions js,jsx 'test/**/*.jsx'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -28,6 +29,8 @@
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-toast": "^1.2.4",
     "@react-oauth/google": "^0.12.1",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.1.0",
     "axios": "^1.7.9",
     "chai": "^5.1.2",
     "class-variance-authority": "^0.7.0",
@@ -36,6 +39,7 @@
     "dotenv": "^16.4.7",
     "framer-motion": "^11.16.1",
     "i18next": "^24.0.2",
+    "jsdom-global": "^3.0.2",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.460.0",
     "mocha": "^11.0.1",
@@ -54,6 +58,9 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/register": "^7.25.9",
     "@eslint/js": "^9.13.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
