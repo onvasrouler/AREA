@@ -229,7 +229,7 @@ exports.postArea = async (req, res) => {
             reaction: newActionReaction.Reaction,
             active: newActionReaction.active,
             created_at: newActionReaction.created_at
-        }
+        };
 
         return api_formatter(req, res, 200, "success", "Action Reaction saved", NewAREAdata);
     }
