@@ -1,4 +1,4 @@
-const server_URL = `http://localhost:8080`;
+const server_URL = "http://localhost:8080";
 
 exports.postRegister = async (test_email, test_username, test_password) => {
     const test_body = JSON.stringify({
