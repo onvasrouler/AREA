@@ -198,8 +198,8 @@ exports.postArea = async (req, res) => {
 
         const actionToken = getToken(action.service);
         const reactionToken = getToken(reaction.service);
-
-        if (!actionToken && action.service !== "discord")
+        console.log(action.service);
+        if (!actionToken && action.service !== "discord" && action.service !== "weather")
             return api_formatter(req, res, 400, "error", `${messages[action.service]} action`, null);
         if (!reactionToken && reaction.service !== "gmail" && reaction.service !== "discord")
             return api_formatter(req, res, 400, "error", `${messages[action.service]} reaction`, null);

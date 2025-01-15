@@ -504,6 +504,53 @@ npm run lintfix
     the action is when the user use the command /following on discord
     the reaction is to list the streamer the user follow
 
+- **USAGE 8**:
+    ```json
+      {
+        "name": "*",
+        "reaction": {
+          "service": "weather",
+          "arguments": {
+              "runtime": [
+                "everyDay",
+                "everyHalfDay",
+                "everyHour"
+              ],
+              "city": "*",
+          }
+        }
+      }
+    ```
+  - **explanation**:
+      everyDay will trigger the reaction once a day
+      everyHalfDay will trigger the reaction twice a day ( separated by 12h )
+      everyHour will trigger the reaction every hour
+      city will be the city to get the weather from
+  - **example**:
+  ```json
+    {
+        "name": "send a message overy a certain ammount of time the weather",
+        "action": {
+            "service": "weather",
+            "arguments": {
+                "runtime": "everyHour",
+                "city": "nantes"
+            }
+        },
+        "reaction": {
+            "service": "discord",
+            "arguments": {
+                "react": "message",
+                "server": "1308348420037279747",
+                "channel": "1325848053206352018",
+                "message": "here is the weather for the last hour :"
+            }
+        }
+    }
+  ```
+  - **explanation**:
+    the action is runned every hour and will get the weather data of nantes
+    the reaction is to send all the weather data to discord
 
 ## API Endpoints
 

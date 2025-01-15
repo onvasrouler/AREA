@@ -9,7 +9,7 @@ async function extractData(AREA, prefix) {
     try {
         let message = prefix + "\n" || "";
 
-        if (AREA.CachedData == "error") {
+        if (AREA.CachedData == "error" || AREA.CachedData.status == "error") {
             message = "an error occured : **" + (AREA.Errors.message || " while fetching the data") + "** on the AREA with name : **" + AREA.Name + "**";
         } else {
             if (AREA.Action.service == "spotify") {
@@ -42,6 +42,8 @@ async function extractData(AREA, prefix) {
                 } else if (AREA.Action.arguments.on == "following_online") {
                     message += "**" + AREA.CachedData[0].user_name + "** is now online : **" + AREA.CachedData[0].title + "**\nand is playing : **" + AREA.CachedData[0].game_name + "**" + (AREA.CachedData[0].is_mature ? "\n⚠️  the content has been marked as restricted, the content is reserved for the adults " : "") + "\n # [link](https://twitch.tv/" + AREA.CachedData[0].user_name + ")";
                 }
+            } else if (AREA.Action.service == "weather") {
+                message += "place : ** " + AREA.Action.arguments.city + "**\n**" + AREA.CachedData.data.current.weather[0].description + "**\nTemperature : **" + AREA.CachedData.data.current.temp + "°C**\nFeels like : **" + AREA.CachedData.data.current.feels_like + "°C**\nHumidity : **" + AREA.CachedData.data.current.humidity + "%**";
             } else {
                 console.error("Service not found : " + AREA.Action.service + " for action " + AREA.Action);
                 message = "ERROR: Service not found : " + AREA.Action.service + " for action " + AREA.Action;
