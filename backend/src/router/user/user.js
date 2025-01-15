@@ -2349,7 +2349,7 @@ exports.resetpassword = async (req, res) => {
         const passwordResetToken = await TokenModel.findOne({ // find the token in the database
             token: hashedToken,
             expiresAt: { $gt: Date.now() },
-            type: "resetPassword"
+            type: "passwordReset"
         });
 
         if (!passwordResetToken) // if the token is not found
