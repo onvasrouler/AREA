@@ -4,6 +4,7 @@ const { ActionGithub, ReactionGithub } = require("./github/AreaGithub.js");
 const { ActionSpotify, ReactionSpotify } = require("./spotify/AreaSpotify.js");
 const { ActionGmail, ReactionGmail } = require("./gmail/AreaGmail.js");
 const { ActionTwitch, ReactionTwitch } = require("./twitch/AreaTwitch.js");
+const { ActionWeather, ReactionWeather } = require("./weather/AreaWeather.js");
 
 class runner {
     constructor() {
@@ -46,6 +47,8 @@ class runner {
             return ActionGmail(AREA);
         else if (Action.service === "twitch")
             return ActionTwitch(AREA);
+        else if (Action.service === "weather")
+            return ActionWeather(AREA);
         else {
             console.log("Service not found : " + Action.service + " for action " + JSON.stringify(Action));
             return "ERROR: Service not found : " + Action.service + " for action " + JSON.stringify(Action);
@@ -65,6 +68,8 @@ class runner {
             return ReactionGmail(AREA);
         else if (Reaction.service === "twitch")
             return ReactionTwitch(AREA);
+        else if (Reaction.service === "weather")
+            return ReactionWeather(AREA);
         else {
             console.log("Service not found : " + Reaction.service + " for reaction " + JSON.stringify(Reaction));
             return "ERROR: Service not found : " + Reaction.service + " for reaction " + JSON.stringify(Reaction);
