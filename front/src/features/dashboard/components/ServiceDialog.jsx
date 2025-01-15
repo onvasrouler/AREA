@@ -273,9 +273,7 @@ useEffect(() => {
         isTwitchAuthenticated={authStatus.isTwitchAuthenticated}
         isGmailAuthenticated={authStatus.isGmailAuthenticated}
         onAreaCreated={(newArea) => {
-          // Update local state
           setAreas(prevAreas => [...prevAreas, newArea]);
-          // Pass to parent
           if (onAreaCreated) {
             onAreaCreated(newArea);
           }
@@ -284,4 +282,3 @@ useEffect(() => {
     </>
   )
 }
-
