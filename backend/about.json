@@ -128,6 +128,24 @@
                         "description": "send an email to the user containing a spécifc message"
                     }
                 ]
+            },
+            {
+                "name": "weather",
+                "actions": [
+                    {
+                        "name": "everyDay",
+                        "description": "will trigger the reaction and send info about the weather every day"
+                    },
+                    {
+                        "name": "everyHalfDay",
+                        "description": "will trigger the reaction and send info about the weather twice a day separated by 12 hours"
+                    },
+                    {
+                        "name": "everyHour",
+                        "description": "will trigger the reaction and send info about the weather every hour"
+                    }
+                ],
+                "reactions": []
             }
         ]
     }
