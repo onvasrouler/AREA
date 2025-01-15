@@ -426,56 +426,57 @@ npm run lintfix
     following_online this will trigger the reaction when one of the streamer the user follow goes online
   - **example**:
     ```json
-    {
-      "name": "*",
-      "action": {
-        "service": "twitch",
-        "arguments": {
-            "on": "new_follow"
+      {
+        "name": "*",
+        "action": {
+          "service": "twitch",
+          "arguments": {
+              "on": "new_follow"
+          }
+      },
+      "reaction": {
+          "service": "discord",
+          "arguments": {
+              "react": "message",
+              "server": "1308348420037279747",
+              "channel": "1325848053206352018",
+              "message": "i'm following a new streamer  :"
+          }
         }
-    },
-     "reaction": {
-        "service": "discord",
-        "arguments": {
-            "react": "message",
-            "server": "1308348420037279747",
-            "channel": "1325848053206352018",
-            "message": "i'm following a new streamer  :"
-        }
-    }
-  }
-  ```
+      }
+    ```
+
   - **explanation**:
-    the action is when the user follow a new person on twitch
-    the reaction is to send a discord message
+      the action is when the user follow a new person on twitch
+      the reaction is to send a discord message
 
 
 - **USAGE 7**:
     ```json
-    {
-      "name": "*",
+      {
+        "name": "*",
+        "reaction": {
+          "service": "discord",
+          "arguments": {
+              "on": [
+                "/twitchonline",
+                "/following"
+              ],
+              "userId": "*",
+          }
+      },
       "reaction": {
-        "service": "discord",
-        "arguments": {
-            "on": [
-              "/twitchonline",
-              "/following"
-            ],
-            "userId": "*",
+          "service": "twitch",
+          "arguments": {
+              "content": [
+                "following",
+                "following_online"
+              ],
+              "message": "*"
+          }
         }
-    },
-    "reaction": {
-        "service": "twitch",
-        "arguments": {
-            "content": [
-              "following",
-              "following_online"
-            ],
-            "message": "*"
-        }
-    }
-  }
-  ```
+      }
+    ```
   - **explanation**:
       /twitchonline will return the list of the streamer the user follow that are online with info about their stream
       /following will return the list of the streamer the user follow
