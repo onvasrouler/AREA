@@ -1,7 +1,8 @@
 import { expect } from "chai";
 import sinon from "sinon";
-import { ApiClient, getApiClient } from "../src/common/client/APIClient.js";
+import { ApiClient } from "../src/common/client/APIClient.js";
 import { JSDOM } from "jsdom";
+import { describe, it, before, beforeEach, afterEach } from "mocha";
 
 describe("ApiClient", () => {
   let apiClient;

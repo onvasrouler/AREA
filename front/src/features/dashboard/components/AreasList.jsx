@@ -200,7 +200,7 @@ export function AreasList({ areas: initialAreas, onAreaDeleted }) {
                   <TableRow key={index}>
                     <TableCell>
                       <Switch
-                        checked={statuses[index] || true}
+                        checked={statuses[index]}
                         onCheckedChange={() => handleStatusChange(index)}
                       />
                     </TableCell>

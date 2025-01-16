@@ -83,7 +83,6 @@ export function DashboardPage() {
           session: session
         })
         const data = await response.json()
-        console.log("Areas:", data.data);
         if (data?.data) {
           setAreas(data.data);
         } else {
@@ -107,7 +106,20 @@ export function DashboardPage() {
     setSelectedService(service)
   }
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = async () => {
+    try {
+      const session = localStorage.getItem("session")
+      const response = await apiClient.get("area", {
+        session: session
+      })
+      const data = await response.json()
+      if (data?.data) {
+        setAreas(data.data);
+      }
+      console.log("Areas From Closed dialog:", areas);
+    } catch (error) {
+      console.error("Error:", error)
+    }
     setSelectedService(null)
   }
 
