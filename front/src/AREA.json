@@ -221,11 +221,6 @@
             ]
         },
         {
-            "name": "OneDrive",
-            "actions": [],
-            "reactions": []
-        },
-        {
             "name": "Gmail",
             "actions": [],
             "reactions": [
@@ -251,11 +246,6 @@
                     }
                 }
             ]
-        },
-        {
-            "name": "Instagram",
-            "actions": [],
-            "reactions": []
         },
         {
             "name": "Twitch",
@@ -297,6 +287,30 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "Weather",
+            "actions": [
+                {
+                    "type": "everyDay",
+                    "display": "Every day",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message", "email"]
+                },
+                {
+                    "type": "everyHalfDay",
+                    "display": "Every half day",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message", "email"]
+                },
+                {
+                    "type": "everyHour",
+                    "display": "Every hour",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message", "email"]
+                }
+            ],
+            "reactions": []
         }
     ]
 }

@@ -161,7 +161,6 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
 
     let reactionArguments = {};
 
-
     if (linkedService === "Gmail") {
       reactionArguments = {
         email: formData.email || "",
@@ -180,6 +179,10 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
 
     if (service.name === "Discord") {
       actionArguments.userId = discordUserId;
+    }
+
+    if (service.name === "Weather") {
+      console.log("Weather service");
     }
 
     if (linkedService === "Discord") {
