@@ -31,6 +31,115 @@ const createToken = async (userId, type, expiresInMinutes) => {
     return token;
 };
 
+/**
+ * @swagger
+ * /fastregister:
+ *   post:
+ *     summary: Register a new user quickly
+ *     description: Register a new user with email, username, and password quickly ( means without sending an email for the verification ), this is useful for testing purposes.
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *               username:
+ *                 type: string
+ *                 description: The user's username.
+ *                 example: username123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: successfully registered 
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations / email_already_exist / username_already_exist
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: some of the information were not provided / an account with the provided email already exist / an account with the provided username already exist
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't register when logged in 
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: Error while registering / Error while creating session / Error while trying to register
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.fastregister = async (req, res) => {
     if (req.user && req.user != null) // if the user is already logged in
         return api_formatter(req, res, 401, "unauthorised", "You can't register when logged in"); // return an error message
@@ -86,11 +195,119 @@ exports.fastregister = async (req, res) => {
     } catch (err) { // if an error occured while trying to register
         console.error(err);
         await delete_user_account(tmpUserRegister);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to register", null, err, null);
     }
 };
 
-// Register a new user
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Register a new user with email, username, and password.
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *               username:
+ *                 type: string
+ *                 description: The user's username.
+ *                 example: username123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: email sent successfully, check your spam folder 
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations / email_already_exist / username_already_exist
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: some of the information were not provided / an account with the provided email already exist / an account with the provided username already exist
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't register when logged in 
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while sending email / An error occured Error while registering / An error occured while trying to register
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.register = async (req, res) => {
     if (req.user && req.user != null)
         return api_formatter(req, res, 401, "unauthorised", "You can't register when logged in");
@@ -130,20 +347,102 @@ exports.register = async (req, res) => {
                 }).catch(async (err) => {
                     console.error(err);
                     await UserModel.deleteOne({ unique_id: savedUser.unique_id }); // delete the user
-                    return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
+                    return api_formatter(req, res, 500, "error", "An error occured while sending email", null, err, null); // return an error message
                 });
 
         }).catch((err) => {
             console.error(err);
-            return api_formatter(req, res, 500, "error", "Error while registering", null, err, null);
+            return api_formatter(req, res, 500, "error", "An error occured while registering", null, err, null);
         });
     } catch (err) {
         console.error(err);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to register", null, err, null);
     }
 };
 
-// Verify the user's email after registration
+/**
+ * @swagger
+ * /register/verify:
+ *   post:
+ *     summary: verify the registration of a new user
+ *     description: verify the new user with a token sent to the email
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The user's email.
+ *                 example: 123456789abcdefgh
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: successfully registered 
+ *       404:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 404 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notfound
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: the provided token doesn't exist or is expired / no user found with the provided token
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while creating session / An error occured while activating the account / An error occured while verifying email
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.verifyregister = async (req, res) => {
     try {
         var tmpUserRegister = null; // this will be used to store the user that was registered
@@ -187,21 +486,142 @@ exports.verifyregister = async (req, res) => {
                 return return_signed_cookies(req, res, sessionRegistered, userRegistered); // return the signed cookies
             }).catch(async (err) => { // if an error occured while creating the session
                 console.error(err);
-                return api_formatter(req, res, 500, "error", "Error while creating session", null, err, null);
+                return api_formatter(req, res, 500, "error", "An error occured while creating session", null, err, null);
             });
         }).catch(async (err) => { // if an error occured while saving the user
             console.error(err);
             await delete_user_account(tmpUserRegister); // delete the user account
-            return api_formatter(req, res, 500, "error", "Error while activating the account", null, err, null);
+            return api_formatter(req, res, 500, "error", "An error occured while activating the account", null, err, null);
         });
 
     } catch (err) { // if an error occured while verifying the email
         console.error(err);
         await delete_user_account(tmpUserRegister);
-        return api_formatter(req, res, 500, "error", "Error while verifying email", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while verifying email", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login a user
+ *     description: log in a user with email or username, and password
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               emailOrUsername:
+ *                 type: string
+ *                 description: The user's email.
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: successfully registered 
+ *                data:
+ *                 type: object
+ *                 description: The data.
+ *                 example: null 
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: null
+ *                session:
+ *                 type: string
+ *                 description: The session token the user will use in his request to be autentificated.
+ *                 example: 123456789abcdefgh
+ *                username:
+ *                 type: string
+ *                 description: The username of the user.
+ *                 example: username123
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: some of the information were not provided
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised / user_not_found / google_account / email_not_verified / incorrect_password
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't register when logged in / no user found with the provided email or username / this account is a google account / the email is not verified for this account / the provided password is incorrect for this account
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while creating session / An error occured while trying to login
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.login = async (req, res) => {
     if (req.user && req.user != null) // if the user is already logged in
         return api_formatter(req, res, 401, "unauthorised", "You can't log in when logged in");
@@ -252,25 +672,144 @@ exports.login = async (req, res) => {
                 return return_signed_cookies(req, res, newSession, userToLogin, "login successful"); // return the signed cookies
             }).catch(async (err) => { // if an error occured while creating the session
                 console.error(err);
-                return api_formatter(req, res, 500, "error", "Error while creating session", null, err, null);
+                return api_formatter(req, res, 500, "error", "An error occured while creating session", null, err, null);
             });
         }).catch(async (err) => { // if an error occured while finding the user
             console.error(err);
-            return api_formatter(req, res, 500, "error", "Error while trying to login", null, err, null);
+            return api_formatter(req, res, 500, "error", "An error occured while trying to login", null, err, null);
         });
     } catch (err) { // if an error occured while trying to login
         console.error(err);
         await reset_user_session(tmpSessuion);
-        return api_formatter(req, res, 500, "error", "Error while trying to login", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to login", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /googleAuth:
+ *   post:
+ *     summary: Authenticate a user using Google OAuth
+ *     description: Authenticate a user using a Google OAuth token.
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The Google OAuth token.
+ *                 example: ya29.a0AfH6SMC...
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: successfully registered 
+ *                data:
+ *                 type: object
+ *                 description: The data.
+ *                 example: null 
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: null
+ *                session:
+ *                 type: string
+ *                 description: The session token the user will use in his request to be autentificated.
+ *                 example: 123456789abcdefgh
+ *                username:
+ *                 type: string
+ *                 description: The username of the user.
+ *                 example: username123
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no token was provided
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't register when logged in
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to register
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.googleAuth = async (req, res) => {
     if (req.user && req.user != null) // if the user is already logged in
         return api_formatter(req, res, 401, "unauthorised", "You can't register when logged in");
 
     var tmpUserRegister = null;  // this will be used to store the user that was registered
     const { token } = req.body; // get the token from the body
+    if (!token) // if the token is not provided
+        return api_formatter(req, res, 400, "missing_informations", "no token was provided"); // return an error message
     const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress; // get the IP
     try {
         const ticket = await GoogleClient.verifyIdToken({ // verify the token
@@ -336,10 +875,71 @@ exports.googleAuth = async (req, res) => {
     } catch (err) { // if an error occured while trying to register
         console.error(err);
         await delete_user_account(tmpUserRegister);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to register", null, err);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to register", null, err);
     }
 };
 
+/**
+ * @swagger
+ * /logout:
+ *   post:
+ *     summary: Logout a user
+ *     description: Logout a user by deleting the session.
+ *     tags:
+ *      - user
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: logout successful
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to logout
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.logout = async (req, res) => {
     try {
         if (req.user && req.user != null && req.user != undefined) // if the user is logged in
@@ -347,21 +947,172 @@ exports.logout = async (req, res) => {
         return api_formatter(req, res, 200, "success", "logout successful", null, null, null); // return a success message
     } catch (err) {
         console.error(err); // if an error occured
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to logout", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to logout", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /logouteverywhere:
+ *   post:
+ *     summary: Logout a user everywhere
+ *     description: Logout a user by deleting all the sessions.
+ *     tags:
+ *      - user
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you logged out everywhere successfully
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to logout everywhere
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.logouteverywhere = async (req, res) => {
     try {
         if (req.user && req.user != null && req.user != undefined) // if the user is logged in
             delete_every_user_session(req.user); // delete all the user sessions
-        return api_formatter(req, res, 200, "success", "you logged out everywhere successful", null, null, null); // return a success message
+        return api_formatter(req, res, 200, "success", "you logged out everywhere successfully", null, null, null); // return a success message
     } catch (err) {
         console.error(err); // if an error occured
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to logout everywhere", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to logout everywhere", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /deletefastprofile:
+ *   delete:
+ *     summary: Delete a user's fast profile
+ *     description: Delete a user's fast profile by providing the password.
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: account deleted successfully
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin / noPassword / incorrect_password
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in / you didn't provide any password / the provided password is incorrect for this account
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to delete the account
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.deletefastprofile = async (req, res) => {
     try {
         if (!req.user || req.user == null)
@@ -377,14 +1128,104 @@ exports.deletefastprofile = async (req, res) => {
             return api_formatter(req, res, 200, "success", "account deleted successfully", null, null, null);
         } catch (err) {
             console.error(err);
-            return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to delete the account", null, err, null);
+            return api_formatter(req, res, 500, "error", "An error occured while trying to delete the account", null, err, null);
         }
     } catch (err) {
         console.error(err);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to delete the account", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to delete the account", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /profile:
+ *   delete:
+ *     summary: Delete a user's account
+ *     description: Delete a user's account by providing the password if the account is not a Google account.
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message, if the account is a google account it will delete it immediatly otherwise it will send a verification email.
+ *                 example: account deleted successfully / email sent successfully, check your spam folder
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin / noPassword / incorrect_password
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in / you didn't provide any password / the provided password is incorrect for this account
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to delete the account
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.deleteaccount = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
@@ -417,16 +1258,138 @@ exports.deleteaccount = async (req, res) => {
             return api_formatter(req, res, 200, "success", "email sent successfully, check your spam folder", null, null, null); // return a success message
         }).catch((err) => {
             console.error(err);
-            return api_formatter(req, res, 500, "error", "Error while sending email", null, err, null); // return an error message
+            return api_formatter(req, res, 500, "error", "An error occured while sending email", null, err, null); // return an error message
         });
     } catch (err) { // if an error occured while trying to delete the account
         console.error(err);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to delete the account", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to delete the account", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /profile/confirm:
+ *   delete:
+ *     summary: Confirm deletion of a user's account
+ *     description: Confirm the deletion of a user's account by providing a valid token.
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The token for confirming account deletion.
+ *                 example: someRandomToken123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: account deleted successfully
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no token was provided
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in
+ *       404:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 404 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notfound
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: the provided token doesn't exist or is expired
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to delete the account
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.confirmdeleteaccount = async (req, res) => {
     try {
+        if (!req.user || req.user == null) // if the user is not logged in
+            return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null); // return an error message
+
         const { token } = req.body; // get the token from the body
         if (!token) // if the token is not provided
             return api_formatter(req, res, 400, "missing_informations", "no token was provided", null, null, null); // return an error message
@@ -444,23 +1407,130 @@ exports.confirmdeleteaccount = async (req, res) => {
 
         if (!user) // if the user is not found
             return api_formatter(req, res, 404, "notfound", "no user found with the provided token", null, null, null); // return an error message
-
         await delete_user_account(user); // delete the user account
         await TokenModel.deleteMany({ userId: user.unique_id }); // delete all the tokens of the user
         return api_formatter(req, res, 200, "success", "account deleted successfully", null, null, null); // return a success message
     } catch (err) { // if an error occured while trying to delete the account
         console.error(err);
-        return api_formatter(req, res, 500, "errorOccured", "An error occured while trying to delete the account", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to delete the account", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /profile_picture:
+ *   post:
+ *     summary: Upload a user's profile picture
+ *     description: Upload a new profile picture for the user.
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: The profile picture file to upload.
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: profile picture uploaded successfully
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: nofile
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no file was provided
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin / unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in / You can't set a profile picture with a google account
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while uploading file / An error occured while saving file path
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.profilepicture = async (req, res) => {
     try {
         if (!req.user || req.user == null) { // if the user is not logged in
             return api_formatter(req, res, 401, "notloggedin", "you are not logged in", null, null, null, null); // return an error message
         } else {
             if (!req.files || Object.keys(req.files).length === 0) // if no file is uploaded
-                return api_formatter(req, res, 400, "nofile", "No files were uploaded.", null, null, null, req.user.username); // return an error message
+                return api_formatter(req, res, 400, "nofile", "no file was provided.", null, null, null, req.user.username); // return an error message
             if (req.user.accountType == "google") // if the session type is google
                 return api_formatter(req, res, 401, "unauthorised", "You can't set a profile picture with a google account", null, null, null, req.user.username); // return an error message
 
@@ -476,7 +1546,7 @@ exports.profilepicture = async (req, res) => {
             profilePicture.mv(uploadPath, function (err) { // move the file
                 if (err) { // if an error occured while uploading the file
                     console.error(err);
-                    return api_formatter(req, res, 500, "error", "Error while uploading file", null, err, null, req.user.username); // return an error message
+                    return api_formatter(req, res, 500, "error", "An error occured while uploading file", null, err, null, req.user.username); // return an error message
                 }
 
                 if (oldPath != null && oldPath != uploadPath) // if there is an old path
@@ -492,7 +1562,7 @@ exports.profilepicture = async (req, res) => {
                     return api_formatter(req, res, 200, "success", "File uploaded successfully", { fileName: uniqueFileName }, null, null, req.user.username); // return a success message
                 }).catch((err) => { // if an error occured while saving the user
                     console.error(err);
-                    return api_formatter(req, res, 500, "error", "Error while saving file path", null, err, null, req.user.username);
+                    return api_formatter(req, res, 500, "error", "An error occured while saving file path", null, err, null, req.user.username);
                 });
             });
         }
@@ -502,6 +1572,92 @@ exports.profilepicture = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /profile_picture:
+ *   get:
+ *     summary: Get a user's profile picture
+ *     description: Retrieve the profile picture of the user.
+ *     tags:
+ *      - user
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     responses:
+ *       200:
+ *         content:
+ *          image/jpeg:
+ *            schema:
+ *              type: string
+ *              format: binary
+ *              description: The user's profile picture.
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in
+ *       404:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 404 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notfound
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no profile picture found
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while retrieving the profile picture
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.getprofilepicture = async (req, res) => {
     try {
         if (!req.user || req.user == null) { // if the user is not logged in
@@ -515,10 +1671,107 @@ exports.getprofilepicture = async (req, res) => {
         }
     } catch (err) { // if an error occured while getting the file
         console.error(err);
-        return api_formatter(req, res, 500, "error", "Error while getting file", null, err, null, req.user.username);
+        return api_formatter(req, res, 500, "error", "An error occured while retrieving the profile picture", null, err, null, req.user.username);
     }
 };
 
+/**
+ * @swagger
+ * /profile_picture:
+ *   delete:
+ *     summary: Delete a user's profile picture
+ *     description: Delete the profile picture of the user.
+ *     tags:
+ *      - user
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: profile picture deleted successfully
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin / unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in / You can't delete a profile picture with a google account
+ *       404:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 404 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notfound
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no profile picture found
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while deleting the profile picture / An error occured while saving file path
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.deleteprofilepicture = async (req, res) => {
     try {
         if (!req.user || req.user == null) { // if the user is not logged in
@@ -531,23 +1784,146 @@ exports.deleteprofilepicture = async (req, res) => {
             fs.unlink(req.user.profilePicture, (err) => { // delete the file
                 if (err) {
                     console.error(err);
-                    return api_formatter(req, res, 500, "error", "Error while deleting file", null, err, null, req.user.username); // return an error message
+                    return api_formatter(req, res, 500, "error", "An error occured while deleting the profile picture", null, err, null, req.user.username); // return an error message
                 }
                 req.user.profilePicture = ""; // set the profile picture path to null
                 req.user.save().then(() => { // save the user
-                    return api_formatter(req, res, 200, "success", "File deleted successfully", null, null, null, req.user.username); // return a success message
+                    return api_formatter(req, res, 200, "success", "profile picture deleted successfully", null, null, null, req.user.username); // return a success message
                 }).catch((err) => { // if an error occured while saving the user
                     console.error(err);
-                    return api_formatter(req, res, 500, "error", "Error while saving file path", null, err, null, req.user.username); // return an error message
+                    return api_formatter(req, res, 500, "error", "An error occured while saving file path", null, err, null, req.user.username); // return an error message
                 });
             });
         }
     } catch (err) { // if an error occured while deleting the file
         console.error(err);
-        return api_formatter(req, res, 500, "error", "Error while deleting file", null, err, null, req.user.username);
+        return api_formatter(req, res, 500, "error", "An error occured while deleting the profile picturee", null, err, null, req.user.username);
     }
 };
 
+/**
+ * @swagger
+ * /sessions:
+ *   get:
+ *     summary: Get a user's active sessions
+ *     description: Retrieve all active sessions for the user.
+ *     tags:
+ *      - user
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: sessions retrieved successfully
+ *                data:
+ *                  type: array
+ *                  items:
+ *                    type: object
+ *                    properties:
+ *                      session_id:
+ *                        type: string
+ *                        description: The session ID.
+ *                        example: abc123
+ *                      session_type:
+ *                        type: string
+ *                        description: the session type. ( can be google or default )
+ *                        example: default
+ *                      expire:
+ *                        type: string
+ *                        format: date-time
+ *                        description: The session expiration date.
+ *                        example: 2023-10-02T12:34:56Z
+ *                      user_agent:
+ *                        type: string
+ *                        description: The user agent of the session.
+ *                        example: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3
+ *                      connexionIp:
+ *                        type: string
+ *                        description: The connexion IP of the session.
+ *                        example: 255-255-255-255
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in
+ *       404:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 404 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notfound
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no sessions found
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while retrieving the sessions
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.getsessions = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
@@ -571,10 +1947,120 @@ exports.getsessions = async (req, res) => {
         return api_formatter(req, res, 200, "success", "sessions found", formattedSessionList, null, null, req.user.username); // return a success message
     } catch (err) { // if an error occured while getting the sessions
         console.error(err);
-        return api_formatter(req, res, 500, "error", "Error while getting sessions", null, err, null, req.user.username); // return an error message
+        return api_formatter(req, res, 500, "error", "An error occured while retrieving the sessions", null, err, null, req.user.username); // return an error message
     }
 };
 
+/**
+ * @swagger
+ * /sessions:
+ *   delete:
+ *     summary: Delete a user's active sessions
+ *     description: Delete specified active sessions for the user.
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               sessionsIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: The IDs of the sessions to delete.
+ *                 example: ["sessionId1", "sessionId2", ...]
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: "['sessionId1', 'sessionId2', ...] deleted successfully"
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no sessions ids were provided
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while deleting the sessions
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.deletesessions = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
@@ -588,10 +2074,129 @@ exports.deletesessions = async (req, res) => {
         return api_formatter(req, res, 200, "success", `${sessionsIds} deleted successfully`, null, null, null, req.user.username); // return a success message
     } catch (err) { // if an error occured while deleting the sessions
         console.error(err);
-        return api_formatter(req, res, 500, "error", "Error while deleting sessions", null, err, null, req.user.username);
+        return api_formatter(req, res, 500, "error", "An error occured while deleting sessions", null, err, null, req.user.username);
     }
 };
 
+/**
+ * @swagger
+ * /forgotpassword:
+ *   post:
+ *     summary: Request a password reset
+ *     description: Request a password reset by providing the user's email.
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email address.
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: email sent successfully, check your spam folder
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no email was provided
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't reset the password of a google account
+ *       404:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 404 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notfound
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no user found with the provided email
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while requesting the password reset / Error while sending email
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.forgotpassword = async (req, res) => {
     try {
         const email = req.body.email; // get the email from the body
@@ -629,6 +2234,111 @@ exports.forgotpassword = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /resetpassword:
+ *   post:
+ *     summary: Reset a user's password
+ *     description: Reset a user's password by providing a valid reset token and a new password.
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               resetToken:
+ *                 type: string
+ *                 description: The reset token.
+ *                 example: someRandomToken123
+ *               newPassword:
+ *                 type: string
+ *                 description: The new password.
+ *                 example: newPassword123
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: password reset successfully
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: missing reset token or password
+ *       404:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 404 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notfound
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: the provided token doesn't exist or is expired / no user found with the provided token
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while resetting the password
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.resetpassword = async (req, res) => {
     try {
         const { resetToken, newPassword } = req.body; // get the reset token and the new password from the body
@@ -639,7 +2349,7 @@ exports.resetpassword = async (req, res) => {
         const passwordResetToken = await TokenModel.findOne({ // find the token in the database
             token: hashedToken,
             expiresAt: { $gt: Date.now() },
-            type: "resetPassword"
+            type: "passwordReset"
         });
 
         if (!passwordResetToken) // if the token is not found
@@ -648,6 +2358,9 @@ exports.resetpassword = async (req, res) => {
         const user = await UserModel.findOne({ unique_id: passwordResetToken.userId }); // find the user in the database
         if (!user) // if the user is not found
             return api_formatter(req, res, 404, "notfound", "no user found with the provided token", null, null, null); // return an error message
+        // if we arrive here it means the user created a token for changing his password,
+        // but he remembered his password, logged in, deleted his account and for some reason
+        // decided to enter the token on the reset password page
 
         user.oldPassword = user.password; // set the old password
         user.password = newPassword; // set the new password
@@ -658,14 +2371,126 @@ exports.resetpassword = async (req, res) => {
             return api_formatter(req, res, 200, "success", "password reset successfully", null, null, null); // return a success message
         }).catch((err) => { // if an error occured while saving the user
             console.error(err);
-            return api_formatter(req, res, 500, "error", "Error while resetting password", null, err, null);  // return an error message
+            return api_formatter(req, res, 500, "error", "An error occured while resetting password", null, err, null);  // return an error message
         });
     } catch (err) { // if an error occured while resetting the password
         console.error(err);
-        return api_formatter(req, res, 500, "error", "Error while resetting password", null, err, null);
+        return api_formatter(req, res, 500, "error", "An error occured while resetting password", null, err, null);
     }
 };
 
+/**
+ * @swagger
+ * /profile:
+ *   patch:
+ *     summary: Update a user's profile
+ *     description: Update the user's profile information.
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The session header
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The new username.
+ *                 example: newUsername
+ *               email:
+ *                 type: string
+ *                 description: The new email address.
+ *                 example: newemail@example.com
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: profile updated successfully
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations / email_already_exist / username_already_exist
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: some of the information were not provided / an account with the provided email already exist / an account with the provided username already exist
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: notloggedin
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you are not logged in
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while updating the profile
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
 exports.updateprofile = async (req, res) => {
     try {
         if (!req.user || req.user == null) // if the user is not logged in
@@ -689,10 +2514,10 @@ exports.updateprofile = async (req, res) => {
             return api_formatter(req, res, 200, "success", "profile updated successfully", null, null, null, req.user.username); // return a success message
         }).catch((err) => { // if an error occured while updating the user
             console.error(err);
-            return api_formatter(req, res, 500, "error", "Error while updating profile", null, err, null, req.user.username); // return an error message
+            return api_formatter(req, res, 500, "error", "An error occured while updating profile", null, err, null, req.user.username); // return an error message
         });
     } catch (err) { // if an error occured while updating the profile
         console.error(err);
-        return api_formatter(req, res, 500, "error", "Error while updating profile", null, err, null, req.user.username); // return an error message
+        return api_formatter(req, res, 500, "error", "An error occured while updating profile", null, err, null, req.user.username); // return an error message
     }
 };

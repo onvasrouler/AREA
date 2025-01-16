@@ -5,9 +5,6 @@
 
   <code><img height="80" src="https://github.com/aimeric44uwu/aimeric44uwu/blob/main/img/nodejs.png?raw=true" alt="nodejs"></code>
   <code><img height="80" src="https://github.com/aimeric44uwu/aimeric44uwu/blob/main/img/mongodb.png?raw=true" alt="mongodb"></code>
-  <code><img height="80" src="https://github.com/aimeric44uwu/aimeric44uwu/blob/main/img/html.png?raw=true" alt="html"></code>
-  <code><img height="80" src="https://github.com/aimeric44uwu/aimeric44uwu/blob/main/img/css.png?raw=true" alt="CSS"></code>
-  <code><img height="80" src="https://github.com/aimeric44uwu/aimeric44uwu/blob/main/img/javascript.png?raw=true" alt="javascript"></code>
 </div>
 
 <br/>
@@ -429,56 +426,57 @@ npm run lintfix
     following_online this will trigger the reaction when one of the streamer the user follow goes online
   - **example**:
     ```json
-    {
-      "name": "*",
-      "action": {
-        "service": "twitch",
-        "arguments": {
-            "on": "new_follow"
+      {
+        "name": "*",
+        "action": {
+          "service": "twitch",
+          "arguments": {
+              "on": "new_follow"
+          }
+      },
+      "reaction": {
+          "service": "discord",
+          "arguments": {
+              "react": "message",
+              "server": "1308348420037279747",
+              "channel": "1325848053206352018",
+              "message": "i'm following a new streamer  :"
+          }
         }
-    },
-     "reaction": {
-        "service": "discord",
-        "arguments": {
-            "react": "message",
-            "server": "1308348420037279747",
-            "channel": "1325848053206352018",
-            "message": "i'm following a new streamer  :"
-        }
-    }
-  }
-  ```
+      }
+    ```
+
   - **explanation**:
-    the action is when the user follow a new person on twitch
-    the reaction is to send a discord message
+      the action is when the user follow a new person on twitch
+      the reaction is to send a discord message
 
 
 - **USAGE 7**:
     ```json
-    {
-      "name": "*",
+      {
+        "name": "*",
+        "reaction": {
+          "service": "discord",
+          "arguments": {
+              "on": [
+                "/twitchonline",
+                "/following"
+              ],
+              "userId": "*",
+          }
+      },
       "reaction": {
-        "service": "discord",
-        "arguments": {
-            "on": [
-              "/twitchonline",
-              "/following"
-            ],
-            "userId": "*",
+          "service": "twitch",
+          "arguments": {
+              "content": [
+                "following",
+                "following_online"
+              ],
+              "message": "*"
+          }
         }
-    },
-    "reaction": {
-        "service": "twitch",
-        "arguments": {
-            "content": [
-              "following",
-              "following_online"
-            ],
-            "message": "*"
-        }
-    }
-  }
-  ```
+      }
+    ```
   - **explanation**:
       /twitchonline will return the list of the streamer the user follow that are online with info about their stream
       /following will return the list of the streamer the user follow
@@ -506,6 +504,53 @@ npm run lintfix
     the action is when the user use the command /following on discord
     the reaction is to list the streamer the user follow
 
+- **USAGE 8**:
+    ```json
+      {
+        "name": "*",
+        "reaction": {
+          "service": "weather",
+          "arguments": {
+              "runtime": [
+                "everyDay",
+                "everyHalfDay",
+                "everyHour"
+              ],
+              "city": "*",
+          }
+        }
+      }
+    ```
+  - **explanation**:
+      everyDay will trigger the reaction once a day
+      everyHalfDay will trigger the reaction twice a day ( separated by 12h )
+      everyHour will trigger the reaction every hour
+      city will be the city to get the weather from
+  - **example**:
+  ```json
+    {
+        "name": "send a message overy a certain ammount of time the weather",
+        "action": {
+            "service": "weather",
+            "arguments": {
+                "runtime": "everyHour",
+                "city": "nantes"
+            }
+        },
+        "reaction": {
+            "service": "discord",
+            "arguments": {
+                "react": "message",
+                "server": "1308348420037279747",
+                "channel": "1325848053206352018",
+                "message": "here is the weather for the last hour :"
+            }
+        }
+    }
+  ```
+  - **explanation**:
+    the action is runned every hour and will get the weather data of nantes
+    the reaction is to send all the weather data to discord
 
 ## API Endpoints
 

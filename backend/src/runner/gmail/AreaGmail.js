@@ -30,7 +30,7 @@ async function extractData(AREA, prefix) {
         let message = "<h1>" + prefix + "</h1>" || "";
 
 
-        if (AREA.CachedData == "error") {
+        if (AREA.CachedData == "error" || AREA.CachedData.status == "error") {
             message = "<h1>an error occured : </h1><br><b>" + (AREA.Errors.message || " while fetching the data") + "</b><br>on the AREA with name : <br><b>" + AREA.Name + "</b>";
         } else {
             if (AREA.Action.service == "spotify") {
@@ -63,6 +63,8 @@ async function extractData(AREA, prefix) {
                 } else if (AREA.Action.arguments.on == "following_online") {
                     message += "<h1><b>" + AREA.CachedData[0].user_name + "</b></h1><h2><b> is now online : " + AREA.CachedData[0].title + "</b></h2><h3> and is playing : <b>" + AREA.CachedData[0].game_name + "</b></h3>" + (AREA.CachedData[0].is_mature ? "<h4>⚠️  the content has been marked as restricted, the content is reserved for the adults </h4>" : "") + "<a href='https://twitch.tv/" + AREA.CachedData[0].user_name + "' style='font-size: 15px' target='_blank'>link</a>";
                 }
+            } else if (AREA.Action.service == "weather") {
+                message += "place : <h1><b>" + AREA.Action.arguments.city + "</b></h1><h1><b>" + AREA.CachedData.data.current.weather[0].description + "</b></h1><h2>Temperature : <b>" + AREA.CachedData.data.current.temp + "°C</b></h2><h2>Feels like : <b>" + AREA.CachedData.data.current.feels_like + "°C</b></h2><h2>Humidity : <b>" + AREA.CachedData.data.current.humidity + "%</b></h2>";
             } else {
                 console.error("Service not found : " + AREA.Action.service + " for action " + AREA.Action);
                 message = "ERROR: Service not found : " + AREA.Action.service + " for action " + AREA.Action;

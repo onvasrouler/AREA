@@ -1,0 +1,152 @@
+{
+    "client": {},
+    "server": {
+        "current_time": "100000",
+        "services": [
+            {
+                "name": "github",
+                "actions": [
+                    {
+                        "name": "new_issue",
+                        "description": "The user opens a new issue"
+                    },
+                    {
+                        "name": "new_repo",
+                        "description": "The user creates a new repository"
+                    },
+                    {
+                        "name": "new_commit",
+                        "description": "The user commits to a repository"
+                    },
+                    {
+                        "name": "new_pr",
+                        "description": "The user opens a new pull request"
+                    }
+                ],
+                "reactions": [
+                    {
+                        "name": "new_issue",
+                        "description": "send a notification to the user about the new issue with the link and the name of the issue"
+                    },
+                    {
+                        "name": "new_repo",
+                        "description": "send a notification to the user about the new repository with the link and the name of the repository"
+                    },
+                    {
+                        "name": "new_commit",
+                        "description": "send a notification to the user about the new commit with the link and the name of the commit"
+                    },
+                    {
+                        "name": "new_pr",
+                        "description": "send a notification to the user about the new pull request with the link and the name of the pull request"
+                    }
+                ]
+            },
+            {
+                "service": "discord",
+                "actions": [
+                    {
+                        "name": "/command",
+                        "description": "handle the /command to do something ( /repo /pr /issue /commit /likedtrack /spotiplaying /twitchonline /following )"
+                    }
+                ],
+                "reactions": [
+                    {
+                        "name": "message",
+                        "description": "send a message in a specific channel"
+                    },
+                    {
+                        "name": "private_message",
+                        "description": "send a message to a specific user"
+                    },
+                    {
+                        "name": "/command",
+                        "description": "react to a command"
+                    }
+                ]
+            },
+            {
+                "service": "spotify",
+                "actions": [
+                    {
+                        "name": "liked_track",
+                        "description": "The user's liked track has changed"
+                    },
+                    {
+                        "name": "currently_playing",
+                        "description": "The user is currently playing a song"
+                    },
+                    {
+                        "name": "new_liked_track",
+                        "description": "The user has liked a new track"
+                    }
+                ],
+                "reactions": [
+                    {
+                        "name": "liked_track",
+                        "description": "send a notification to the user containing the last 10 user's liked tracks"
+                    },
+                    {
+                        "name": "currently_playing",
+                        "description": "send a notification to the user about the song that is currently playing containing the name of the song, the artist and the link to the song"
+                    },
+                    {
+                        "name": "new_liked_track",
+                        "description": "send a notification to the user about the new liked track containing the name of the song, the artist and the link to the song"
+                    }
+                ]
+            },
+            {
+                "service": "twitch",
+                "actions": [
+                    {
+                        "name": "new_follow",
+                        "description": "when the user follow a new streming channel"
+                    },
+                    {
+                        "name": "following_online",
+                        "description": "when one of the channel the user is following goes online"
+                    }
+                ],
+                "reactions": [
+                    {
+                        "name": "new_follow",
+                        "description": "send a notification to the user containing the name of the channel and a link to it"
+                    },
+                    {
+                        "name": "following_online",
+                        "description": "send a notification to the user containing the name of the streamer, the name of the live, the name of the game and a link to the stream ( and whether the streamer is a classified as for adults )"
+                    }
+                ]
+            },
+            {
+                "service": "gmail",
+                "actions": [],
+                "reactions": [
+                    {
+                        "name": "send_email",
+                        "description": "send an email to the user containing a spécifc message"
+                    }
+                ]
+            },
+            {
+                "name": "weather",
+                "actions": [
+                    {
+                        "name": "everyDay",
+                        "description": "will trigger the reaction and send info about the weather every day"
+                    },
+                    {
+                        "name": "everyHalfDay",
+                        "description": "will trigger the reaction and send info about the weather twice a day separated by 12 hours"
+                    },
+                    {
+                        "name": "everyHour",
+                        "description": "will trigger the reaction and send info about the weather every hour"
+                    }
+                ],
+                "reactions": []
+            }
+        ]
+    }
+}
