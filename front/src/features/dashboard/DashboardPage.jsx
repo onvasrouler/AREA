@@ -23,9 +23,7 @@ export function DashboardPage() {
     isDiscordAuthenticated: false,
     isGithubAuthenticated: false,
     isSpotifyAuthenticated: false,
-    isOneDriveAuthenticated: false,
     isGmailAuthenticated: false,
-    isInstagramAuthenticated: false,
     isTwitchAuthenticated: false
   })
   const apiClient = getApiClient()
@@ -58,10 +56,9 @@ export function DashboardPage() {
             isDiscordAuthenticated: responseData.data?.logged_in_discord === true && responseData.data?.logged_in_discord !== "session_expired",
             isGitHubAuthenticated: responseData.data?.logged_in_github === true && responseData.data?.logged_in_github !== "session_expired",
             isSpotifyAuthenticated: responseData.data?.logged_in_spotify === true && responseData.data?.logged_in_spotify !== "session_expired",
-            isOneDriveAuthenticated: false,
             isGmailAuthenticated: true,
-            isInstagramAuthenticated: false,
-            isTwitchAuthenticated: responseData.data?.logged_in_twitch === true && responseData.data?.logged_in_twitch !== "session_expired"
+            isTwitchAuthenticated: responseData.data?.logged_in_twitch === true && responseData.data?.logged_in_twitch !== "session_expired",
+            isWeatherAuthenticated: true
           })
         } catch (error) {
           console.error("Error:", error)
