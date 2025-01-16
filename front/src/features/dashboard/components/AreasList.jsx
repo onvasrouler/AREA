@@ -199,10 +199,10 @@ export function AreasList({ areas: initialAreas, onAreaDeleted }) {
                 {areas.map((area, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      <Switch
-                        checked={statuses[index]}
-                        onCheckedChange={() => handleStatusChange(index)}
-                      />
+                    <Switch
+                      checked={statuses[index]}
+                      onCheckedChange={() => handleStatusChange(index)}
+                    />
                     </TableCell>
                     <TableCell className="font-medium text-center">
                       {editingId === area.id ? (
