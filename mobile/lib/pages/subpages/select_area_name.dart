@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:area/provider/user.service.dart';
 import 'package:area/provider/action.service.dart';
 import 'package:area/constant/constant.dart';
 
@@ -29,17 +28,15 @@ class _AreaNameState extends State<AreaNamePage> {
     super.dispose();
   }
 
-  final userService = UserService();
+  final actionService = ActionService();
 
   Future<void> _server() async {
-    final response = await userService.getServer();
+    final response = await actionService.sendActionWithDiscordReactionChannel();
 
     if (response) {
-      GoRouter.of(context).push('/server');
+      GoRouter.of(context).push('/success');
     }
   }
-
-  final actionService = ActionService();
 
   Future<void> _disordmp() async {
     final response = await actionService.sendActionWithDiscordReactionPrivate();

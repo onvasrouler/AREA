@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
+import 'package:area/provider/user.service.dart';
 
 class ReactionPage extends StatefulWidget {
   const ReactionPage({super.key});
@@ -14,6 +15,16 @@ class _ReactionPageState extends State<ReactionPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  final userService = UserService();
+
+  Future<void> _server() async {
+    final response = await userService.getServer();
+
+    if (response) {
+      GoRouter.of(context).push('/server');
+    }
   }
 
   @override
@@ -51,7 +62,14 @@ class _ReactionPageState extends State<ReactionPage> {
                       onTap: () 
                       {
                         currentReaction = index - 1;
-                        GoRouter.of(context).push('/areaName');
+
+                        if (reactions[currentReactionService].reaction[currentReaction] == "Message in a channel") {
+                          _server();
+                        } else if (reactions[currentReactionService].reaction[currentReaction] == "Private message") {
+                          GoRouter.of(context).push('/areaName');
+                        } else {
+                          GoRouter.of(context).push('/fail');
+                        }
                       },
                       child:Container(
                         width: 300,

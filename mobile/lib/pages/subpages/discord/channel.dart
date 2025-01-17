@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
-import 'package:area/provider/action.service.dart';
 
 class ChannelPage extends StatefulWidget {
   const ChannelPage({super.key});
@@ -15,16 +14,6 @@ class _ChannelPageState extends State<ChannelPage> {
   @override
   void initState() {
     super.initState();
-  }
-
-  final actionService = ActionService();
-
-  Future<void> _action() async {
-    final response = await actionService.sendActionWithDiscordReactionChannel();
-
-    if (response) {
-      GoRouter.of(context).push('/success');
-    }
   }
 
   @override
@@ -62,7 +51,7 @@ class _ChannelPageState extends State<ChannelPage> {
                       onTap: () 
                       {
                         currentChannel = index - 1;
-                        _action();
+                        GoRouter.of(context).push('/areaName');
                       },
                       child:Container(
                         width: 300,

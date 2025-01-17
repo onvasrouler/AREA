@@ -311,12 +311,11 @@ class DiscordAuthService {
         url: authEndpoint.toString(),
         callbackUrlScheme: "myapp",
       );
-      print("aaaaaaaaaaaaaaaaaaaaaaa");
-      print(result);
 
       final code = Uri.parse(result).queryParameters['code'];
-      print("bbbbbbbbbbbbbbb");
+
       print(code);
+      
       if (code == null) {
         return false;
       }

@@ -76,7 +76,7 @@ class _ServiceReactionPageState extends State<ServiceReactionPage> {
                           currentActionService = index - 1;
                           GoRouter.of(context).push('/reaction');
                         } else {
-                          _connect(actions[index - 1].name, index);
+                          _connect(reactions[index - 1].name, index);
                         }
                       },
                       child:Container(
