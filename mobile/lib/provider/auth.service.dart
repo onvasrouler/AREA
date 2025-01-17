@@ -210,6 +210,8 @@ class AuthService {
       "newPassword": password,
     };
 
+    print(requestBody);
+
     try {
       final response = await http.post(
         url,
@@ -218,7 +220,9 @@ class AuthService {
         },
         body: jsonEncode(requestBody),
       );
-      
+
+      print(response.statusCode);
+
       if (response.statusCode == 200) {
         return true;
       } else {
@@ -240,15 +244,22 @@ class GoogleLoginService {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
+      print("oui");
+
       if (googleUser == null) {
         return false;
       }
 
-      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      print(googleAuth);
+      print(googleAuth.idToken);
+      print(googleAuth.accessToken);
 
       token = googleAuth.accessToken;
 
     } catch (error) {
+      print(error);
       return false;
     }
 
@@ -286,7 +297,7 @@ class GoogleLoginService {
 
 class DiscordAuthService {
 
-  final String clientId = "";
+  final String clientId = info["DISCORD_CLIENT_ID"] ?? "";
   final String redirectUri = "$baseurl/discord_manager";
   final String authUrl = "https://discord.com/api/oauth2/authorize";
 
@@ -300,9 +311,12 @@ class DiscordAuthService {
         url: authEndpoint.toString(),
         callbackUrlScheme: "myapp",
       );
-      print("result = $result");
+      print("aaaaaaaaaaaaaaaaaaaaaaa");
+      print(result);
 
       final code = Uri.parse(result).queryParameters['code'];
+      print("bbbbbbbbbbbbbbb");
+      print(code);
       if (code == null) {
         return false;
       }
@@ -320,20 +334,47 @@ class DiscordAuthService {
         })
       );
 
+      print(response.statusCode);
+
       if (response.statusCode == 200) {
+        print("nonnnnn");
         return true;
       } else {
         return false;
       }
     } catch (e) {
       return false;
+    }
   }
+
+  Future<bool> logoutDiscord() async {
+    try {
+      final url = Uri.parse('$baseurl/logout/discord');
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+      );
+
+      print(response.statusCode);
+
+      if (response.statusCode == 200) {
+          return true;
+      } else {
+          return false;
+      }
+    } catch (e) {
+      return false;
+    }
   }
 }
 
 class GitHubAuthService {
 
-  final String clientId = "";
+  final String clientId = info["GITHUB_CLIENT_ID"] ?? "";
   final String redirectUri = "myapp://github";
   final String authUrl = "https://github.com/login/oauth/authorize";
   
@@ -375,19 +416,43 @@ class GitHubAuthService {
       return false;
     }
   }
+
+  Future<bool> logoutGithub() async {
+    try {
+      final url = Uri.parse('$baseurl/logout/github');
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+      );
+
+      print(response.statusCode);
+
+      if (response.statusCode == 200) {
+          return true;
+      } else {
+          return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 
 class SpotifyAuthService {
 
-  final String clientId = "";
+  final String clientId = info["SPOTIFY_CLIENT_ID"] ?? "";
   final String redirectUri = "myapp://spotify";
-  final String authUrl = "";
+  final String authUrl = "https://accounts.spotify.com/authorize";
   
-  Future<bool> authGitHub() async {
+  Future<bool> authSpotify() async {
     try {
       final authEndpoint = Uri.parse(
-        ""
+        "$authUrl?response_type=code&client_id=$clientId&redirect_uri=$redirectUri&scope=user-read-private%20user-read-email"
       );
 
       final result = await FlutterWebAuth.authenticate(
@@ -400,6 +465,8 @@ class SpotifyAuthService {
         return false;
       }
         
+      print(code);
+
       final url = Uri.parse('$baseurl/auth/callback/spotify');
 
       final response = await http.post(
@@ -412,6 +479,32 @@ class SpotifyAuthService {
           "code": code,
         })
       );
+
+      print(response.statusCode);
+
+      if (response.statusCode == 200) {
+          return true;
+      } else {
+          return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> logoutSpotify() async {
+    try {
+      final url = Uri.parse('$baseurl/logout/spotify');
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+      );
+
+      print(response.statusCode);
 
       if (response.statusCode == 200) {
           return true;
@@ -426,14 +519,14 @@ class SpotifyAuthService {
 
 class TwitchAuthService {
 
-  final String clientId = "";
-  final String redirectUri = "myapp://twitch";
-  final String authUrl = "";
+  final String clientId = "0elzk3f1nb2kcye60vdhmfal7uv19d";
+  final String redirectUri = "$baseurl/twitch_manager";
+  final String authUrl = "https://id.twitch.tv/oauth2/authorize";
   
-  Future<bool> authGitHub() async {
+  Future<bool> authTwitch() async {
     try {
       final authEndpoint = Uri.parse(
-        ""
+        "$authUrl?response_type=code&client_id=$clientId&redirect_uri=$redirectUri&scope=user:read:email"
       );
 
       final result = await FlutterWebAuth.authenticate(
@@ -458,6 +551,30 @@ class TwitchAuthService {
           "code": code,
         })
       );
+
+      if (response.statusCode == 200) {
+          return true;
+      } else {
+          return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> logoutTwitch() async {
+    try {
+      final url = Uri.parse('$baseurl/logout/twitch');
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+      );
+
+      print(response.statusCode);
 
       if (response.statusCode == 200) {
           return true;
