@@ -27,6 +27,8 @@ services:
       context: ./mobile
     volumes:
       - shared-volume:/shared
+    env_file:
+      - ./mobile/.env.docker
 
   client_web:
     build:
