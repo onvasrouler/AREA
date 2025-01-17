@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
-import 'package:area/provider/auth.service.dart';
-import 'package:area/provider/action.service.dart';
 
 class ChannelPage extends StatefulWidget {
   const ChannelPage({super.key});
@@ -16,26 +14,6 @@ class _ChannelPageState extends State<ChannelPage> {
   @override
   void initState() {
     super.initState();
-  }
-
-  final authService = AuthService();
-
-  Future<void> _logout() async {
-    final response = await authService.logout();
-
-    if (response) {
-      GoRouter.of(context).push('/login');
-    }
-  }
-
-  final actionService = ActionService();
-
-  Future<void> _action() async {
-    final response = await actionService.sendActionWithDiscordReactionChannel();
-
-    if (response) {
-      GoRouter.of(context).push('/success');
-    }
   }
 
   @override
@@ -63,37 +41,6 @@ class _ChannelPageState extends State<ChannelPage> {
                             },
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 200.0),
-                          child: PopupMenuButton<String>(
-                            icon: const CircleAvatar(
-                              backgroundColor: Color.fromARGB(255, 225, 220, 216),
-                              radius: 30,
-                            ),
-                            onSelected: (String value) {
-                              if (value == 'logout') {
-                                _logout();
-                              }
-                            },
-                            itemBuilder: (BuildContext context) {
-                              return [
-                                const PopupMenuItem<String>(
-                                  value: 'logout',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.logout, 
-                                        color: Colors.red
-                                      ),
-                                      Text('Logout'),
-                                    ],
-                                  ),
-                                ),
-                              ];
-                            },
-                            color: const Color.fromARGB(255, 241, 237, 233),
-                          ),
-                        ),
                       ],
                     ),
                   );
@@ -104,7 +51,7 @@ class _ChannelPageState extends State<ChannelPage> {
                       onTap: () 
                       {
                         currentChannel = index - 1;
-                        _action();
+                        GoRouter.of(context).push('/areaName');
                       },
                       child:Container(
                         width: 300,
@@ -119,6 +66,7 @@ class _ChannelPageState extends State<ChannelPage> {
                             style: const TextStyle(
                               fontSize: 20,
                               fontStyle: FontStyle.italic,
+                              color: Colors.white,
                             ),
                           ),
                         ),
