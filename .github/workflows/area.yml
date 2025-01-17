@@ -92,6 +92,9 @@ jobs:
 
       - run: flutter --version
 
+      - name: Create .env file
+        run: echo "${{ secrets.DUMMY_ENV }}" > .env
+
       - name: Install dependencies
         run: flutter pub get
         working-directory: mobile
