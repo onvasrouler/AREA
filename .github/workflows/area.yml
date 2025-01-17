@@ -97,7 +97,7 @@ jobs:
         working-directory: mobile
 
       - name: Run build
-        run: flutter build apk
+        run: flutter build apk --release
         working-directory: mobile
 
 # Docker
