@@ -37,11 +37,10 @@ class _LoginState extends State<LoginPage> {
   Future<void> _login() async {
     final response = await authService.login(_username.text, _password.text);
     if (response) {
+      showSnackBar(context, "Connected", true);
       GoRouter.of(context).push('/menu');
     } else {
-      setState(() {
-        error = true;
-      });
+      showSnackBar(context, "Connection failed", false);
     }
   }
 
@@ -50,7 +49,10 @@ class _LoginState extends State<LoginPage> {
   Future<void> _loginGoogle() async {
     final response = await googleLoginService.loginWithGoogle(context);
     if (response) {
+      showSnackBar(context, "Connected", true);
       GoRouter.of(context).push('/menu');
+    } else {
+      showSnackBar(context, "Connection failed", false);
     }
   }
 
@@ -144,8 +146,8 @@ class _LoginState extends State<LoginPage> {
                         SizedBox(
                           width: 20,
                           height: 20,
-                          child: Image.network(
-                            'https://developers.google.com/identity/images/g-logo.png',
+                          child: Image.asset(
+                            'assets/g-logo.png',
                             fit: BoxFit.cover,
                           ),
                         ),

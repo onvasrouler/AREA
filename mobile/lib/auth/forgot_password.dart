@@ -34,11 +34,10 @@ class _ForgotPasswordState extends State<ForgotPasswordPage> {
   Future<void> _askNewPassword() async {
     final response = await authService.forgotPassword(_email.text);
     if (response) {
+      showSnackBar(context, "A mail has been send", true);
       GoRouter.of(context).push('/resetPassword');
     } else {
-      setState(() {
-        error = true;
-      });
+      showSnackBar(context, "Error", false);
     }
   }
 

@@ -34,11 +34,10 @@ class _ConfirmEmailState extends State<ConfirmEmailPage> {
   Future<void> _confirmMail() async {
     final response = await authService.confirmEmail(_code.text);
     if (response) {
+      showSnackBar(context, "Mail confirmed", true);
       GoRouter.of(context).push('/login');
     } else {
-      setState(() {
-        error = true;
-      });
+      showSnackBar(context, "Error", false);
     }
   }
 

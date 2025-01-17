@@ -38,7 +38,10 @@ class _RegisterState extends State<RegisterPage> {
     final response = await authService.register(_email.text, _username.text, _password.text);
 
     if (response) {
+      showSnackBar(context, "A mail has been send", true);
       GoRouter.of(context).push('/checkEmail');
+    } else {
+      showSnackBar(context, "Error", false);
     }
   }
 
@@ -145,8 +148,8 @@ class _RegisterState extends State<RegisterPage> {
                             SizedBox(
                               width: 20,
                               height: 20,
-                              child: Image.network(
-                                'https://developers.google.com/identity/images/g-logo.png',
+                              child: Image.asset(
+                                'assets/g-logo.png',
                                 fit: BoxFit.cover,
                               ),
                             ),

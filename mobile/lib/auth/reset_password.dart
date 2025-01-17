@@ -13,14 +13,12 @@ class ResetPasswordPage extends StatefulWidget {
 class _ResetPasswordState extends State<ResetPasswordPage> {
   late TextEditingController _code;
   late TextEditingController _password;
-  late bool error;
   bool loader = false;
 
   @override
   void initState() {
     _code = TextEditingController();
     _password = TextEditingController();
-    error = false;
     super.initState();
   }
 
@@ -37,11 +35,10 @@ class _ResetPasswordState extends State<ResetPasswordPage> {
   Future<void> _resetPassword() async {
     final response = await authService.resetPassword(_code.text, _password.text);
     if (response) {
+      showSnackBar(context, "Password reset", true);
       GoRouter.of(context).push('/login');
     } else {
-      setState(() {
-        error = true;
-      });
+      showSnackBar(context, "Password reset", false);
     }
   }
 
