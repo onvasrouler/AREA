@@ -93,10 +93,10 @@ jobs:
       - run: flutter --version
 
       - name: Create .env file
-        run: echo "${{ secrets.DUMMY_ENV }}" > .env
+        run: pwd ; echo "${{ secrets.DUMMY_ENV }}" > .env ; ls -la
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get ; ls -la
         working-directory: mobile
 
       - name: Run build
