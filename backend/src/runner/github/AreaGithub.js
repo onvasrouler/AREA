@@ -33,32 +33,35 @@ async function ActionGithub(AREA) {
         const TriggerEvent = actionReactions.Action.arguments.on;
         let Datas = "";
         switch (TriggerEvent) {
-        case "new_issue":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
-            break;
-        case "new_pr":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
-            break;
-        case "new_commit":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
-            break;
-        case "new_repo":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
-            break;
-        default:
-            console.error("Unknown action");
-            Datas = "unknownAction";
+            case "new_issue":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
+                break;
+            case "new_pr":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
+                break;
+            case "new_commit":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
+                break;
+            case "new_repo":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "unknownAction";
         }
         if (Datas == "unknownAction")
             return;
         if (Datas.ErrorOnGitFetch) {
-            if (actionReactions.CachedData != "error")
-                actionReactions.Treated = false;
-            else
-                actionReactions.Treated = true;
-            actionReactions.Errors = Datas.ErrorOnGitFetch;
-            actionReactions.CachedData = "error";
-            await actionReactions.save();
+            await ActionReactionModel.updateOne(
+                { "unique_id": actionReactions.unique_id },
+                {
+                    $set: {
+                        Errors: Datas.ErrorOnGitFetch,
+                        CachedData: "error",
+                        Treated: actionReactions.CachedData != "error" ? false : true
+                    }
+                }
+            );
             return;
         }
 
@@ -86,8 +89,16 @@ async function ActionGithub(AREA) {
                 }
             }
         }
-        actionReactions.CachedData = Datas;
-        await actionReactions.save();
+        await ActionReactionModel.updateOne(
+            { "unique_id": actionReactions.unique_id },
+            {
+                $set: {
+                    Errors: "null",
+                    CachedData: Datas,
+                    Treated: actionReactions.Treated
+                }
+            }
+        );
         return;
     } catch (err) {
         console.error(err);
@@ -117,28 +128,34 @@ async function ReactionGithub(AREA) {
         const TriggerEvent = actionReactions.Action.arguments.on;
 
         switch (TriggerEvent) {
-        case "issues":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
-            break;
-        case "pr":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
-            break;
-        case "commit":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
-            break;
-        case "repo":
-            Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
-            break;
-        default:
-            console.error("Unknown action");
-            Datas = "unknownAction";
+            case "issues":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=is:issue+author:@me");
+                break;
+            case "pr":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/issues?q=type:pr+author:@me");
+                break;
+            case "commit":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/search/commits?q=author:@me");
+                break;
+            case "repo":
+                Datas = await getGithubUserData(actionReactions.tokens.github, "https://api.github.com/user/repos");
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "unknownAction";
         }
         if (Datas == "unknownAction")
             return;
         if (Datas.ErrorOnGitFetch) {
-            actionReactions.Errors = Datas.ErrorOnGitFetch;
-            actionReactions.CachedData = "error";
-            await actionReactions.save();
+            await ActionReactionModel.updateOne(
+                { "unique_id": actionReactions.unique_id },
+                {
+                    $set: {
+                        Errors: Datas.ErrorOnGitFetch,
+                        CachedData: "error",
+                    }
+                }
+            );
             return;
         }
         if (TriggerEvent == "new_commit" || TriggerEvent == "new_pr" || TriggerEvent == "new_issue") {
@@ -147,9 +164,16 @@ async function ReactionGithub(AREA) {
         } else if (TriggerEvent == "new_repo") {
             Datas.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         }
-        actionReactions.CachedData = Datas;
-        actionReactions.CachedData.content = actionReactions.Reaction.arguments.content;
-        await actionReactions.save();
+        await ActionReactionModel.updateOne(
+            { "unique_id": actionReactions.unique_id },
+            {
+                $set: {
+                    Errors: Datas.ErrorOnGitFetch,
+                    CachedData: Datas,
+                    "CachedData.content": actionReactions.Reaction.arguments.content,
+                }
+            }
+        );
         return;
     } catch (err) {
         console.error(err);

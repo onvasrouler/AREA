@@ -103,8 +103,10 @@ async function ReactionDiscord(AREA) {
                     console.error("Error sending message:", error);
                 });
         }
-        actionReactions.Treated = true;
-        await actionReactions.save();
+        await ActionReactionModel.updateOne(
+            { unique_id: actionReactions.unique_id },
+            { $set: { "actionReactions.Treated": true } }
+        );
         return;
     } catch (err) {
         console.error(err);

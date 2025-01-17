@@ -71,26 +71,29 @@ async function ActionTwitch(AREA) {
         }
         const TriggerEvent = actionReactions.Action.arguments.on;
         switch (TriggerEvent) {
-        case "new_follow":
-            Datas = await getTwitchUserData(actionReactions.tokens.twitch, "https://api.twitch.tv/helix/channels/followed?user_id=" + actionReactions.tokens.twitch_user_data.id);
-            break;
-        case "following_online":
-            Datas = await getMyFollowingOnline(actionReactions.tokens.twitch, actionReactions.tokens.twitch_user_data.id);
-            break;
-        default:
-            console.error("Unknown action");
-            Datas = "UnknownAction";
+            case "new_follow":
+                Datas = await getTwitchUserData(actionReactions.tokens.twitch, "https://api.twitch.tv/helix/channels/followed?user_id=" + actionReactions.tokens.twitch_user_data.id);
+                break;
+            case "following_online":
+                Datas = await getMyFollowingOnline(actionReactions.tokens.twitch, actionReactions.tokens.twitch_user_data.id);
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "UnknownAction";
         }
         if (Datas == "UnknownAction")
             return;
-        if (Datas.ErrorOnSpotiFetch) {
-            if (actionReactions.CachedData != "error")
-                actionReactions.Treated = true;
-            else
-                actionReactions.Treated = true;
-            actionReactions.Errors = Datas.ErrorOnSpotiFetch.error ? Datas.ErrorOnSpotiFetch.error : Datas.ErrorOnSpotiFetch;
-            actionReactions.CachedData = "error";
-            await actionReactions.save();
+        if (Datas.ErrorOnTwitchFetch) {
+            await ActionReactionModel.updateOne(
+                { "unique_id": actionReactions.unique_id },
+                {
+                    $set: {
+                        Errors: Datas.ErrorOnTwitchFetch.error || Datas.ErrorOnTwitchFetch,
+                        CachedData: "error",
+                        Treated: actionReactions.CachedData != "error" ? false : true
+                    }
+                }
+            );
             return;
         }
         //avoid treating the same data twice and avoid treating data that has already been treated and avoid treating data when it decrease
@@ -114,8 +117,16 @@ async function ActionTwitch(AREA) {
                 }
             }
         }
-        actionReactions.CachedData = Datas;
-        await actionReactions.save();
+        await ActionReactionModel.updateOne(
+            { "unique_id": actionReactions.unique_id },
+            {
+                $set: {
+                    Errors: "null",
+                    CachedData: Datas,
+                    Treated: actionReactions.Treated
+                }
+            }
+        );
         return;
     } catch (err) {
         console.error("An error occured on action twitch :\n" + err + "\nWith data :\n" + Datas);
@@ -143,26 +154,29 @@ async function ReactionTwitch(AREA) {
         let Datas = "";
         const TriggerEvent = actionReactions.Reaction.arguments.content;
         switch (TriggerEvent) {
-        case "following":
-            Datas = await getTwitchUserData(actionReactions.tokens.twitch, "https://api.twitch.tv/helix/channels/followed?user_id=" + actionReactions.tokens.twitch_user_data.id);
-            break;
-        case "following_online":
-            Datas = await getMyFollowingOnline(actionReactions.tokens.twitch, actionReactions.tokens.twitch_user_data.id);
-            break;
-        default:
-            console.error("Unknown action");
-            Datas = "UnknownAction";
+            case "following":
+                Datas = await getTwitchUserData(actionReactions.tokens.twitch, "https://api.twitch.tv/helix/channels/followed?user_id=" + actionReactions.tokens.twitch_user_data.id);
+                break;
+            case "following_online":
+                Datas = await getMyFollowingOnline(actionReactions.tokens.twitch, actionReactions.tokens.twitch_user_data.id);
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "UnknownAction";
         }
         if (Datas == "UnknownAction")
             return;
         if (Datas.ErrorOnSpotiFetch) {
-            if (actionReactions.CachedData != "error")
-                actionReactions.Treated = true;
-            else
-                actionReactions.Treated = true;
-            actionReactions.Errors = Datas.ErrorOnSpotiFetch.error ? Datas.ErrorOnSpotiFetch.error : Datas.ErrorOnSpotiFetch;
-            actionReactions.CachedData = "error";
-            await actionReactions.save();
+            await ActionReactionModel.updateOne(
+                { "unique_id": actionReactions.unique_id },
+                {
+                    $set: {
+                        Errors: Datas.ErrorOnSpotiFetch.error || Datas.ErrorOnSpotiFetch,
+                        CachedData: "error",
+                        Treated: actionReactions.CachedData != "error" ? false : true
+                    }
+                }
+            );
             return;
         }
         if (TriggerEvent == "following") {
@@ -170,18 +184,34 @@ async function ReactionTwitch(AREA) {
         } else if (TriggerEvent == "following_online") {
             Datas.sort((a, b) => new Date(b.started_at) - new Date(a.started_at));
         }
-        actionReactions.CachedData = Datas;
-        actionReactions.CachedData.content = actionReactions.Reaction.arguments.content;
-        await actionReactions.save();
+        await ActionReactionModel.updateOne(
+            { "unique_id": actionReactions.unique_id },
+            {
+                $set: {
+                    Errors: "null",
+                    Treated: true,
+                    CachedData: Datas,
+                    "CachedData.content": actionReactions.Reaction.arguments.content
+                }
+            }
+        );
+
         return;
     } catch (err) {
         console.error(err);
         if (err.response?.data) {
             console.error(err.response?.data);
             try {
-                actionReactions.CachedData = err.response?.data;
-                actionReactions.CachedData.content = "error";
-                await actionReactions.save();
+                await ActionReactionModel.updateOne(
+                    { "unique_id": actionReactions.unique_id },
+                    {
+                        $set: {
+                            Errors: err.response?.data,
+                            CachedData: "error",
+                        }
+                    }
+                );
+
             } catch (err) {
                 console.error(err);
                 return;

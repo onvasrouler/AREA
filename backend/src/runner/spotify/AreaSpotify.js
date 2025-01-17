@@ -34,29 +34,32 @@ async function ActionSpotify(AREA) {
         }
         const TriggerEvent = actionReactions.Action.arguments.on;
         switch (TriggerEvent) {
-        case "currently_playing":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
-            break;
-        case "liked_track":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
-            break;
-        case "new_liked_track":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
-            break;
-        default:
-            console.error("Unknown action");
-            Datas = "UnknownAction";
+            case "currently_playing":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
+                break;
+            case "liked_track":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+                break;
+            case "new_liked_track":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "UnknownAction";
         }
         if (Datas == "UnknownAction")
             return;
         if (Datas.ErrorOnSpotiFetch) {
-            if (actionReactions.CachedData != "error")
-                actionReactions.Treated = false;
-            else
-                actionReactions.Treated = true;
-            actionReactions.Errors = Datas.ErrorOnSpotiFetch.error ? Datas.ErrorOnSpotiFetch.error : Datas.ErrorOnSpotiFetch;
-            actionReactions.CachedData = "error";
-            await actionReactions.save();
+            await ActionReactionModel.updateOne(
+                { "unique_id": actionReactions.unique_id },
+                {
+                    $set: {
+                        Errors: Datas.ErrorOnSpotiFetch.error || Datas.ErrorOnSpotiFetch,
+                        CachedData: "error",
+                        Treated: actionReactions.CachedData != "error" ? false : true
+                    }
+                }
+            );
             return;
         }
 
@@ -85,8 +88,16 @@ async function ActionSpotify(AREA) {
                 }
             }
         }
-        actionReactions.CachedData = Datas;
-        await actionReactions.save();
+        await ActionReactionModel.updateOne(
+            { "unique_id": actionReactions.unique_id },
+            {
+                $set: {
+                    Errors: "null",
+                    CachedData: Datas,
+                    Treated: actionReactions.Treated
+                }
+            }
+        );
         return;
     } catch (err) {
         console.error("An error occured :\n" + err + "\nWith data :\n" + Datas);
@@ -113,31 +124,42 @@ async function ReactionSpotify(AREA) {
 
         let Datas = "";
         switch (actionReactions.Reaction.arguments.content) {
-        case "currently_playing":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
-            break;
-        case "liked_track":
-            Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
-            break;
-        default:
-            console.error("Unknown action");
-            Datas = "UnknownAction";
+            case "currently_playing":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/player/currently-playing");
+                break;
+            case "liked_track":
+                Datas = await getSpotifyUserData(actionReactions.tokens.spotify, "https://api.spotify.com/v1/me/tracks?limit=31");
+                break;
+            default:
+                console.error("Unknown action");
+                Datas = "UnknownAction";
         }
         if (Datas == "UnknownAction")
             return;
         if (Datas.ErrorOnSpotiFetch) {
-            if (actionReactions.CachedData != "error")
-                actionReactions.Treated = false;
-            else
-                actionReactions.Treated = true;
-            actionReactions.Errors = Datas.ErrorOnSpotiFetch.error ? Datas.ErrorOnSpotiFetch.error : Datas.ErrorOnSpotiFetch;
-            actionReactions.CachedData = "error";
-            await actionReactions.save();
+            await ActionReactionModel.updateOne(
+                { "unique_id": actionReactions.unique_id },
+                {
+                    $set: {
+                        Errors: Datas.ErrorOnSpotiFetch.error || Datas.ErrorOnSpotiFetch,
+                        CachedData: "error",
+                        Treated: actionReactions.CachedData != "error" ? false : true
+                    }
+                }
+            );
             return;
         }
-        actionReactions.CachedData = Datas;
-        actionReactions.CachedData.content = actionReactions.Reaction.arguments.content;
-        await actionReactions.save();
+        await ActionReactionModel.updateOne(
+            { "unique_id": actionReactions.unique_id },
+            {
+                $set: {
+                    Errors: "null",
+                    CachedData: Datas,
+                    Treated: actionReactions.Treated,
+                    "CachedData.content": actionReactions.Reaction.arguments.content
+                }
+            }
+        );
         return;
     } catch (err) {
         console.error(err);

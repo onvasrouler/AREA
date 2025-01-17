@@ -101,8 +101,14 @@ async function ReactionGmail(AREA) {
             subject: Arguments.object,
             html: Datas
         });
-        actionReactions.Treated = true;
-        await actionReactions.save();
+        await ActionReactionModel.updateOne(
+            { "unique_id": actionReactions.unique_id },
+            {
+                $set: {
+                    Treated: true
+                }
+            }
+        );
         return;
     } catch (err) {
         console.error(err);
