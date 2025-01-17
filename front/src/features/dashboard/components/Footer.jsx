@@ -57,7 +57,7 @@ export function Footer() {
             Contact
           </motion.a>
           <motion.a
-            href="http://localhost:8081/client.apk"
+            href={import.meta.env.VITE_MOBILE_APP_URL || "#"}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-primary-foreground/80 transition-colors"
