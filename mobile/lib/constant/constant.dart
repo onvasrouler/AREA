@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-String baseurl = "http://172.16.218.188:8080";
+String baseurl = "http://10.84.106.237:8080";
 
 String session = "";
+String userName = "";
+String userMail = "";
 
 int currentActionService = 0;
 int currentReactionService = 0;
@@ -10,13 +12,14 @@ int currentAction = 0;
 int currentReaction = 0;
 int currentChannel = 0;
 int currentServer = 0;
+String areasName = "";
+late Map<String, String> info;
 
 Color containerColor = const Color.fromARGB(255, 255, 255, 255);
 Color backgroundColor = const Color.fromARGB(255, 245, 245, 245);
 Color buttonColor = const Color.fromARGB(255, 23, 37, 84);
 
 class Service {
-  final Color color;
   final String image;
   final String name;
   final String nameId;
@@ -29,7 +32,6 @@ class Service {
 
   Service(
     {
-      required this.color, 
       required this.image, 
       required this.name, 
       required this.nameId, 
@@ -45,13 +47,16 @@ class Service {
 
 var discordChannel = [];
 var discordServer = [];
+var areas = [];
+var sessions = [];
 
-const int indexDiscord = 1;
+const int indexDiscord = 0;
 const int indexGithub = 0;
+const int indexSpotify = 1;
+const int indexTwitch = 2;
 
-final List<Service> services = [
+final List<Service> actions = [
   Service(
-    color: const Color.fromARGB(255, 0, 0, 0), 
     image: 'assets/Github.png',
     name: 'GitHub',
     nameId: 'github',
@@ -79,7 +84,53 @@ final List<Service> services = [
   ),
 
   Service(
-    color: const Color.fromARGB(255, 82, 106, 241), 
+    image: 'assets/spotify.png',
+    name: 'Spotify',
+    nameId: 'spotify',
+    action: [
+      "Liked Tracks",
+      "New Liked Tracks",
+      "Currently Playing"
+    ],
+    actionName: [
+      "liked_track",
+      "new_liked_track",
+      "currently_playing"
+    ],
+    actionNotification: [
+      "this is your liked tracks list",
+      "you like a new track",
+      "you are listening"
+    ],
+    reaction: [],
+    reactionName: [],
+    connected: false
+  ),
+
+  Service(
+    image: 'assets/twitch.png',
+    name: 'Twitch',
+    nameId: 'twitch',
+    action: [
+      "New follow",
+      "Following online"
+    ],
+    actionName: [
+      "new_follow",
+      "following_online",
+    ],
+    actionNotification: [
+      "New follow",
+      "Following online"
+    ],
+    reaction: [],
+    reactionName: [],
+    connected: false
+  ),
+];
+
+final List<Service> reactions = [
+  Service(
     image: 'assets/Discord.png',
     name: 'Discord',
     nameId: 'discord',
@@ -98,28 +149,42 @@ final List<Service> services = [
   ),
 
   Service(
-    color: const Color.fromARGB(255, 29, 185, 84), 
-    image: 'assets/Spotify.png',
-    name: 'Spotify',
-    nameId: 'spotify',
+    image: 'assets/gmail-new.png',
+    name: 'Mail',
+    nameId: 'mail',
     action: [],
     actionName: [],
     actionNotification: [],
-    reaction: [],
-    reactionName: [],
-    connected: false
-  ),
-
-  Service(
-    color: const Color.fromARGB(255, 29, 185, 84), 
-    image: 'assets/twitch.png',
-    name: 'Twitch',
-    nameId: 'twitch',
-    action: [],
-    actionName: [],
-    actionNotification: [],
-    reaction: [],
-    reactionName: [],
+    reaction: [
+      "Send an Email"
+    ],
+    reactionName: [
+      ""
+    ],
     connected: false
   ),
 ];
+
+void showSnackBar(BuildContext context, String message, bool isSuccess) {
+  final snackBar = SnackBar(
+    content: Row(
+      children: [
+        Icon(
+          isSuccess ? Icons.check_circle : Icons.error,
+          color: isSuccess ? Colors.green : Colors.red,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+    ),
+    backgroundColor: buttonColor,
+    duration: const Duration(seconds: 3),
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
