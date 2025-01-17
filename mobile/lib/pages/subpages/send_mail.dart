@@ -79,7 +79,7 @@ class _SendMailState extends State<SendMailPage> {
                   ),
                   const SizedBox(height: 20),
                   TextField(
-                    controller:  _email,
+                    controller:  _name,
                     decoration: const InputDecoration(
                       labelText: 'Area\'s name',
                       border: OutlineInputBorder(),

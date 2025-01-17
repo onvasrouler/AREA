@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
+import 'package:area/provider/user.service.dart';
 
 class YourAreaPage extends StatefulWidget {
   const YourAreaPage({super.key});
@@ -12,6 +13,36 @@ class YourAreaPage extends StatefulWidget {
 class _YourAreaPageState extends State<YourAreaPage> {
   int selectedSection = -1;
 
+  final userService = UserService();
+
+  Future<void> _deleteArea(String id) async {
+    final response = await userService.deleteArea(id);
+    if (response) {
+      showSnackBar(context, "Area deleted", true);
+      setState(() {
+        areas;
+      });
+    } else {
+      showSnackBar(context, "Error", false);
+    }
+  }
+
+  Future<void> _activeArea(String id, bool active) async {
+    final response = await userService.activeArea(id);
+    if (response) {
+      if (active == true) {
+        showSnackBar(context, "Area stoped", true);
+      } else {
+        showSnackBar(context, "Area started", true);
+      }
+      setState(() {
+        areas;
+      });
+    } else {
+      showSnackBar(context, "Error", false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +51,7 @@ class _YourAreaPageState extends State<YourAreaPage> {
         children: [
           Center(
             child: ListView.builder(
-              itemCount: 6,
+              itemCount: areas.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return SizedBox(
@@ -51,13 +82,6 @@ class _YourAreaPageState extends State<YourAreaPage> {
   }
 
   Widget buildButtonWithSection(int index) {
-    final titles = [
-      "Personal information",
-      "Modify password",
-      "Manage session",
-      "Manage services auth",
-      "Delete profile"
-    ];
 
     return Column(
       children: [
@@ -76,7 +100,7 @@ class _YourAreaPageState extends State<YourAreaPage> {
             ),
             child: Center(
               child: Text(
-                titles[index - 1],
+                areas[index - 1]['name'],
                 style: const TextStyle(
                   fontSize: 20,
                   fontStyle: FontStyle.italic,
@@ -94,116 +118,102 @@ class _YourAreaPageState extends State<YourAreaPage> {
   }
 
   Widget buildSectionContent(int index) {
-    switch (index) {
-      case 1:
-        return buildPersonalInfoSection();
-      case 2:
-        return buildModifyPasswordSection();
-      case 3:
-        return buildManageSessionSection();
-      case 4:
-        return buildManageAuthSection();
-      case 5:
-        return buildDeleteProfileSection();
-      default:
-        return const SizedBox.shrink();
-    }
+    return buildAreasInfo(index);
   }
 
-  Widget buildPersonalInfoSection() {
-    return buildSectionWrapper(
-      children: [
-        const TextField(
-          decoration: InputDecoration(labelText: "Username"),
-        ),
-        const TextField(
-          decoration: InputDecoration(labelText: "Email"),
-        ),
-        GestureDetector(
-          //onTap: ,
-          child: Container(
-            width: 50,
-            height: 30,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: buttonColor,
-            ),
-            child: const Center(
-              child: Text(
-                "Valid infos",
-                style: TextStyle(
-                  color: Colors.white,
+  Widget buildAreasInfo(int index) {
+    return Container(
+      width: 300,
+      height: 220,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          width: 1,
+          color: Colors.grey,
+        )
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Text("Action : "),
+              Text(areas[index - 1]['action']['service'])
+            ],
+          ),
+          Row(
+            children: [
+              const Text("Reaction : "),
+              Text(areas[index - 1]['reaction']['service'])
+            ],
+          ),
+          Row(
+            children: [
+              const Text("Message : "),
+              Text(areas[index - 1]['reaction']['arguments']['message']),
+            ],
+          ), 
+          Row(
+            children: [
+              const Text("Status : "),
+              Text(areas[index - 1]['active'] ? "Active": "Unactive")
+            ],
+          ),          
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  _activeArea(areas[index - 1]['id'], areas[index - 1]['active']);
+                },
+                child: Container(
+                  width: 100,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: buttonColor,
+                  ),
+                  child: Center(
+                    child: Text(
+                      areas[index - 1]['active'] ? "Stop" : "Start",
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-        ),
-      ],
+              const SizedBox(width: 30),
+              GestureDetector(
+                onTap: () {
+                  _deleteArea(areas[index - 1]['id']);
+                },
+                child: Container(
+                  width: 100,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.red,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Delete Area",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 
-  Widget buildModifyPasswordSection() {
-    return buildSectionWrapper(
-      children: [
-        const TextField(
-          decoration: InputDecoration(labelText: "Current Password"),
-          obscureText: true,
-        ),
-        const TextField(
-          decoration: InputDecoration(labelText: "New Password"),
-          obscureText: true,
-        ),
-        buildActionButtons(
-          primaryButtonLabel: "Change Password",
-          primaryAction: () {
-            print("Password changed");
-          },
-          secondaryButtonLabel: "Forgot Password?",
-          secondaryAction: () {
-            print("Forgot Password clicked");
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget buildManageSessionSection() {
-    return buildSectionWrapper(
-      children: [
-        const Text("• Session 1: Logged in from Chrome on Windows"),
-        const Text("• Session 2: Logged in from Android"),
-        buildActionButtons(
-          primaryButtonLabel: "Logout All",
-          primaryAction: () {
-            print("Logged out of all sessions");
-          },
-          secondaryButtonLabel: "Refresh",
-          secondaryAction: () {
-            print("Refresh sessions");
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget buildManageAuthSection() {
-    return buildSectionWrapper(
-      children: [
-        const Text("Service: Google"),
-        const Text("Service: Spotify"),
-        buildActionButtons(
-          primaryButtonLabel: "Disconnect",
-          primaryAction: () {
-            print("Service disconnected");
-          },
-          secondaryButtonLabel: "Add Service",
-          secondaryAction: () {
-            print("Add new service clicked");
-          },
-        ),
-      ],
-    );
-  }
+ 
 
   Widget buildDeleteProfileSection() {
     return buildSectionWrapper(

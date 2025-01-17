@@ -94,6 +94,7 @@ class UserService {
 
         final data = jsonDecode(response.body);
         areas = data['data'];
+        print(areas);
 
         return true;
       } else {
@@ -114,7 +115,32 @@ class UserService {
           "Content-Type": "application/json",
           "session": session,
         },
-        body:jsonEncode({"sessionsIds": id})
+        body:jsonEncode({"id": id})
+      );
+
+      if (response.statusCode == 200) {
+        await getArea();
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
+  Future<bool> activeArea(String id) async {
+    final url = Uri.parse('$baseurl/activeAreas');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "session": session,
+        },
+        body:jsonEncode({"id": [id]})
       );
 
       if (response.statusCode == 200) {
