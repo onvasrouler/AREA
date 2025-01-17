@@ -30,43 +30,69 @@ AREA is a web application built with ReactJS. It leverages modern libraries and 
 
         VITE_DISCORD_CLIENT_ID=
         VITE_DISCORD_REDIRECT_URI=
-        VITE_BACKEND_CALLBACK_URL=
+        VITE_DISCORD_AUTH_URL=
+        VITE_BACKEND_CALLBACK_DISCORD_URL=
+        VITE_DISCORD_SERVERS_FETCH_URL=
         VITE_DISCORD_CHANNELS_FETCH_URL=
+        VITE_DISCORD_FETCH_USERID_URL=
+
+        VITE_GITHUB_CLIENT_ID=
+        VITE_GITHUB_REDIRECT_URI=
+        VITE_BACKEND_GITHUB_CALLBACK_URL=
+        VITE_GITHUB_PR_FETCH_URL=
+
+        VITE_GOOGLE_CLIENT_ID=
+
+        VITE_SPOTIFY_CLIENT_ID=
+        VITE_SPOTIFY_REDIRECT_URI=
+        VITE_BACKEND_SPOTIFY_CALLBACK_URL=
+
+        VITE_TWITCH_CLIENT_ID=
+        VITE_TWITCH_REDIRECT_URI=
+        VITE_BACKEND_TWITCH_CALLBACK_URL=
      ```
 5. Start the development server:
    ```bash
-   npm run dev
+   npm run dev 
+   ```
+   OR
+   ```bash
+   npm start
+   ```
+   OR if you want to use docker go at the root of the repository and execute the following command :
+   ```bash
+   docker compose up
    ```
 6. Open your browser and navigate to [http://localhost:8081](http://localhost:8081).
 
 ## NPM Scripts
 ```json
 "scripts": {
+  "start": "vite --port 8081",
   "dev": "vite --port 8081",
   "build": "vite build",
   "lint": "eslint .",
-  "preview": "vite preview"
+  "preview": "vite preview",
+  "test": "mocha",
+  "test-react": "mocha --require jsdom-global/register --require @babel/register --extensions js,jsx 'test/**/*.jsx'"
 }
 ```
 
 ## Project Structure
 ```
-AREA/
+AREA/front/
+├── Dockerfile
 ├── README.md
-├── eslint.config.js
-├── node_modules
-├── package.json
-├── public
-├── tailwind.config.js
-├── tsconfig.json
-├── vite.config.js
 ├── components.json
+├── eslint.config.js
 ├── index.html
-├── package-lock.json
+├── package.json
 ├── postcss.config.js
+├── public
+│   ├── area.svg
+│   └── vite.svg
 ├── src
-│   ├── App.css
-│   ├── App.jsx
+│   ├── AREA.json
 │   ├── app
 │   │   ├── APIClient.js
 │   │   ├── App.css
@@ -81,9 +107,9 @@ AREA/
 │   │       ├── Discord.png
 │   │       ├── Github.png
 │   │       ├── Gmail.png
-│   │       ├── Instagram.png
-│   │       ├── Onedrive.png
-│   │       └── Spotify.png
+│   │       ├── Spotify.png
+│   │       ├── Twitch.png
+│   │       └── Weather.png
 │   ├── common
 │   │   ├── client
 │   │   │   └── APIClient.js
@@ -91,20 +117,22 @@ AREA/
 │   │       └── auth.js
 │   ├── components
 │   │   └── ui
-│   │       ├── accordion.tsx
-│   │       ├── alert.tsx
-│   │       ├── button.tsx
-│   │       ├── card.tsx
-│   │       ├── dialog.tsx
-│   │       ├── form.tsx
-│   │       ├── input.tsx
-│   │       ├── label.tsx
-│   │       ├── toast.tsx
-│   │       └── toaster.tsx
+│   │       └── SOME REACT COMPONENTS
 │   ├── features
-│   │   ├── PAGES
-│   └── lib
-│       └── utils.ts
+│   │   └── PAGES AND CUSTOM COMPONENTS
+|   |
+│   ├── hooks
+│   │   └── use-toast.ts
+│   ├── lib
+│   │   └── utils.ts
+│   └── main.jsx
+├── tailwind.config.js
+├── test
+│   └── SOME TESTS
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.js
 ```
 
 ## Contributors

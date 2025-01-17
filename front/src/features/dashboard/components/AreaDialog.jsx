@@ -143,7 +143,6 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
           session: session,
         },
       });
-      console.log(response);
       if (!response.ok) throw new Error("Invalid response");
       const responseData = await response.json();
       if (responseData?.data) {
@@ -155,12 +154,19 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
   };
 
   const buildRequestBody = () => {
-    const actionArguments = {
-      on: selectedAction || ""
-    };
-
+    let actionArguments = {};
     let reactionArguments = {};
 
+    if (service.name === "Weather") {
+      actionArguments = {
+        runtime: selectedAction || "",
+        city: formData.city || ""
+      };
+    } else {
+      actionArguments = {
+        on: selectedAction || ""
+      };
+    }
 
     if (linkedService === "Gmail") {
       reactionArguments = {
@@ -221,6 +227,20 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
         arguments: reactionArguments,
       },
     };
+  };
+
+  const renderWeatherSpecificFields = () => {
+    if (service.name !== "Weather") return null;
+    return (
+      <div className="mt-4">
+        <label className="block mb-1">City</label>
+        <Textarea
+          placeholder="Enter the city name (lowercase only)"
+          value={formData.city || ""}
+          onChange={(e) => handleInputChange("city", e.target.value)}
+        />
+      </div>
+    );
   };
 
   const handleSubmit = async () => {
@@ -345,6 +365,8 @@ export function AreaDialog({ isOpen, onClose, service, isDiscordAuthenticated, i
             </SelectContent>
           </Select>
         </div>
+
+        {renderWeatherSpecificFields()}
 
         {Object.entries(argumentsData).map(([key, value]) => (
           <div key={key} className="mt-4">

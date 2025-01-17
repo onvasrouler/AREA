@@ -56,6 +56,16 @@ export function Footer() {
           >
             Contact
           </motion.a>
+          <motion.a
+            href="http://localhost:8081/client.apk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary-foreground/80 transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Download mobile version
+          </motion.a>
         </div>
       </div>
     </motion.footer>

@@ -1,4 +1,4 @@
-class ApiClient {
+export class ApiClient {
   constructor(baseURL) {
     this.baseURL = baseURL.endsWith("/") ? baseURL : `${baseURL}/`
     this.accessToken = null;

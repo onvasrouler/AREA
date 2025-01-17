@@ -32,18 +32,6 @@ const handleLoginFunctions = {
     window.location.href = AUTH_URL;
     console.log("Spotify login")
   },
-  handleOneDriveLogin: () => {
-    // Implement OneDrive login logic
-    console.log("OneDrive login")
-  },
-  handleGmailLogin: () => {
-    // Implement Gmail login logic
-    console.log("Gmail login")
-  },
-  handleInstagramLogin: () => {
-    // Implement Instagram login logic
-    console.log("Instagram login")
-  },
   handleTwitchLogin: () => {
     const CLIENT_ID = import.meta.env.VITE_TWITCH_CLIENT_ID;
     const REDIRECT_URI = import.meta.env.VITE_TWITCH_REDIRECT_URI;
@@ -272,10 +260,9 @@ useEffect(() => {
         isSpotifyAuthenticated={authStatus.isSpotifyAuthenticated}
         isTwitchAuthenticated={authStatus.isTwitchAuthenticated}
         isGmailAuthenticated={authStatus.isGmailAuthenticated}
+        isWeatherAuthenticated={authStatus.isWeatherAuthenticated}
         onAreaCreated={(newArea) => {
-          // Update local state
           setAreas(prevAreas => [...prevAreas, newArea]);
-          // Pass to parent
           if (onAreaCreated) {
             onAreaCreated(newArea);
           }
@@ -284,4 +271,3 @@ useEffect(() => {
     </>
   )
 }
-

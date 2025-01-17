@@ -179,7 +179,7 @@
                 },
                 {
                     "type": "liked_track",
-                    "display": "List of favorite songs",
+                    "display": "Update liked tracks playlist",
                     "validLinkedServices": ["Discord", "Gmail"],
                     "validReactions": ["message", "private_message", "email"]
                 }
@@ -206,13 +206,19 @@
                             "component": "TextArea"
                         }
                     }
+                },
+                {
+                    "type": "new_liked_track",
+                    "display": "New liked track",
+                    "arguments": {
+                        "message": {
+                            "label": "Message",
+                            "description": "You just liked the song: ",
+                            "component": "TextArea"
+                        }
+                    }
                 }
             ]
-        },
-        {
-            "name": "OneDrive",
-            "actions": [],
-            "reactions": []
         },
         {
             "name": "Gmail",
@@ -240,11 +246,6 @@
                     }
                 }
             ]
-        },
-        {
-            "name": "Instagram",
-            "actions": [],
-            "reactions": []
         },
         {
             "name": "Twitch",
@@ -286,6 +287,30 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "Weather",
+            "actions": [
+                {
+                    "type": "everyDay",
+                    "display": "Every day",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message", "email"]
+                },
+                {
+                    "type": "everyHalfDay",
+                    "display": "Every half day",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message", "email"]
+                },
+                {
+                    "type": "everyHour",
+                    "display": "Every hour",
+                    "validLinkedServices": ["Discord", "Gmail"],
+                    "validReactions": ["message", "private_message", "email"]
+                }
+            ],
+            "reactions": []
         }
     ]
 }

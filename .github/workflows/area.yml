@@ -70,8 +70,6 @@ jobs:
         run: npm run lint
         working-directory: backend
 
-      # ADD A JOB FOR THE TESTS
-
 # Mobile
   mobile:
     runs-on: ubuntu-latest
