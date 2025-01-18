@@ -1006,23 +1006,23 @@ exports.googleMobileAuth = async (req, res) => {
         return api_formatter(req, res, 400, "missing_informations", "no token was provided"); // return an error message
     const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress; // get the IP
     try {
-        const endpoint = 'https://www.googleapis.com/oauth2/v3/userinfo';
+        const endpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
 
         const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
         });
 
         if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const payload = await response.json();
 
         // Extraire les informations nécessaires
-        const { sub: googleId, email, name, picture } = payload;
+        var { sub: googleId, email, name, picture } = payload;
 
 
         // Check if the user exists in the database
