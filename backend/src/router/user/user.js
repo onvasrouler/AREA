@@ -1009,7 +1009,7 @@ exports.googleMobileAuth = async (req, res) => {
         const endpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
 
         const response = await fetch(endpoint, {
-            method: 'GET',
+            method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
             },
