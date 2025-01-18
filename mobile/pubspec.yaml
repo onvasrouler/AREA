@@ -31,8 +31,10 @@ dependencies:
   flutter:
     sdk: flutter
   go_router: ^14.6.0
-  http: ^0.13.5
+  http: ^1.2.2
   flutter_web_auth: ^0.6.0
+  google_sign_in: ^6.2.2
+  flutter_dotenv: ^5.2.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -48,7 +50,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -56,13 +58,13 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/Onedrive.png
+    - assets/g-logo.png
     - assets/Github.png
     - assets/Discord.png
-    - assets/Gmail.png
-    - assets/Instagram.png
-    - assets/Onedrive.png
-    - assets/Spotify.png
+    - assets/gmail-new.png
+    - assets/twitch.png
+    - assets/spotify.png
+    - .env
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

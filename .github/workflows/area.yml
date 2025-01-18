@@ -92,12 +92,16 @@ jobs:
 
       - run: flutter --version
 
+      - name: Create .env file
+        run: echo "${{ secrets.DUMMY_ENV }}" > .env
+        working-directory: mobile
+
       - name: Install dependencies
         run: flutter pub get
         working-directory: mobile
 
       - name: Run build
-        run: flutter build apk
+        run: flutter build apk --release
         working-directory: mobile
 
 # Docker

@@ -37,11 +37,10 @@ class _LoginState extends State<LoginPage> {
   Future<void> _login() async {
     final response = await authService.login(_username.text, _password.text);
     if (response) {
+      showSnackBar(context, "Connected", true);
       GoRouter.of(context).push('/menu');
     } else {
-      setState(() {
-        error = true;
-      });
+      showSnackBar(context, "Connection failed", false);
     }
   }
 
@@ -50,7 +49,10 @@ class _LoginState extends State<LoginPage> {
   Future<void> _loginGoogle() async {
     final response = await googleLoginService.loginWithGoogle(context);
     if (response) {
+      showSnackBar(context, "Connected", true);
       GoRouter.of(context).push('/menu');
+    } else {
+      showSnackBar(context, "Connection failed", false);
     }
   }
 
@@ -88,7 +90,7 @@ class _LoginState extends State<LoginPage> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               TextField(
                 controller: _password,
                 obscureText: true,
@@ -99,10 +101,63 @@ class _LoginState extends State<LoginPage> {
               ),
               if (error)
                 const Text(
-                  'Wrong mail or password',
+                  'Wrong username or password',
                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.red),
                 ),
               
+              const SizedBox(height: 15),
+              GestureDetector(
+                onTap: _login,
+                child: Container(
+                  width: 250,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: buttonColor,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Login",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: _loginGoogle,
+                child: Container(
+                  width: 250,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 2,
+                    )
+                  ),
+                  child: Center(
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: Image.asset(
+                            'assets/g-logo.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        const Text("Continue with Google"),
+                      ],
+                    )
+                  ),
+                ),
+              ),
               const SizedBox(height: 10),
               Align(
                 alignment: Alignment.center,
@@ -110,33 +165,26 @@ class _LoginState extends State<LoginPage> {
                   onPressed: () {
                     GoRouter.of(context).push('/register');
                   },
-                  child: const Text(
+                  child: Text(
                     'Register',
-                    style: TextStyle(color: Color.fromARGB(255, 27, 27, 28)),
+                    style: TextStyle(
+                      color: buttonColor,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _login,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
-                  foregroundColor: Colors.black,
-                  minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: Colors.black),
-                ),
-                child : const Text('Login'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton.icon(
-                onPressed: _loginGoogle,
-                icon: const Icon(Icons.g_mobiledata),
-                label: const Text('Continue with Google'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
-                  foregroundColor: Colors.black,
-                  minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: Colors.black),
+              Align(
+                alignment: Alignment.center,
+                child: TextButton(
+                  onPressed: () {
+                    GoRouter.of(context).push('/forgotPassword');
+                  },
+                  child: Text(
+                    'Forgot password !',
+                    style: TextStyle(
+                      color: buttonColor,
+                    ),
+                  ),
                 ),
               ),
             ],

@@ -48,7 +48,10 @@ class _SuccessState extends State<SuccessPage> {
                 foregroundColor: Colors.black,
                 side: const BorderSide(color: Colors.black),
                 ),
-                child: const Text('Back to menu'),
+                child: const Text(
+                  'Back to menu',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),

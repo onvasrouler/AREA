@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:area/constant/constant.dart';
-import 'package:area/provider/auth.service.dart';
 
 class ActionPage extends StatefulWidget {
   const ActionPage({super.key});
@@ -17,16 +16,6 @@ class _ActionPageState extends State<ActionPage> {
     super.initState();
   }
 
-  final authService = AuthService();
-
-  Future<void> _logout() async {
-    final response = await authService.logout();
-
-    if (response) {
-      GoRouter.of(context).push('/login');
-    }
-  }
-
   @override
     Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +24,7 @@ class _ActionPageState extends State<ActionPage> {
         children: [
           Center(
             child: ListView.builder(
-              itemCount: services[currentActionService].action.length + 1,
+              itemCount: actions[currentActionService].action.length + 1,
               itemBuilder:(context, index) {
                 if (index == 0) {
                   return SizedBox(
@@ -50,37 +39,6 @@ class _ActionPageState extends State<ActionPage> {
                               currentActionService = 0;
                               GoRouter.of(context).pop();
                             },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 200.0),
-                          child: PopupMenuButton<String>(
-                            icon: const CircleAvatar(
-                              backgroundColor: Color.fromARGB(255, 225, 220, 216),
-                              radius: 30,
-                            ),
-                            onSelected: (String value) {
-                              if (value == 'logout') {
-                                _logout();
-                              }
-                            },
-                            itemBuilder: (BuildContext context) {
-                              return [
-                                const PopupMenuItem<String>(
-                                  value: 'logout',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.logout, 
-                                        color: Colors.red
-                                      ),
-                                      Text('Logout'),
-                                    ],
-                                  ),
-                                ),
-                              ];
-                            },
-                            color: const Color.fromARGB(255, 241, 237, 233),
                           ),
                         ),
                       ],
@@ -104,10 +62,11 @@ class _ActionPageState extends State<ActionPage> {
                         ),
                         child: Center(
                           child: Text(
-                            services[currentActionService].action[index - 1],
+                            actions[currentActionService].action[index - 1],
                             style: const TextStyle(
                               fontSize: 20,
                               fontStyle: FontStyle.italic,
+                              color: Colors.white
                             ),
                           ),
                         ),

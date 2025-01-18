@@ -31,6 +31,10 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <meta-data
+            android:name="com.google.android.gms.client_id"
+            android:value="" />
         
         <activity android:name="com.linusu.flutter_web_auth.CallbackActivity" android:exported="true">
             <intent-filter>
@@ -40,6 +44,9 @@
 
                 <data android:scheme="myapp" android:host="github" />
                 <data android:scheme="myapp" android:host="discord" />
+                <data android:scheme="myapp" android:host="google" />
+                <data android:scheme="myapp" android:host="spotify" />
+                <data android:scheme="myapp" android:host="twitch" />
             </intent-filter>
         </activity>
     </application>

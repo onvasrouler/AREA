@@ -1,20 +1,18 @@
-# Use the official image as a parent image
+# Use the official Node.js image
 FROM node:latest
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the file from your host to your current location
+# Copy only package.json and install dependencies
 COPY package.json /app
+RUN npm install --legacy-peer-deps
 
-# Install the dependencies
-RUN npm i
-
-# Copy all the source code into the container's working directory
+# Copy the application source code
 COPY . .
 
-# Make port 8080 available to the world outside this container
+# Expose the application port
 EXPOSE 8080
 
-# Run the app when the container launches
+# Run the application
 CMD ["npm", "start"]

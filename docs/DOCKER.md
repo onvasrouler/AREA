@@ -45,6 +45,8 @@ services:
       context: ./mobile
     volumes:
       - shared-volume:/shared
+    env_file:
+      - ./mobile/.env.docker
 
   client_web:
     build:
@@ -95,6 +97,7 @@ volumes:
   - Context: `./mobile` directory where the mobile Dockerfile is located.
 - **Volumes**: Mounts `shared-volume` to `/shared` for output communication.
 - **Command**: Builds the Flutter application APK and copies it to the shared volume.
+- **Environment File**: Loads environment variables from `./mobile/.env.docker`.
 
 #### **Volumes**
 - `mongo-data`: Stores MongoDB data persistently.
@@ -206,12 +209,12 @@ docker-compose down
 1. **MongoDB**: Accessible at `localhost:27017`.
 2. **Backend Server**: Accessible at `http://localhost:8080`.
 3. **Frontend Client**: Accessible at `http://localhost:8081`.
-4. **Mobile APK**: The built APK will be available in the shared volume.
+4. **Mobile APK**: The built APK will be available in the shared volume or at `http://localhost:8081/client.apk`.
 
 ---
 
 ## Notes
-- Ensure environment variables for `backend` and `front` are correctly configured in `.env.docker` files.
+- Ensure environment variables for `backend`, `mobile` and `front` are correctly configured in `.env.docker` files.
 - Shared volume `shared-volume` is used for communication between `client_web` and `client_mobile`.
 - The `client_mobile` service builds a release APK that is available in the shared volume.
 
