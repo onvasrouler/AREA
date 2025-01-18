@@ -127,6 +127,30 @@ final List<Service> actions = [
     reactionName: [],
     connected: false
   ),
+
+  Service(
+    image: 'assets/Weather.png',
+    name: 'Weather',
+    nameId: 'weather',
+    action: [
+      "Every Day",
+      "Every half day",
+      "Every hour"
+    ],
+    actionName: [
+      "everyDay",
+      "everyHalfDay",
+      "everyHour"
+    ],
+    actionNotification: [
+      "everyDay",
+      "everyHalfDay",
+      "everyHour"
+    ],
+    reaction: [],
+    reactionName: [],
+    connected: true,
+  ),
 ];
 
 final List<Service> reactions = [
@@ -161,7 +185,7 @@ final List<Service> reactions = [
     reactionName: [
       ""
     ],
-    connected: false
+    connected: true,
   ),
 ];
 
