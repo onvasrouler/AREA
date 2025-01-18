@@ -881,6 +881,211 @@ exports.googleAuth = async (req, res) => {
 
 /**
  * @swagger
+ * /googleMobileAuth:
+ *   post:
+ *     summary: Authenticate a user using Google OAuth
+ *     description: Authenticate a user using a Google OAuth access token.
+ *     tags:
+ *      - user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The Google OAuth access token.
+ *                 example: ya29.a0AfH6SMC...
+ *     responses:
+ *       200:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 200 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: success
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: successfully registered 
+ *                data:
+ *                 type: object
+ *                 description: The data.
+ *                 example: null 
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: null
+ *                session:
+ *                 type: string
+ *                 description: The session token the user will use in his request to be autentificated.
+ *                 example: 123456789abcdefgh
+ *                username:
+ *                 type: string
+ *                 description: The username of the user.
+ *                 example: username123
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: missing_informations
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: no token was provided
+ *       401:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 401 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: unauthorised
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: You can't register when logged in
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to register
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
+exports.googleMobileAuth = async (req, res) => {
+    if (req.user && req.user != null) // if the user is already logged in
+        return api_formatter(req, res, 401, "unauthorised", "You can't register when logged in");
+
+    var tmpUserRegister = null;  // this will be used to store the user that was registered
+    const { token } = req.body; // get the token from the body
+    if (!token) // if the token is not provided
+        return api_formatter(req, res, 400, "missing_informations", "no token was provided"); // return an error message
+    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress; // get the IP
+    try {
+        const endpoint = 'https://www.googleapis.com/oauth2/v3/userinfo';
+
+        const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        });
+
+        if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const payload = await response.json();
+
+        // Extraire les informations nécessaires
+        const { sub: googleId, email, name, picture } = payload;
+
+
+        // Check if the user exists in the database
+        let googleUser = await UserModel.findOne({ google_id: googleId }); // find the user in the database
+
+        if (!googleUser) { // if the user is not found create a new user
+            if (await UserModel.usernameExists(name)) // check if the email already exist
+                name = name + crypto.randomBytes(2).toString("hex"); // add a random string to the username
+            googleUser = new UserModel({
+                google_id: googleId,
+                email: email,
+                username: name,
+                profilePicture: picture,
+                creationIp: ip,
+                unique_id: crypto.randomUUID(),
+                emailVerified: true,
+                accountType: "google"
+            });
+            await googleUser.save().then(async function (userRegistered) { // if the user is created successfully
+                tmpUserRegister = userRegistered;
+                await new SessionModel({ // create a new session
+                    unique_session_id: crypto.randomUUID(),
+                    signed_id: crypto.randomUUID(),
+                    user_signed_id: userRegistered.unique_id,
+                    connexionIp: userRegistered.ip,
+                    session_type: "google",
+                    user_agent: req.headers["user-agent"],
+                    expire: Date.now() + month,
+                }).save().then(async function (sessionRegistered) { // if the session is created
+                    await userRegistered.updateOne({
+                        $addToSet: {
+                            link_session_id: sessionRegistered.signed_id // add the session id to the link_session_id field
+                        }
+                    });
+                    return return_signed_cookies(req, res, sessionRegistered, userRegistered, "registration successful");
+                });
+            });
+        } else { // if the user is found
+            await new SessionModel({ // create a new session
+                unique_session_id: crypto.randomUUID(),
+                signed_id: crypto.randomUUID(),
+                user_signed_id: googleUser.unique_id,
+                connexionIp: ip,
+                session_type: "google",
+                expire: Date.now() + month,
+            }).save().then(async function (sessionRegistered) { // if the session is created
+                await googleUser.updateOne({
+                    $addToSet: {
+                        link_session_id: sessionRegistered.signed_id // add the session id to the link_session_id field
+                    }
+                });
+                return return_signed_cookies(req, res, sessionRegistered, googleUser, "registration successful"); // return the signed cookies
+            });
+        }
+    } catch (err) { // if an error occured while trying to register
+        console.error(err);
+        await delete_user_account(tmpUserRegister);
+        return api_formatter(req, res, 500, "error", "An error occured while trying to register", null, err);
+    }
+};
+
+/**
+ * @swagger
  * /logout:
  *   post:
  *     summary: Logout a user
