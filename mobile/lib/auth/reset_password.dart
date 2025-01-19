@@ -38,7 +38,7 @@ class _ResetPasswordState extends State<ResetPasswordPage> {
       showSnackBar(context, "Password reset", true);
       GoRouter.of(context).push('/login');
     } else {
-      showSnackBar(context, "Password reset", false);
+      showSnackBar(context, "Erro to reset password", false);
     }
   }
 

@@ -34,9 +34,11 @@ class _DeleteProfileState extends State<DeleteProfilePage> {
   Future<void> _confirmDelete() async {
     final response = await userService.confirmDelete(_code.text);
     if (response) {
+      showSnackBar(context, "Account deleted", true);
       session = "";
       GoRouter.of(context).push('/login');
     } else {
+      showSnackBar(context, "Error to delete account", false);
       setState(() {
         error = true;
       });
