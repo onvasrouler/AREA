@@ -11,4 +11,4 @@ COPY . .
 RUN flutter pub get
 
 # Build the APK and copy it to the shared volume
-CMD flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk /shared/client.apk
+CMD flutter build apk --debug && cp build/app/outputs/apk/debug/app-debug.apk /shared/client.apk
