@@ -12,18 +12,6 @@ const userSchema = new mongoose.Schema({
     google_id: {
         type: String,
         trim: true,
-        validate: {
-            validator: function (v) {
-                if (this.accountType === "google") {
-                    return v && v.length > 0;
-                }
-                return true;
-            },
-            message: "Google ID is required for Google accounts."
-        },
-        unique: function () {
-            return this.accountType === "google";
-        },
         default: ""
     },
     link_session_id: { // this will be used list every session that the user created
