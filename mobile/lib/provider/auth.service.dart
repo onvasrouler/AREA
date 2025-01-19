@@ -26,6 +26,8 @@ class AuthService {
         body: jsonEncode(requestBody),
       );
 
+      print(response.statusCode);
+
       if (response.statusCode == 200) {
 
         final data = jsonDecode(response.body);
@@ -59,6 +61,8 @@ class AuthService {
         },
         body: jsonEncode(requestBody),
       );
+
+      print(response.statusCode);
 
       if (response.statusCode == 200) {
         return true;
@@ -244,26 +248,22 @@ class GoogleLoginService {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-      print("oui");
-
       if (googleUser == null) {
         return false;
       }
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-      print(googleAuth);
-      print(googleAuth.idToken);
-      print(googleAuth.accessToken);
-
       token = googleAuth.accessToken;
+
+      print(token);
 
     } catch (error) {
       print(error);
       return false;
     }
 
-    final url = Uri.parse('$baseurl/auth/google');
+    final url = Uri.parse('$baseurl/mobileauth/google');
 
     final Map<String, dynamic> requestBody = {
       "token": token,
@@ -277,6 +277,8 @@ class GoogleLoginService {
         },
         body: jsonEncode(requestBody),
       );
+
+      print(response.statusCode);
 
       if (response.statusCode == 200) {
 
@@ -336,7 +338,6 @@ class DiscordAuthService {
       print(response.statusCode);
 
       if (response.statusCode == 200) {
-        print("nonnnnn");
         return true;
       } else {
         return false;
@@ -466,7 +467,7 @@ class SpotifyAuthService {
         
       print(code);
 
-      final url = Uri.parse('$baseurl/auth/callback/spotify');
+      final url = Uri.parse('$baseurl/mobileauth/callback/spotify');
 
       final response = await http.post(
         url,
@@ -538,7 +539,7 @@ class TwitchAuthService {
         return false;
       }
         
-      final url = Uri.parse('$baseurl/auth/callback/twitch');
+      final url = Uri.parse('$baseurl/mobileauth/callback/twitch');
 
       final response = await http.post(
         url,

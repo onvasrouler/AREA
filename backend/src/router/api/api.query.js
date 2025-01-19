@@ -13,6 +13,7 @@ module.exports = function (app) {
     app.get("/get_list_of_channels", checkAuthenticated, getCachedData, discordGuilds, api_interactions.getListOfChannels);
 
     app.get("/discord_manager", api_interactions.manage_discord);
+    app.get("/twitch_manager", api_interactions.manage_twitch);
 
     app.get("/get_pull_requests", checkAuthenticated, getCachedData, api_interactions.getPullRequests);
     app.get("/get_my_repos", checkAuthenticated, getCachedData, api_interactions.getMyRepos);

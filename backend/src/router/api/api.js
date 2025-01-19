@@ -629,6 +629,88 @@ exports.manage_discord = async (req, res) => {
 
 /**
  * @swagger
+ * /twitch_manager:
+ *   get:
+ *     summary: Redirect to the mobile app
+ *     description: Redirect to the mobile app with the twitch code.
+ *     tags:
+ *      - api
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: the code to redirect to the mobile app with
+ *     responses:
+ *       200:
+ *         description: Redirect to the mobile app with the twitch code
+ *         headers:
+ *           Location:
+ *             description: The location to redirect to
+ *             schema:
+ *               type: string
+ *               example: "yourapp://twitch?code=1234567890"
+ *       400:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 400 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: Missing_code
+ *                message:
+ *                 type: string
+ *                 description: The message.
+ *                 example: you didn't provide any code
+ *       500:
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: integer
+ *                  description: The status code.
+ *                  example: 500 
+ *                messageStatus:
+ *                  type: string
+ *                  description: The status message.
+ *                  example: error
+ *                message:
+ *                  type: string
+ *                  description: The message.
+ *                  example: An error occured while trying to manage twitch
+ *                data:
+ *                  type: object
+ *                  description: The data.
+ *                  example: null
+ *                error:
+ *                 type: object
+ *                 description: The error.
+ *                 example: {"..." : "..."}
+ */
+exports.manage_twitch = async (req, res) => {
+    try {
+        const code = req.query.code;
+
+        if (!code)
+            return api_formatter(req, res, 400, "Missing_code", "you didn't provide any code");
+
+        return res.redirect(`${process.env.MOBILE_APP_NAME}://twitch?code=${code}`);
+    } catch (error) {
+        return api_formatter(req, res, 500, "error", "An error occured while trying to manage twitch", null, error, null);
+    }
+};
+
+/**
+ * @swagger
  * /get_pull_requests:
  *   get:
  *     summary: get the user's github pull requests

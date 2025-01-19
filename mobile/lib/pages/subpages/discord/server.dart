@@ -40,20 +40,32 @@ class _ServerPageState extends State<ServerPage> {
                 if (index == 0) {
                   return SizedBox(
                     height: 150,
-                    child: Row(
+                    child: Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 25),
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: () {
-                              currentReaction = 0;
-                              GoRouter.of(context).pop();
-                            },
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 25),
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: () {
+                                  currentActionService = 0;
+                                  GoRouter.of(context).pop();
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          "Choose an server",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
                           ),
                         ),
                       ],
-                    ),
+                    )
                   );
                 }
                 return Column(

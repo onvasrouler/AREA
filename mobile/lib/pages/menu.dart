@@ -87,84 +87,96 @@ class _MenuPageState extends State<MenuPage> {
                 if (index == 0) {
                   return SizedBox(
                     height: 150,
-                    child: Row(
+                    child: Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 30.0),
-                          child: GestureDetector(
-                            onTap: _areas,
-                            child: Container(
-                              width:  80,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: backgroundColor,
-                                border: Border.all(
-                                  color: buttonColor,
-                                  width: 3,
-                                )
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  "Your Areas",
-                                  style: TextStyle(
-                                    color: Colors.blueGrey,
-                                    fontSize: 12,
+                            Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 30.0),
+                              child: GestureDetector(
+                                onTap: _areas,
+                                child: Container(
+                                  width:  80,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: backgroundColor,
+                                    border: Border.all(
+                                      color: buttonColor,
+                                      width: 3,
+                                    )
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      "Your Areas",
+                                      style: TextStyle(
+                                        color: Colors.blueGrey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 190.0),
-                          child: PopupMenuButton<String>(
-                            icon: const Icon(
-                              Icons.account_circle,
-                              size: 50,
+                            Padding(
+                              padding: const EdgeInsets.only(left: 190.0),
+                              child: PopupMenuButton<String>(
+                                icon: const Icon(
+                                  Icons.account_circle,
+                                  size: 50,
+                                ),
+                                onSelected: (String value) {
+                                  if (value == 'logout') {
+                                    _logout();
+                                  }
+                                  if (value == 'profile') {
+                                    _profile();
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) {
+                                  return [
+                                    const PopupMenuItem<String>(
+                                      value: 'profile',
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.account_box, 
+                                            color: Colors.grey
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text('Profile'),
+                                        ],
+                                      ),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'logout',
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.logout, 
+                                            color: Colors.red
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text('Logout'),
+                                        ],
+                                      ),
+                                    ),
+                                  ];
+                                },
+                                color: containerColor,
+                              ),
                             ),
-                            onSelected: (String value) {
-                              if (value == 'logout') {
-                                _logout();
-                              }
-                              if (value == 'profile') {
-                                _profile();
-                              }
-                            },
-                            itemBuilder: (BuildContext context) {
-                              return [
-                                const PopupMenuItem<String>(
-                                  value: 'profile',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.account_box, 
-                                        color: Colors.grey
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text('Profile'),
-                                    ],
-                                  ),
-                                ),
-                                const PopupMenuItem<String>(
-                                  value: 'logout',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.logout, 
-                                        color: Colors.red
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text('Logout'),
-                                    ],
-                                  ),
-                                ),
-                              ];
-                            },
-                            color: containerColor,
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          "Choose a service",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
                           ),
                         ),
-                      ],
+                      ]
                     ),
                   );
                 }

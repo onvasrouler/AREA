@@ -64,6 +64,7 @@ flutter:
     - assets/gmail-new.png
     - assets/twitch.png
     - assets/spotify.png
+    - assets/Weather.png
     - .env
 
   # The following line ensures that the Material Icons font is
