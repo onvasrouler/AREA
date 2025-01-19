@@ -58,7 +58,7 @@ class _ServiceReactionPageState extends State<ServiceReactionPage> {
                               child: IconButton(
                                 icon: const Icon(Icons.arrow_back),
                                 onPressed: () {
-                                  currentActionService = 0;
+                                  currentReactionService = 0;
                                   GoRouter.of(context).pop();
                                 },
                               ),
@@ -83,10 +83,11 @@ class _ServiceReactionPageState extends State<ServiceReactionPage> {
                       onTap: () 
                       {
                         if (reactions[index - 1].name == "Mail") {
+                          currentReactionService = index - 1;
                           GoRouter.of(context).push('/sendMail');
                         }
                         if (reactions[index - 1].connected) {
-                          currentActionService = index - 1;
+                          currentReactionService = index - 1;
                           GoRouter.of(context).push('/reaction');
                         } else {
                           _connect(reactions[index - 1].name, index);
